@@ -13,7 +13,6 @@
 		4B91FB2A288057E700792B24 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB28288057E700792B24 /* Localizable.strings */; };
 		4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB2B28805A0800792B24 /* Loop-Follower-InfoPlist.strings */; };
 		4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */; };
-		4BEB46912885D72D000773C1 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 4BEB46902885D72D000773C1 /* README.md */; };
 		4BEDD0542884D70200224401 /* GraphGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEDD0532884D70200224401 /* GraphGridView.swift */; };
 		4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DD3287EF911003B9060 /* Loop_FollowerApp.swift */; };
 		4BF86DD6287EF911003B9060 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DD5287EF911003B9060 /* ContentView.swift */; };
@@ -314,7 +313,6 @@
 				4B91FB2A288057E700792B24 /* Localizable.strings in Resources */,
 				4BF86E0C287F1E56003B9060 /* sgvData.json in Resources */,
 				4BF86E16287F4EDF003B9060 /* deviceData.json in Resources */,
-				4BEB46912885D72D000773C1 /* README.md in Resources */,
 				4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */,
 				4BF86DDB287EF913003B9060 /* Preview Assets.xcassets in Resources */,
 				4BF86DD8287EF913003B9060 /* Assets.xcassets in Resources */,
