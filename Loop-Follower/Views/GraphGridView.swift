@@ -9,13 +9,13 @@ import SwiftUI
 
 struct GraphGridView: View {
     
-    let upperThreshold : CGFloat
-    let lowerThreshold : CGFloat
-    let criticalThreshold : CGFloat
+    let upperThreshold : Double
+    let lowerThreshold : Double
+    let criticalThreshold : Double
+
     let now : Date
     let startDate : Date
-
-    let maxWidth : CGFloat
+    let maxWidth : TimeInterval
     
     var body: some View {
         GeometryReader { geo in
@@ -65,7 +65,7 @@ struct GraphGridView: View {
 
             // next hours
             Path { path in
-                for h in 1 ... 1 {
+                for h in 1 ... 2 {
                     let date = Calendar.current.date(byAdding: .hour, value: h, to: now)!
                     
                     path.move(to: CGPoint(x: (date - startDate) / maxWidth * width, y: 0))

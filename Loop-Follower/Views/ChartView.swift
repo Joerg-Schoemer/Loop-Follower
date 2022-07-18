@@ -11,28 +11,26 @@ import SwiftUI
 struct ChartView: View {
     
     @EnvironmentObject var modelData : ModelData
-    
+
+    let lower = Double(70)
+    let upper = Double(180)
+    let critical = Double(250)
+
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                let area = CGRect(origin: CGPoint(x:0, y:0), size: geo.size)
                 let now = Date()
                 let startDate = Calendar.current.date(byAdding: .hour, value: -4, to: now)!
-                let endDate = Calendar.current.date(byAdding: .hour, value: 2, to: now)!
+                let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: now)!
                 let maxWidth : TimeInterval = endDate - startDate
 
-                let width = geo.size.width
                 let height = geo.size.height
 
-                let lower = Double(70)
-                let upper = Double(180)
-                let critical = Double(250)
-                
                 let maxSgv = calcMaxSgv(modelData)
-                
-                let criticalThreshold: Double = height - (critical / maxSgv) * height
-                let upperThreshold: Double = height - (upper / maxSgv) * height
-                let lowerThreshold: Double = height - (lower / maxSgv) * height
+
+                let lowerThreshold: Double = (1 - (lower / maxSgv)) * height
+                let upperThreshold: Double = (1 - (upper / maxSgv)) * height
+                let criticalThreshold: Double = (1 - (critical / maxSgv)) * height
 
                 GraphGridView(
                     upperThreshold: upperThreshold,
@@ -40,76 +38,29 @@ struct ChartView: View {
                     criticalThreshold: criticalThreshold,
                     now: now,
                     startDate: startDate,
-                    maxWidth: maxWidth)
+                    maxWidth: maxWidth
+                )
                 
                 if let currentLoop = modelData.currentLoopData {
-                    if let predicted = currentLoop.loop.predicted {
-                        if !predicted.values.isEmpty {
-                            
-                            let maxSgv = calcMaxSgv(modelData)
-                            
-                            var date = predicted.date
-                            let sgvs : [CGPoint] = predicted.values.map {
-                                let p = CGPoint(
-                                    x: (date - startDate) / maxWidth * width,
-                                    y: height - (Double($0) / maxSgv) * height
-                                )
-                                date = Calendar.current.date(byAdding: .minute, value: 5, to: date)!
-                                return p
-                            }
-                            ForEach(sgvs, id: \.self) { sgv in
-                                Path { path in
-                                    if area.contains(sgv) {
-                                        path.addEllipse(in: CGRect(x: sgv.x, y: sgv.y, width: 6, height: 6))
-                                    }
-                                }.fill(.purple)
-                            }
-                        }
-                    }
-                }
-                
-                if !modelData.insulin.isEmpty {
-                    let insulins = modelData.insulin.map {
-                        return CGRect(
-                            x: ($0.date - startDate) / maxWidth * width,
-                            y: height - ((maxSgv - 5) / maxSgv) * height,
-                            width: CGFloat(3),
-                            height: CGFloat(200 * $0.insulin)
-                        )
-                    }
-
-                    ForEach(insulins, id: \.self) { insulin in
-                        Path { path in
-                            if area.contains(insulin.origin) {
-                                path.addRect(insulin)
-                            }
-                        }.fill(.blue)
-                    }
+                    PredictionView(
+                        currentLoop: currentLoop,
+                        startDate: startDate,
+                        maxWidth: maxWidth,
+                        maxSgv: maxSgv
+                    )
                 }
 
-                if !modelData.entries.isEmpty {
-                    
-                    let sgvs : [CGPoint] = modelData.entries.map {
-                        return CGPoint(
-                            x: ($0.date - startDate) / maxWidth * width,
-                            y: height - (Double($0.sgv) / maxSgv) * height
-                        )
-                    }
-                    
-                    ForEach(sgvs, id: \.self) { sgv in
-                        Path { path in
-                            if area.contains(sgv) {
-                                path.addEllipse(in: CGRect(x: sgv.x, y: sgv.y, width: 6, height: 6))
-                            }
-                        }.fill(
-                            estimateColorBySgv(
-                                sgv: sgv.y,
-                                lower: lowerThreshold,
-                                upper: upperThreshold,
-                                critical: criticalThreshold
-                            ))
-                    }
-                }
+                InsulinView(insulins: modelData.insulin, startDate: startDate, maxWidth: maxWidth)
+
+                GlucoseView(
+                    entries: modelData.entries,
+                    startDate: startDate,
+                    maxWidth: maxWidth,
+                    maxSgv: maxSgv,
+                    lowerThreshold: lowerThreshold,
+                    upperThreshold: upperThreshold,
+                    criticalThreshold: criticalThreshold
+                )
             }
         }
     }
@@ -125,18 +76,6 @@ func calcMaxSgv(_ data: ModelData) -> Double {
     }
     
     return max(maxSgv, 260)
-}
-
-func estimateColorBySgv(sgv : Double, lower: Double, upper : Double, critical : Double) -> Color {
-    if sgv >= lower || sgv <= critical {
-        return .red
-    }
-    
-    if sgv < upper {
-        return .yellow
-    }
-    
-    return .green
 }
 
 extension CGPoint: Hashable {
