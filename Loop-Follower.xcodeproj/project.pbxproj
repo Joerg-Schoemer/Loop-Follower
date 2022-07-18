@@ -1,0 +1,701 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4B2124A2288593BA00453B69 /* NightScoutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */; };
+		4B2124A42885959400453B69 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2124A32885959400453B69 /* SettingsStore.swift */; };
+		4B431A43288081CB00FC6185 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B431A42288081CB00FC6185 /* ChartView.swift */; };
+		4B91FB2A288057E700792B24 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB28288057E700792B24 /* Localizable.strings */; };
+		4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB2B28805A0800792B24 /* Loop-Follower-InfoPlist.strings */; };
+		4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */; };
+		4BEDD0542884D70200224401 /* GraphGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEDD0532884D70200224401 /* GraphGridView.swift */; };
+		4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DD3287EF911003B9060 /* Loop_FollowerApp.swift */; };
+		4BF86DD6287EF911003B9060 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DD5287EF911003B9060 /* ContentView.swift */; };
+		4BF86DD8287EF913003B9060 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86DD7287EF913003B9060 /* Assets.xcassets */; };
+		4BF86DDB287EF913003B9060 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86DDA287EF913003B9060 /* Preview Assets.xcassets */; };
+		4BF86DE5287EF913003B9060 /* Loop_FollowerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DE4287EF913003B9060 /* Loop_FollowerTests.swift */; };
+		4BF86DEF287EF913003B9060 /* Loop_FollowerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DEE287EF913003B9060 /* Loop_FollowerUITests.swift */; };
+		4BF86DF1287EF913003B9060 /* Loop_FollowerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DF0287EF913003B9060 /* Loop_FollowerUITestsLaunchTests.swift */; };
+		4BF86DFE287EF97D003B9060 /* MonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DFD287EF97D003B9060 /* MonitorView.swift */; };
+		4BF86E00287EFA6F003B9060 /* LoopParameterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DFF287EFA6F003B9060 /* LoopParameterView.swift */; };
+		4BF86E02287EFABB003B9060 /* CurrentValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E01287EFABB003B9060 /* CurrentValueView.swift */; };
+		4BF86E07287F15D3003B9060 /* ModelData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E06287F15D3003B9060 /* ModelData.swift */; };
+		4BF86E0B287F1653003B9060 /* Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E0A287F1653003B9060 /* Entries.swift */; };
+		4BF86E0C287F1E56003B9060 /* sgvData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E05287F15A0003B9060 /* sgvData.json */; };
+		4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E13287F4E51003B9060 /* LoopData.swift */; };
+		4BF86E16287F4EDF003B9060 /* deviceData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E15287F4EDF003B9060 /* deviceData.json */; };
+		4BF86E19287F5414003B9060 /* LoopParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E18287F5414003B9060 /* LoopParameterValue.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4BF86DE1287EF913003B9060 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4BF86DC8287EF911003B9060 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4BF86DCF287EF911003B9060;
+			remoteInfo = "Loop-Follower";
+		};
+		4BF86DEB287EF913003B9060 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4BF86DC8287EF911003B9060 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4BF86DCF287EF911003B9060;
+			remoteInfo = "Loop-Follower";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutSettingsView.swift; sourceTree = "<group>"; };
+		4B2124A32885959400453B69 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
+		4B431A42288081CB00FC6185 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
+		4B91FB29288057E700792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4B91FB2C28805A0800792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = "de.lproj/Loop-Follower-InfoPlist.strings"; sourceTree = "<group>"; };
+		4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterBatteryView.swift; sourceTree = "<group>"; };
+		4BEDD0532884D70200224401 /* GraphGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphGridView.swift; sourceTree = "<group>"; };
+		4BF86DD0287EF911003B9060 /* Loop-Follower.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Loop-Follower.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BF86DD3287EF911003B9060 /* Loop_FollowerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loop_FollowerApp.swift; sourceTree = "<group>"; };
+		4BF86DD5287EF911003B9060 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		4BF86DD7287EF913003B9060 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4BF86DDA287EF913003B9060 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		4BF86DE0287EF913003B9060 /* Loop-FollowerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Loop-FollowerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BF86DE4287EF913003B9060 /* Loop_FollowerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loop_FollowerTests.swift; sourceTree = "<group>"; };
+		4BF86DEA287EF913003B9060 /* Loop-FollowerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Loop-FollowerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4BF86DEE287EF913003B9060 /* Loop_FollowerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loop_FollowerUITests.swift; sourceTree = "<group>"; };
+		4BF86DF0287EF913003B9060 /* Loop_FollowerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loop_FollowerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		4BF86DFD287EF97D003B9060 /* MonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorView.swift; sourceTree = "<group>"; };
+		4BF86DFF287EFA6F003B9060 /* LoopParameterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterView.swift; sourceTree = "<group>"; };
+		4BF86E01287EFABB003B9060 /* CurrentValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentValueView.swift; sourceTree = "<group>"; };
+		4BF86E05287F15A0003B9060 /* sgvData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = sgvData.json; sourceTree = "<group>"; };
+		4BF86E06287F15D3003B9060 /* ModelData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelData.swift; sourceTree = "<group>"; };
+		4BF86E0A287F1653003B9060 /* Entries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entries.swift; sourceTree = "<group>"; };
+		4BF86E13287F4E51003B9060 /* LoopData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopData.swift; sourceTree = "<group>"; };
+		4BF86E15287F4EDF003B9060 /* deviceData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = deviceData.json; sourceTree = "<group>"; };
+		4BF86E18287F5414003B9060 /* LoopParameterValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterValue.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4BF86DCD287EF911003B9060 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BF86DDD287EF913003B9060 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BF86DE7287EF913003B9060 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4BF86DC7287EF911003B9060 = {
+			isa = PBXGroup;
+			children = (
+				4B91FB2B28805A0800792B24 /* Loop-Follower-InfoPlist.strings */,
+				4BF86DD2287EF911003B9060 /* Loop-Follower */,
+				4BF86DE3287EF913003B9060 /* Loop-FollowerTests */,
+				4BF86DED287EF913003B9060 /* Loop-FollowerUITests */,
+				4BF86DD1287EF911003B9060 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4BF86DD1287EF911003B9060 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4BF86DD0287EF911003B9060 /* Loop-Follower.app */,
+				4BF86DE0287EF913003B9060 /* Loop-FollowerTests.xctest */,
+				4BF86DEA287EF913003B9060 /* Loop-FollowerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		4BF86DD2287EF911003B9060 /* Loop-Follower */ = {
+			isa = PBXGroup;
+			children = (
+				4B91FB28288057E700792B24 /* Localizable.strings */,
+				4BF86E09287F15EC003B9060 /* Model */,
+				4BF86E08287F15DF003B9060 /* Resources */,
+				4BF86DD3287EF911003B9060 /* Loop_FollowerApp.swift */,
+				4BF86DD5287EF911003B9060 /* ContentView.swift */,
+				4BF86DD7287EF913003B9060 /* Assets.xcassets */,
+				4BF86DD9287EF913003B9060 /* Preview Content */,
+				4BF86E17287F53EE003B9060 /* Views */,
+			);
+			path = "Loop-Follower";
+			sourceTree = "<group>";
+		};
+		4BF86DD9287EF913003B9060 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				4BF86DDA287EF913003B9060 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		4BF86DE3287EF913003B9060 /* Loop-FollowerTests */ = {
+			isa = PBXGroup;
+			children = (
+				4BF86DE4287EF913003B9060 /* Loop_FollowerTests.swift */,
+			);
+			path = "Loop-FollowerTests";
+			sourceTree = "<group>";
+		};
+		4BF86DED287EF913003B9060 /* Loop-FollowerUITests */ = {
+			isa = PBXGroup;
+			children = (
+				4BF86DEE287EF913003B9060 /* Loop_FollowerUITests.swift */,
+				4BF86DF0287EF913003B9060 /* Loop_FollowerUITestsLaunchTests.swift */,
+			);
+			path = "Loop-FollowerUITests";
+			sourceTree = "<group>";
+		};
+		4BF86E08287F15DF003B9060 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				4BF86E05287F15A0003B9060 /* sgvData.json */,
+				4BF86E15287F4EDF003B9060 /* deviceData.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		4BF86E09287F15EC003B9060 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4BF86E06287F15D3003B9060 /* ModelData.swift */,
+				4BF86E0A287F1653003B9060 /* Entries.swift */,
+				4BF86E13287F4E51003B9060 /* LoopData.swift */,
+				4B2124A32885959400453B69 /* SettingsStore.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4BF86E17287F53EE003B9060 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4BF86DFD287EF97D003B9060 /* MonitorView.swift */,
+				4BF86E01287EFABB003B9060 /* CurrentValueView.swift */,
+				4BF86DFF287EFA6F003B9060 /* LoopParameterView.swift */,
+				4BF86E18287F5414003B9060 /* LoopParameterValue.swift */,
+				4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */,
+				4B431A42288081CB00FC6185 /* ChartView.swift */,
+				4BEDD0532884D70200224401 /* GraphGridView.swift */,
+				4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4BF86DCF287EF911003B9060 /* Loop-Follower */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BF86DF4287EF913003B9060 /* Build configuration list for PBXNativeTarget "Loop-Follower" */;
+			buildPhases = (
+				4BF86DCC287EF911003B9060 /* Sources */,
+				4BF86DCD287EF911003B9060 /* Frameworks */,
+				4BF86DCE287EF911003B9060 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Loop-Follower";
+			packageProductDependencies = (
+			);
+			productName = "Loop-Follower";
+			productReference = 4BF86DD0287EF911003B9060 /* Loop-Follower.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4BF86DDF287EF913003B9060 /* Loop-FollowerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BF86DF7287EF913003B9060 /* Build configuration list for PBXNativeTarget "Loop-FollowerTests" */;
+			buildPhases = (
+				4BF86DDC287EF913003B9060 /* Sources */,
+				4BF86DDD287EF913003B9060 /* Frameworks */,
+				4BF86DDE287EF913003B9060 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4BF86DE2287EF913003B9060 /* PBXTargetDependency */,
+			);
+			name = "Loop-FollowerTests";
+			productName = "Loop-FollowerTests";
+			productReference = 4BF86DE0287EF913003B9060 /* Loop-FollowerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4BF86DE9287EF913003B9060 /* Loop-FollowerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4BF86DFA287EF913003B9060 /* Build configuration list for PBXNativeTarget "Loop-FollowerUITests" */;
+			buildPhases = (
+				4BF86DE6287EF913003B9060 /* Sources */,
+				4BF86DE7287EF913003B9060 /* Frameworks */,
+				4BF86DE8287EF913003B9060 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4BF86DEC287EF913003B9060 /* PBXTargetDependency */,
+			);
+			name = "Loop-FollowerUITests";
+			productName = "Loop-FollowerUITests";
+			productReference = 4BF86DEA287EF913003B9060 /* Loop-FollowerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4BF86DC8287EF911003B9060 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1330;
+				LastUpgradeCheck = 1330;
+				TargetAttributes = {
+					4BF86DCF287EF911003B9060 = {
+						CreatedOnToolsVersion = 13.3.1;
+					};
+					4BF86DDF287EF913003B9060 = {
+						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = 4BF86DCF287EF911003B9060;
+					};
+					4BF86DE9287EF913003B9060 = {
+						CreatedOnToolsVersion = 13.3.1;
+						TestTargetID = 4BF86DCF287EF911003B9060;
+					};
+				};
+			};
+			buildConfigurationList = 4BF86DCB287EF911003B9060 /* Build configuration list for PBXProject "Loop-Follower" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				de,
+			);
+			mainGroup = 4BF86DC7287EF911003B9060;
+			packageReferences = (
+			);
+			productRefGroup = 4BF86DD1287EF911003B9060 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4BF86DCF287EF911003B9060 /* Loop-Follower */,
+				4BF86DDF287EF913003B9060 /* Loop-FollowerTests */,
+				4BF86DE9287EF913003B9060 /* Loop-FollowerUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4BF86DCE287EF911003B9060 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4B91FB2A288057E700792B24 /* Localizable.strings in Resources */,
+				4BF86E0C287F1E56003B9060 /* sgvData.json in Resources */,
+				4BF86E16287F4EDF003B9060 /* deviceData.json in Resources */,
+				4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */,
+				4BF86DDB287EF913003B9060 /* Preview Assets.xcassets in Resources */,
+				4BF86DD8287EF913003B9060 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BF86DDE287EF913003B9060 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BF86DE8287EF913003B9060 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4BF86DCC287EF911003B9060 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BF86E02287EFABB003B9060 /* CurrentValueView.swift in Sources */,
+				4BF86E00287EFA6F003B9060 /* LoopParameterView.swift in Sources */,
+				4B2124A2288593BA00453B69 /* NightScoutSettingsView.swift in Sources */,
+				4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */,
+				4BF86E19287F5414003B9060 /* LoopParameterValue.swift in Sources */,
+				4B431A43288081CB00FC6185 /* ChartView.swift in Sources */,
+				4BEDD0542884D70200224401 /* GraphGridView.swift in Sources */,
+				4BF86DD6287EF911003B9060 /* ContentView.swift in Sources */,
+				4BF86E07287F15D3003B9060 /* ModelData.swift in Sources */,
+				4BF86E0B287F1653003B9060 /* Entries.swift in Sources */,
+				4B2124A42885959400453B69 /* SettingsStore.swift in Sources */,
+				4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */,
+				4BF86DFE287EF97D003B9060 /* MonitorView.swift in Sources */,
+				4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BF86DDC287EF913003B9060 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BF86DE5287EF913003B9060 /* Loop_FollowerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4BF86DE6287EF913003B9060 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4BF86DF1287EF913003B9060 /* Loop_FollowerUITestsLaunchTests.swift in Sources */,
+				4BF86DEF287EF913003B9060 /* Loop_FollowerUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4BF86DE2287EF913003B9060 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4BF86DCF287EF911003B9060 /* Loop-Follower */;
+			targetProxy = 4BF86DE1287EF913003B9060 /* PBXContainerItemProxy */;
+		};
+		4BF86DEC287EF913003B9060 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4BF86DCF287EF911003B9060 /* Loop-Follower */;
+			targetProxy = 4BF86DEB287EF913003B9060 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		4B91FB28288057E700792B24 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4B91FB29288057E700792B24 /* de */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		4B91FB2B28805A0800792B24 /* Loop-Follower-InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4B91FB2C28805A0800792B24 /* de */,
+			);
+			name = "Loop-Follower-InfoPlist.strings";
+			path = "Loop-Follower";
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		4BF86DF2287EF913003B9060 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4BF86DF3287EF913003B9060 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4BF86DF5287EF913003B9060 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Loop-Follower/Preview Content\"";
+				DEVELOPMENT_TEAM = 94QQZX9U85;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-Follower";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4BF86DF6287EF913003B9060 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Loop-Follower/Preview Content\"";
+				DEVELOPMENT_TEAM = 94QQZX9U85;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-Follower";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4BF86DF8287EF913003B9060 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 94QQZX9U85;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-FollowerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Loop-Follower.app/Loop-Follower";
+			};
+			name = Debug;
+		};
+		4BF86DF9287EF913003B9060 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 94QQZX9U85;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-FollowerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Loop-Follower.app/Loop-Follower";
+			};
+			name = Release;
+		};
+		4BF86DFB287EF913003B9060 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 94QQZX9U85;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-FollowerUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Loop-Follower";
+			};
+			name = Debug;
+		};
+		4BF86DFC287EF913003B9060 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 94QQZX9U85;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-FollowerUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Loop-Follower";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4BF86DCB287EF911003B9060 /* Build configuration list for PBXProject "Loop-Follower" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BF86DF2287EF913003B9060 /* Debug */,
+				4BF86DF3287EF913003B9060 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4BF86DF4287EF913003B9060 /* Build configuration list for PBXNativeTarget "Loop-Follower" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BF86DF5287EF913003B9060 /* Debug */,
+				4BF86DF6287EF913003B9060 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4BF86DF7287EF913003B9060 /* Build configuration list for PBXNativeTarget "Loop-FollowerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BF86DF8287EF913003B9060 /* Debug */,
+				4BF86DF9287EF913003B9060 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4BF86DFA287EF913003B9060 /* Build configuration list for PBXNativeTarget "Loop-FollowerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4BF86DFB287EF913003B9060 /* Debug */,
+				4BF86DFC287EF913003B9060 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4BF86DC8287EF911003B9060 /* Project object */;
+}
