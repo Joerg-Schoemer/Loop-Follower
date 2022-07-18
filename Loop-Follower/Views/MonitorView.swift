@@ -20,6 +20,7 @@ struct MonitorView: View {
         Group {
             if orientation.isLandscape {
                 ChartView()
+                    .padding([.top], 10)
             } else {
                 ScrollView {
                     if let lastEntry = modelData.lastEntry {
