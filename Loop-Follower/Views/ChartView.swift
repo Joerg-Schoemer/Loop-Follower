@@ -15,12 +15,15 @@ struct ChartView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack {
+                let area = CGRect(origin: CGPoint(x:0, y:0), size: geo.size)
                 let now = Date()
                 let startDate = Calendar.current.date(byAdding: .hour, value: -4, to: now)!
                 let endDate = Calendar.current.date(byAdding: .hour, value: 2, to: now)!
                 let maxWidth : TimeInterval = endDate - startDate
+
                 let width = geo.size.width
                 let height = geo.size.height
+
                 let lower = Double(70)
                 let upper = Double(180)
                 let critical = Double(250)
@@ -56,12 +59,31 @@ struct ChartView: View {
                             }
                             ForEach(sgvs, id: \.self) { sgv in
                                 Path { path in
-                                    if 0 < sgv.x && sgv.x < width {
+                                    if area.contains(sgv) {
                                         path.addEllipse(in: CGRect(x: sgv.x, y: sgv.y, width: 6, height: 6))
                                     }
                                 }.fill(.purple)
                             }
                         }
+                    }
+                }
+                
+                if !modelData.insulin.isEmpty {
+                    let insulins = modelData.insulin.map {
+                        return CGRect(
+                            x: ($0.date - startDate) / maxWidth * width,
+                            y: height - ((maxSgv - 5) / maxSgv) * height,
+                            width: CGFloat(3),
+                            height: CGFloat(200 * $0.insulin)
+                        )
+                    }
+
+                    ForEach(insulins, id: \.self) { insulin in
+                        Path { path in
+                            if area.contains(insulin.origin) {
+                                path.addRect(insulin)
+                            }
+                        }.fill(.blue)
                     }
                 }
 
@@ -76,7 +98,7 @@ struct ChartView: View {
                     
                     ForEach(sgvs, id: \.self) { sgv in
                         Path { path in
-                            if 0 < sgv.x && sgv.x < width {
+                            if area.contains(sgv) {
                                 path.addEllipse(in: CGRect(x: sgv.x, y: sgv.y, width: 6, height: 6))
                             }
                         }.fill(
@@ -121,6 +143,15 @@ extension CGPoint: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(x)
         hasher.combine(y)
+    }
+}
+
+extension CGRect: Hashable {
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(origin.x)
+        hasher.combine(origin.y)
+        hasher.combine(size.width)
+        hasher.combine(size.height)
     }
 }
 

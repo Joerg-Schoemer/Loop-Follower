@@ -12,11 +12,13 @@ class ModelData : ObservableObject {
 
     @Published var entries : [Entry] = []
     
+    @Published var lastEntry : Entry?
+    
     @Published var loopData : [LoopData] = []
     
     @Published var currentLoopData : LoopData?
     
-    @Published var lastEntry : Entry?
+    @Published var insulin : [Treatment] = []
     
     func loadSvg(completionHandler: @escaping ([Entry]) -> ()) {
         let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
@@ -27,30 +29,74 @@ class ModelData : ObservableObject {
             return
         }
 
-        let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&count=60")!
-        
-        URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-            if let error = error {
-                print("Error with fetching sgv: \(error)")
-                return
-            }
-
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
-                print("Error with the response, unexpected status code: \(String(describing: response))")
-                return
-            }
-
-            if let data = data {
-                let entries = try! JSONDecoder().decode([Entry].self, from: data)
-                DispatchQueue.main.async {
-                    completionHandler(entries)
+        if let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&count=60") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+                if let error = error {
+                    print("Error with fetching sgv: \(error)")
+                    return
                 }
-            } else {
-                print("no data")
-                return
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error with the response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+                
+                if let data = data {
+                    let entries = try! JSONDecoder().decode([Entry].self, from: data)
+                    DispatchQueue.main.async {
+                        completionHandler(entries)
+                    }
+                } else {
+                    print("no data")
+                    return
+                }
             }
-        }).resume()
+            ).resume()
+        } else {
+            completionHandler([])
+        }
+    }
+    
+    func loadInsulin(completionHandler: @escaping ([Treatment]) -> ()) {
+        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
+        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+
+        if baseUrl.isEmpty || token.isEmpty {
+            completionHandler([])
+            return
+        }
+        
+        let format = ISO8601DateFormatter()
+        format.formatOptions = [.withFullDate]
+        
+        let today = format.string(from: Date())
+
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction%20Bolus&find[timestamp][$gte]=\(today)") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+
+                if let error = error {
+                    print("Error fetching treatments: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+
+                if let data = data {
+                    let treatmentData = try! JSONDecoder().decode([Treatment].self, from: data)
+                    DispatchQueue.main.async {
+                        completionHandler(treatmentData)
+                    }
+                } else {
+                    print("no data")
+                    return
+                }
+            }).resume()
+        }
     }
     
     func loadDevice(completionHandler: @escaping ([LoopData]) -> ()) {
@@ -62,31 +108,31 @@ class ModelData : ObservableObject {
             return
         }
 
-        let url = URL(string: "\(baseUrl)/api/v1/devicestatus.json?token=\(token)&count=1")!
-        
-        URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+        if let url = URL(string: "\(baseUrl)/api/v1/devicestatus.json?token=\(token)&count=1") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
-            if let error = error {
-                print("Error with fetching devicestatus: \(error)")
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
-                print("Error with the response, unexpected status code: \(String(describing: response))")
-                return
-            }
-
-            if let data = data {
-                let loopData = try! JSONDecoder().decode([LoopData].self, from: data)
-                DispatchQueue.main.async {
-                    completionHandler(loopData)
+                if let error = error {
+                    print("Error with fetching devicestatus: \(error)")
+                    return
                 }
-            } else {
-                print("no data")
-                return
-            }
-        }).resume()
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error with the response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+
+                if let data = data {
+                    let loopData = try! JSONDecoder().decode([LoopData].self, from: data)
+                    DispatchQueue.main.async {
+                        completionHandler(loopData)
+                    }
+                } else {
+                    print("no data")
+                    return
+                }
+            }).resume()
+        }
     }
 
     init() {
@@ -103,16 +149,18 @@ class ModelData : ObservableObject {
     }
 
     @objc func load() {
-        loadSvg { (entries) in
+        loadSvg { entries in
             self.entries = entries
             self.lastEntry = entries.first
         }
-        loadDevice{ (loopData) in
+        loadDevice { loopData in
             self.loopData = loopData
             self.currentLoopData = loopData.first
         }
+        loadInsulin { treatments in
+            self.insulin = treatments
+        }
     }
-    
 }
 
 func initLoad<T: Decodable>(_ filename: String) -> T {

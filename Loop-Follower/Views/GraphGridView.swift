@@ -40,13 +40,13 @@ struct GraphGridView: View {
             Path { path in
                 path.move(to: CGPoint(x: 0, y: upperThreshold))
                 path.addLine(to: CGPoint(x: width, y: upperThreshold))
-            }.stroke(.yellow, lineWidth: 3)
+            }.stroke(.yellow, lineWidth: 1)
             
             // lower threshold
             Path { path in
                 path.move(to: CGPoint(x: 0, y: lowerThreshold))
                 path.addLine(to: CGPoint(x: width, y: lowerThreshold))
-            }.stroke(.red, lineWidth: 3)
+            }.stroke(.red, lineWidth: 1)
             
             // current time
             Path { path in
@@ -80,7 +80,7 @@ struct GraphGridView: View {
 
 struct GraphGridView_Previews: PreviewProvider {
     static var previews: some View {
-        GraphGridView(upperThreshold: 180, lowerThreshold: 70, criticalThreshold: 250, now: Date(), startDate: Date() + -100, maxWidth: 120)
+        GraphGridView(upperThreshold: 400 - 180, lowerThreshold: 400 - 70, criticalThreshold: 400 - 250, now: Date(), startDate: Date() - 14400, maxWidth: 21600)
             .previewLayout(.sizeThatFits)
     }
 }
