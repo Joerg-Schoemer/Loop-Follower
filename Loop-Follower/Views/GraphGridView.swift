@@ -9,20 +9,26 @@ import SwiftUI
 
 struct GraphGridView: View {
     
-    let upperThreshold : Double
-    let lowerThreshold : Double
-    let criticalThreshold : Double
+    let critical : Double
+    let upper : Double
+    let lower : Double
 
     let now : Date
     let startDate : Date
-    let maxWidth : TimeInterval
-    
+
+    let xMax : TimeInterval
+    let yMax : Double
+
     var body: some View {
         GeometryReader { geo in
             Rectangle()
                 .stroke(.gray, lineWidth: 1)
             let width = geo.size.width
             let height = geo.size.height
+            
+            let criticalThreshold = (1 - critical / yMax) * height
+            let upperThreshold = (1 - upper / yMax) * height
+            let lowerThreshold = (1 - lower / yMax) * height
 
             // in range
             Rectangle()
@@ -50,37 +56,44 @@ struct GraphGridView: View {
             
             // current time
             Path { path in
-                path.move(to: CGPoint(x: (now - startDate) / maxWidth * width, y: 0))
-                path.addLine(to: CGPoint(x: (now - startDate) / maxWidth * width, y: height))
+                path.move(to: CGPoint(x: (now - startDate) / xMax * width, y: 0))
+                path.addLine(to: CGPoint(x: (now - startDate) / xMax * width, y: height))
             }.stroke(.gray, lineWidth: 1)
             
             // previouse hours
             Path { path in
-                for h in 1 ... 3 {
-                    let date = Calendar.current.date(byAdding: .hour, value: -h, to: now)!
-                    path.move(to: CGPoint(x: (date - startDate) / maxWidth * width, y: 0))
-                    path.addLine(to: CGPoint(x: (date - startDate) / maxWidth * width, y: height))
+                var date = Calendar.current.date(byAdding: .hour, value: -1, to: now)!
+                while date > startDate {
+                    path.move(to: CGPoint(x: (date - startDate) / xMax * width, y: 0))
+                    path.addLine(to: CGPoint(x: (date - startDate) / xMax * width, y: height))
+                    date = Calendar.current.date(byAdding: .hour, value: -1, to: date)!
                 }
             }.stroke(.teal, style: StrokeStyle(lineWidth: 1, dash: [4]))
 
             // next hours
             Path { path in
-                for h in 1 ... 2 {
-                    let date = Calendar.current.date(byAdding: .hour, value: h, to: now)!
-                    
-                    path.move(to: CGPoint(x: (date - startDate) / maxWidth * width, y: 0))
-                    path.addLine(to: CGPoint(x: (date - startDate) / maxWidth * width, y: height))
-                    
+                var date = Calendar.current.date(byAdding: .hour, value: 1, to: now)!
+                while date < startDate + xMax {
+                    path.move(to: CGPoint(x: (date - startDate) / xMax * width, y: 0))
+                    path.addLine(to: CGPoint(x: (date - startDate) / xMax * width, y: height))
+                    date = Calendar.current.date(byAdding: .hour, value: 1, to: date)!
                 }
             }.stroke(.purple, style: StrokeStyle(lineWidth: 1, dash: [4]))
-            
         }
     }
 }
 
 struct GraphGridView_Previews: PreviewProvider {
     static var previews: some View {
-        GraphGridView(upperThreshold: 400 - 180, lowerThreshold: 400 - 70, criticalThreshold: 400 - 250, now: Date(), startDate: Date() - 14400, maxWidth: 21600)
+        GraphGridView(
+            critical: 250,
+            upper: 180,
+            lower: 70,
+            now: Date(),
+            startDate: Date() - 14400,
+            xMax: 25200,
+            yMax: 260
+        )
             .previewLayout(.sizeThatFits)
     }
 }

@@ -22,7 +22,7 @@ struct MonitorView: View {
                 ChartView()
                     .padding([.top], 10)
             } else {
-                ScrollView {
+                VStack(spacing: 0) {
                     if let lastEntry = modelData.lastEntry {
                         CurrentValueView(
                             currentEntry: lastEntry,
@@ -30,24 +30,26 @@ struct MonitorView: View {
                     }
 
                     if let loopData = modelData.currentLoopData {
-                        LoopParameterView(loopData: loopData)
+                        LoopParameterView(
+                            loopData: loopData
+                        ).padding([.leading, .trailing, .bottom])
                     }
-                    
+
                     ChartView()
-                        .frame(height: 200)
                 }
             }
-        }.onReceive(orientationChanged) { _ in
+        }
+        .onReceive(orientationChanged) { _ in
             self.orientation = UIDevice.current.orientation
         }
     }
     
-    func calcDelta(_ entries : [Entry]) -> Int {
+    func calcDelta(_ entries : [Entry]) -> Int? {
         if entries.count > 1 {
             return entries[0].sgv - entries[1].sgv
         }
 
-        return 0
+        return nil
     }
 }
 

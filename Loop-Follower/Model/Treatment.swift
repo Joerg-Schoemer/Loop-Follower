@@ -26,6 +26,8 @@ struct Treatment : Codable, Identifiable {
     let timestamp: String
     
     var date : Date {
-        return ISO8601DateFormatter().date(from: timestamp)!
+        return formatter.date(from: timestamp)!
     }
 }
+
+fileprivate let formatter = ISO8601DateFormatter()

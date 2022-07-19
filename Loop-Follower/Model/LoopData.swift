@@ -53,9 +53,11 @@ struct Predicted : Codable {
 
     var date : Date {
         
-        return ISO8601DateFormatter().date(from: startDate)!
+        return formatter.date(from: startDate)!
     }
 }
+
+fileprivate let formatter = ISO8601DateFormatter()
 
 struct Cob: Codable {
     let cob : Double

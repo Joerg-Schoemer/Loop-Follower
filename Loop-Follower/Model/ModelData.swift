@@ -137,7 +137,7 @@ class ModelData : ObservableObject {
 
     init() {
         load()
-        Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(load), userInfo: nil, repeats: true)
+        Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(load), userInfo: nil, repeats: true)
     }
     
     init(test: Bool) {
@@ -146,6 +146,8 @@ class ModelData : ObservableObject {
 
         self.loopData = initLoad("deviceData.json")
         self.currentLoopData = loopData.first
+        
+        self.insulin = initLoad("treatments.json")
     }
 
     @objc func load() {

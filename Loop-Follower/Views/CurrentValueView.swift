@@ -10,15 +10,17 @@ import SwiftUI
 struct CurrentValueView: View {
     
     let currentEntry : Entry
-    let delta : Int
-    
-    var dFormatter : RelativeDateTimeFormatter = RelativeDateTimeFormatter()
+    let delta : Int?
     
     fileprivate func formatDelta() -> String {
-        if delta == 0 {
-            return String(format: "±%d mg/dl", delta)
+        if let delta = self.delta {
+            if delta == 0 {
+                return String(format: "±%d mg/dl", delta)
+            }
+            return String(format: "%+d mg/dl", delta)
+        } else {
+            return "? mg/dl"
         }
-        return String(format: "%+d mg/dl", delta)
     }
     
     var body: some View {
@@ -42,47 +44,29 @@ struct CurrentValueView: View {
                     CGPoint(x: middle, y: top)
                 ])
             }
-            let length : CGFloat = 12
-            ZStack {
-                Circle()
-                    .fill(color)
-                Circle()
-                    .strokeBorder(color, lineWidth: length)
-                    .brightness(-0.38)
-                    .shadow(radius: 8)
 
-                ForEach(0..<7) { i in
-                    Tick(length: length)
-                        .rotation(.degrees(Double(30*i)))
-                        .stroke(.black.opacity(0.7), lineWidth: 2)
-                        .brightness(1.1)
-                }.shadow(color: .black, radius: 2, x: 2, y: 2)
-            }
-            .padding(46)
+            Indicator(color: color)
+                .padding(46)
+
             if currentEntry.direction != nil {
-                ZStack {
-                    arrow
-                        .rotation(.degrees(currentEntry.directionDegree))
-                        .fill(color)
-                        .brightness(-0.15)
-                        .shadow(radius: 2, x: 2, y: 2)
-                    arrow
-                        .rotation(.degrees(currentEntry.directionDegree))
-                        .stroke(color, lineWidth: 2)
-                        .brightness(-0.10)
-                        
-                }
+                arrow
+                    .rotation(.degrees(currentEntry.directionDegree))
+                    .fill(color)
+                    .brightness(-0.15)
+                    .shadow(radius: 2, x: 2, y: 2)
+                arrow
+                    .rotation(.degrees(currentEntry.directionDegree))
+                    .stroke(color, lineWidth: 2)
+                    .brightness(-0.10)
             }
         }
         .frame(width: 300, height: 300)
         .overlay {
             VStack(spacing: -5.0) {
-                Text(dFormatter.localizedString(fromTimeInterval: currentEntry.date - Date()))
-                    .fontWeight(.light)
+                Text(currentEntry.date.formatted(date: .omitted, time: .standard))
                 Text(String(currentEntry.sgv))
                     .font(.system(size: 64, weight: .heavy, design: .default))
                 Text(formatDelta())
-                    .fontWeight(.bold)
             }
             .foregroundColor(textColor)
             .shadow(radius: 2, x: 5, y:5)
@@ -110,6 +94,28 @@ private func estimateTextColor(_ sgv : Int) -> Color {
     }
     
     return .black
+}
+
+struct Indicator : View {
+    let length : CGFloat = 12
+    let color : Color
+
+    var body: some View {
+        Circle()
+            .fill(color)
+        Circle()
+            .strokeBorder(color, lineWidth: length)
+            .brightness(-0.38)
+            .shadow(radius: 8)
+        
+        ForEach(0 ..< 7) { i in
+            Tick(length: length)
+                .rotation(.degrees(Double(30*i)))
+                .stroke(.black.opacity(0.7), lineWidth: 2)
+                .brightness(1.1)
+        }
+        .shadow(color: .black, radius: 2, x: 2, y: 2)
+    }
 }
 
 struct Tick : Shape {
@@ -142,7 +148,7 @@ struct CurrentValueView_Previews: PreviewProvider {
                     direction: nil,
                     dateString: df.string(from: date)
                 ),
-                delta: Int.random(in: -10...10)
+                delta: nil
             )
             
             ForEach(0 ..< dirs.count, id: \.self) { i in

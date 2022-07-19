@@ -63,7 +63,7 @@ struct Entry: Hashable, Decodable, Identifiable {
     }
 }
 
-let formatter = ISO8601DateFormatter(.withFractionalSeconds)
+fileprivate let formatter = ISO8601DateFormatter(.withFractionalSeconds)
 
 extension ISO8601DateFormatter {
     convenience init(_ formatOptions: Options) {

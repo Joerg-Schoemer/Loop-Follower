@@ -15,67 +15,66 @@ struct ChartView: View {
     let lower = Double(70)
     let upper = Double(180)
     let critical = Double(250)
+    var now = Date()
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                let now = Date()
                 let startDate = Calendar.current.date(byAdding: .hour, value: -4, to: now)!
                 let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: now)!
-                let maxWidth : TimeInterval = endDate - startDate
 
-                let height = geo.size.height
-
-                let maxSgv = calcMaxSgv(modelData)
-
-                let lowerThreshold: Double = (1 - (lower / maxSgv)) * height
-                let upperThreshold: Double = (1 - (upper / maxSgv)) * height
-                let criticalThreshold: Double = (1 - (critical / maxSgv)) * height
+                let xMax : TimeInterval = endDate - startDate
+                let yMax = estimateYMax(modelData)
 
                 GraphGridView(
-                    upperThreshold: upperThreshold,
-                    lowerThreshold: lowerThreshold,
-                    criticalThreshold: criticalThreshold,
+                    critical: critical,
+                    upper: upper,
+                    lower: lower,
                     now: now,
                     startDate: startDate,
-                    maxWidth: maxWidth
+                    xMax: xMax,
+                    yMax: yMax
                 )
                 
-                if let currentLoop = modelData.currentLoopData {
+                if let predicted = modelData.currentLoopData?.loop.predicted {
                     PredictionView(
-                        currentLoop: currentLoop,
+                        predicted: predicted,
                         startDate: startDate,
-                        maxWidth: maxWidth,
-                        maxSgv: maxSgv
+                        xMax: xMax,
+                        yMax: yMax
                     )
                 }
 
-                InsulinView(insulins: modelData.insulin, startDate: startDate, maxWidth: maxWidth)
+                InsulinView(
+                    insulins: modelData.insulin,
+                    startDate: startDate,
+                    xMax: xMax
+                )
 
                 GlucoseView(
                     entries: modelData.entries,
                     startDate: startDate,
-                    maxWidth: maxWidth,
-                    maxSgv: maxSgv,
-                    lowerThreshold: lowerThreshold,
-                    upperThreshold: upperThreshold,
-                    criticalThreshold: criticalThreshold
+                    xMax: xMax,
+                    yMax: yMax,
+                    critical: critical,
+                    upper: upper,
+                    lower: lower
                 )
             }
         }
     }
 }
 
-func calcMaxSgv(_ data: ModelData) -> Double {
-    var maxSgv : Double = 0
+func estimateYMax(_ data: ModelData) -> Double {
+    var yMax : Double = 250
     if let v = data.currentLoopData?.loop.predicted?.values {
-        maxSgv = v.max()! + 10
+        yMax = max(yMax, v.max()!)
     }
     if data.entries.count > 0 {
-        maxSgv = max(maxSgv, data.entries.map { Double($0.sgv) }.max()! + 10)
+        yMax = max(yMax, data.entries.map { Double($0.sgv) }.max()!)
     }
     
-    return max(maxSgv, 260)
+    return yMax + 10
 }
 
 extension CGPoint: Hashable {
@@ -96,8 +95,10 @@ extension CGRect: Hashable {
 
 struct ChartView_Previews: PreviewProvider {
     static var previews: some View {
-        ChartView()
-            .environmentObject(ModelData(test: true))
-            .previewLayout(.sizeThatFits)
+        ChartView(
+            now: ISO8601DateFormatter().date(from: "2022-07-19T06:37:55Z")!
+        )
+        .environmentObject(ModelData(test: true))
+        .previewLayout(.sizeThatFits)
     }
 }

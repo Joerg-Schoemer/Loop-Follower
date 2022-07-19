@@ -25,7 +25,6 @@ struct LoopParameterView: View {
     
     var body : some View {
         VStack {
-            Divider()
             LoopParameterValue(
                 label: NSLocalizedString("COB", comment: "Carbs on board"),
                 data: loopData.cob.formatted(gramFormatStyle))
@@ -43,8 +42,7 @@ struct LoopParameterView: View {
             LoopParameterBatteryView(
                 label: NSLocalizedString("Battery", comment: "Battery"),
                 percentage: loopData.uploader.battery)
-            Divider()
-        }.padding()
+        }
     }
     
     func recommendedBolus(_ bolus : Measurement<UnitInsulin>?) -> String {
