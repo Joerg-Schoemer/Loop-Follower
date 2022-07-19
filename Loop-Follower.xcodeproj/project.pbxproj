@@ -12,6 +12,9 @@
 		4B431A43288081CB00FC6185 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B431A42288081CB00FC6185 /* ChartView.swift */; };
 		4B91FB2A288057E700792B24 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB28288057E700792B24 /* Localizable.strings */; };
 		4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB2B28805A0800792B24 /* Loop-Follower-InfoPlist.strings */; };
+		4BB8D29928875B0B006AAEE5 /* sgvData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E05287F15A0003B9060 /* sgvData.json */; };
+		4BB8D29A28875B0F006AAEE5 /* deviceData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E15287F4EDF003B9060 /* deviceData.json */; };
+		4BB8D29B28875B0F006AAEE5 /* treatments.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B961B5728868B1800E51DC0 /* treatments.json */; };
 		4BCD62B02885F6DD007D0B6A /* Treatment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62AF2885F6DD007D0B6A /* Treatment.swift */; };
 		4BCD62B228860C5E007D0B6A /* PredictionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62B128860C5E007D0B6A /* PredictionView.swift */; };
 		4BCD62B428860E5D007D0B6A /* InsulinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62B328860E5D007D0B6A /* InsulinView.swift */; };
@@ -323,9 +326,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				4B91FB2A288057E700792B24 /* Localizable.strings in Resources */,
+				4BB8D29928875B0B006AAEE5 /* sgvData.json in Resources */,
 				4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */,
 				4BF86DDB287EF913003B9060 /* Preview Assets.xcassets in Resources */,
 				4BF86DD8287EF913003B9060 /* Assets.xcassets in Resources */,
+				4BB8D29B28875B0F006AAEE5 /* treatments.json in Resources */,
+				4BB8D29A28875B0F006AAEE5 /* deviceData.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,34 +10,37 @@ import SwiftUI
 struct NightScoutSettingsView: View {
     
     @EnvironmentObject var settings: SettingsStore
-
+    
     var body: some View {
         Form {
             Section(header: Text("Nightscout")) {
-                TextField(
-                    text: $settings.url,
-                    prompt: Text("https://nightscout.example.com")
-                ) {
-                    Text("URL")
-                }
-                .autocapitalization(.none)
-                .disableAutocorrection(true)
-                .keyboardType(.URL)
-                .textContentType(.URL)
-
-                TextField(
-                    text: $settings.token,
-                    prompt: Text("your nightscout token")) {
-                        Text("Token")
-                    }.autocapitalization(.none)
+                HStack {
+                    Text("URL").font(.callout)
+                    TextField(
+                        "your Nightscout URL",
+                        text: $settings.url
+                    )
+                    .autocapitalization(.none)
                     .disableAutocorrection(true)
+                    .keyboardType(.URL)
+                    .textContentType(.URL)
+                }
+                HStack {
+                    Text("Token").font(.callout)
+                    TextField(
+                        "your Nightscout token",
+                        text: $settings.token
+                    )
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                }
             }
-        }
+        }.navigationBarTitle("Settings")
     }
 }
 
 struct NightScoutSettingsView_Previews: PreviewProvider {
-
+    
     static var previews: some View {
         Group {
             NightScoutSettingsView()

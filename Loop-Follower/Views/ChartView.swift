@@ -19,48 +19,46 @@ struct ChartView: View {
 
     var body: some View {
         GeometryReader { geo in
-            ZStack {
-                let startDate = Calendar.current.date(byAdding: .hour, value: -4, to: now)!
-                let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: now)!
-
-                let xMax : TimeInterval = endDate - startDate
-                let yMax = estimateYMax(modelData)
-
-                GraphGridView(
-                    critical: critical,
-                    upper: upper,
-                    lower: lower,
-                    now: now,
+            let startDate = Calendar.current.date(byAdding: .hour, value: -4, to: now)!
+            let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: now)!
+            
+            let xMax : TimeInterval = endDate - startDate
+            let yMax = estimateYMax(modelData)
+            
+            GraphGridView(
+                critical: critical,
+                upper: upper,
+                lower: lower,
+                now: now,
+                startDate: startDate,
+                xMax: xMax,
+                yMax: yMax
+            )
+            
+            if let predicted = modelData.currentLoopData?.loop.predicted {
+                PredictionView(
+                    predicted: predicted,
                     startDate: startDate,
                     xMax: xMax,
                     yMax: yMax
                 )
-                
-                if let predicted = modelData.currentLoopData?.loop.predicted {
-                    PredictionView(
-                        predicted: predicted,
-                        startDate: startDate,
-                        xMax: xMax,
-                        yMax: yMax
-                    )
-                }
-
-                InsulinView(
-                    insulins: modelData.insulin,
-                    startDate: startDate,
-                    xMax: xMax
-                )
-
-                GlucoseView(
-                    entries: modelData.entries,
-                    startDate: startDate,
-                    xMax: xMax,
-                    yMax: yMax,
-                    critical: critical,
-                    upper: upper,
-                    lower: lower
-                )
             }
+            
+            InsulinView(
+                insulins: modelData.insulin,
+                startDate: startDate,
+                xMax: xMax
+            )
+            
+            GlucoseView(
+                entries: modelData.entries,
+                startDate: startDate,
+                xMax: xMax,
+                yMax: yMax,
+                critical: critical,
+                upper: upper,
+                lower: lower
+            )
         }
     }
 }

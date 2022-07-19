@@ -7,14 +7,33 @@
 /* Insulin on board */
 "IOB" = "IOB";
 
+/* No comment provided by engineer. */
+"Nightscout" = "Nightscout";
+
+/* no recommended Bolus */
+"None" = "Keiner";
+
 /* Pump reservoir volume */
 "Pump Volume" = "Pumpentank";
 
 /* abbreviated recommended bolus */
 "Rec. Bolus" = "Empf. Bolus";
 
+/* No comment provided by engineer. */
+"Settings" = "Einstellungen";
+
+/* No comment provided by engineer. */
+"Token" = "Token";
+
 /* Unit of Insulin */
 "U" = "IE";
 
-/* no recommended Bolus */
-"None" = "Keiner";
+/* No comment provided by engineer. */
+"URL" = "URL";
+
+/* No comment provided by engineer. */
+"your Nightscout token" = "Dein Nightscout Token";
+
+/* No comment provided by engineer. */
+"your Nightscout URL" = "Deine Nightscout URL";
+
