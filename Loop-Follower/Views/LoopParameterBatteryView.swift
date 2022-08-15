@@ -26,16 +26,16 @@ struct LoopParameterBatteryView: View {
                         let start : CGFloat = width + 2
                         let length : CGFloat = 5
                         
-                        RoundedRectangle(cornerRadius: radius)
+                        Rectangle()
                             .fill(estimateColor(percentage))
                             .frame(
                                 width: (width * CGFloat(min(max(percentage, 20), 100))) / 100,
                                 height: geo.size.height)
                         RoundedRectangle(cornerRadius: radius)
-                            .stroke(.white, lineWidth: 4)
+                            .stroke(.background, lineWidth: 3)
                             .frame(width: width, height: geo.size.height)
                         RoundedRectangle(cornerRadius: radius)
-                            .stroke(.black, lineWidth: 1)
+                            .stroke(.gray, lineWidth: 1)
                             .frame(width: width, height: geo.size.height)
 
                         Path() { path in
@@ -49,7 +49,7 @@ struct LoopParameterBatteryView: View {
                                 cornerSize: CGSize(width: radius, height: radius)
                             )
                         }
-                        .stroke(lineWidth: 1)
+                        .stroke(.gray, lineWidth: 1)
                     }
                 }
                 .frame(width: 48, height: 16)
@@ -71,14 +71,17 @@ private func estimateColor(_ percentage : Int) -> Color {
 
 struct LoopParameterBatteryView_Previews: PreviewProvider {
     static var previews: some View {
-        VStack {
-            LoopParameterBatteryView(label: "Battery", percentage: -10)
-            LoopParameterBatteryView(label: "Battery", percentage: 10)
-            LoopParameterBatteryView(label: "Battery", percentage: 20)
-            LoopParameterBatteryView(label: "Battery", percentage: 30)
-            LoopParameterBatteryView(label: "Battery", percentage: 75)
-            LoopParameterBatteryView(label: "Battery", percentage: 100)
-            LoopParameterBatteryView(label: "Battery", percentage: 200)
+        ForEach(ColorScheme.allCases, id: \.self) {
+            VStack {
+                LoopParameterBatteryView(label: "Battery", percentage: -10)
+                LoopParameterBatteryView(label: "Battery", percentage: 10)
+                LoopParameterBatteryView(label: "Battery", percentage: 20)
+                LoopParameterBatteryView(label: "Battery", percentage: 30)
+                LoopParameterBatteryView(label: "Battery", percentage: 75)
+                LoopParameterBatteryView(label: "Battery", percentage: 100)
+                LoopParameterBatteryView(label: "Battery", percentage: 200)
+            }
+            .preferredColorScheme($0)
         }
         .previewLayout(.sizeThatFits)
     }
