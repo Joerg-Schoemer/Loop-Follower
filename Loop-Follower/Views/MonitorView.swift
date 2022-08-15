@@ -11,6 +11,7 @@ struct MonitorView: View {
     
     @EnvironmentObject var modelData : ModelData
     @State var orientation = UIDevice.current.orientation
+    @State var prevOrientation = UIDevice.current.orientation
 
     let orientationChanged = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
         .makeConnectable()
@@ -18,7 +19,8 @@ struct MonitorView: View {
     
     var body: some View {
         Group {
-            if orientation.isLandscape {
+            
+            if orientation.isLandscape || prevOrientation.isLandscape && orientation.isFlat {
                 ChartView()
                     .padding([.top], 10)
             } else {
@@ -40,6 +42,7 @@ struct MonitorView: View {
             }
         }
         .onReceive(orientationChanged) { _ in
+            self.prevOrientation = self.orientation
             self.orientation = UIDevice.current.orientation
         }
     }

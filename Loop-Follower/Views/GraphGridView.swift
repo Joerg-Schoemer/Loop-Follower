@@ -9,9 +9,10 @@ import SwiftUI
 
 struct GraphGridView: View {
     
-    let critical : Double
+    let criticalHigh : Double
     let upper : Double
     let lower : Double
+    let criticalLow : Double
 
     let now : Date
     let startDate : Date
@@ -25,10 +26,12 @@ struct GraphGridView: View {
                 .stroke(.gray, lineWidth: 1)
             let width = geo.size.width
             let height = geo.size.height
+            let xScale = width / xMax
             
-            let criticalThreshold = (1 - critical / yMax) * height
+            let criticalHighThreshold = (1 - criticalHigh / yMax) * height
             let upperThreshold = (1 - upper / yMax) * height
             let lowerThreshold = (1 - lower / yMax) * height
+            let criticalLowThreshold = (1 - criticalLow / yMax) * height
 
             // in range
             Rectangle()
@@ -38,8 +41,8 @@ struct GraphGridView: View {
             
             // critical threshold
             Path { path in
-                path.move(to: CGPoint(x: 0, y: criticalThreshold))
-                path.addLine(to: CGPoint(x: width, y: criticalThreshold))
+                path.move(to: CGPoint(x: 0, y: criticalHighThreshold))
+                path.addLine(to: CGPoint(x: width, y: criticalHighThreshold))
             }.stroke(.red, style: StrokeStyle(lineWidth: 1, dash: [4]))
             
             // upper threshold
@@ -52,20 +55,26 @@ struct GraphGridView: View {
             Path { path in
                 path.move(to: CGPoint(x: 0, y: lowerThreshold))
                 path.addLine(to: CGPoint(x: width, y: lowerThreshold))
-            }.stroke(.red, lineWidth: 1)
+            }.stroke(.yellow, lineWidth: 1)
+            
+            // critical lower threshold
+            Path { path in
+                path.move(to: CGPoint(x: 0, y: criticalLowThreshold))
+                path.addLine(to: CGPoint(x: width, y: criticalLowThreshold))
+            }.stroke(.red, style: StrokeStyle(lineWidth: 1, dash: [4]))
             
             // current time
             Path { path in
-                path.move(to: CGPoint(x: (now - startDate) / xMax * width, y: 0))
-                path.addLine(to: CGPoint(x: (now - startDate) / xMax * width, y: height))
+                path.move(to: CGPoint(x: (now - startDate) * xScale, y: 0))
+                path.addLine(to: CGPoint(x: (now - startDate) * xScale, y: height))
             }.stroke(.gray, lineWidth: 1)
             
             // previouse hours
             Path { path in
                 var date = Calendar.current.date(byAdding: .hour, value: -1, to: now)!
                 while date > startDate {
-                    path.move(to: CGPoint(x: (date - startDate) / xMax * width, y: 0))
-                    path.addLine(to: CGPoint(x: (date - startDate) / xMax * width, y: height))
+                    path.move(to: CGPoint(x: (date - startDate) * xScale, y: 0))
+                    path.addLine(to: CGPoint(x: (date - startDate) * xScale, y: height))
                     date = Calendar.current.date(byAdding: .hour, value: -1, to: date)!
                 }
             }.stroke(.teal, style: StrokeStyle(lineWidth: 1, dash: [4]))
@@ -74,8 +83,8 @@ struct GraphGridView: View {
             Path { path in
                 var date = Calendar.current.date(byAdding: .hour, value: 1, to: now)!
                 while date < startDate + xMax {
-                    path.move(to: CGPoint(x: (date - startDate) / xMax * width, y: 0))
-                    path.addLine(to: CGPoint(x: (date - startDate) / xMax * width, y: height))
+                    path.move(to: CGPoint(x: (date - startDate) * xScale, y: 0))
+                    path.addLine(to: CGPoint(x: (date - startDate) * xScale, y: height))
                     date = Calendar.current.date(byAdding: .hour, value: 1, to: date)!
                 }
             }.stroke(.purple, style: StrokeStyle(lineWidth: 1, dash: [4]))
@@ -86,9 +95,10 @@ struct GraphGridView: View {
 struct GraphGridView_Previews: PreviewProvider {
     static var previews: some View {
         GraphGridView(
-            critical: 250,
+            criticalHigh: 250,
             upper: 180,
             lower: 70,
+            criticalLow: 50,
             now: Date(),
             startDate: Date() - 14400,
             xMax: 25200,

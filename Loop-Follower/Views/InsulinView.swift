@@ -9,7 +9,7 @@ import SwiftUI
 
 struct InsulinView: View {
 
-    var insulins : [Treatment]
+    var insulins : [CorrectionBolus]
     var startDate : Date
     var xMax : TimeInterval
     
@@ -21,17 +21,19 @@ struct InsulinView: View {
                 return CGRect(
                     x: ($0.date - startDate) / xMax * geo.size.width,
                     y: 0,
-                    width: CGFloat(3),
-                    height: min(CGFloat(80 * $0.insulin), geo.size.height)
+                    width: 5,
+                    height: min(80 * $0.insulin, geo.size.height)
                 )
             }
+            
+            let fillColor = Color(UIColor.orange.withAlphaComponent(0.5))
 
             ForEach(insulins, id: \.self) { insulin in
-                Path { path in
-                    if area.contains(insulin.origin) {
+                if area.contains(insulin.origin) {
+                    Path { path in
                         path.addRect(insulin)
-                    }
-                }.fill(.blue)
+                    }.fill(fillColor)
+                }
             }
         }
     }
@@ -41,28 +43,14 @@ struct InsulinView_Previews: PreviewProvider {
     static var previews: some View {
         InsulinView(
             insulins: [
-                Treatment(
+                CorrectionBolus(
                     id: "",
-                    type: "",
-                    programmed: 0,
-                    insulinType: "",
                     insulin: 0.05,
-                    unabsorbed: 0,
-                    automatic: true,
-                    eventType: "",
-                    duration: 0,
                     timestamp: "2022-07-19T03:00:00Z"
                 ),
-                Treatment(
+                CorrectionBolus(
                     id: "",
-                    type: "",
-                    programmed: 0,
-                    insulinType: "",
                     insulin: 2.9,
-                    unabsorbed: 0,
-                    automatic: true,
-                    eventType: "",
-                    duration: 0,
                     timestamp: "2022-07-19T03:15:00Z"
                 )
             ],

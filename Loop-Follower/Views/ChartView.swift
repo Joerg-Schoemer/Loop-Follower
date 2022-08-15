@@ -12,9 +12,11 @@ struct ChartView: View {
     
     @EnvironmentObject var modelData : ModelData
 
-    let lower = Double(70)
-    let upper = Double(180)
-    let critical = Double(250)
+    let criticalLow = 50.0
+    let lower = 70.0
+    let upper = 180.0
+    let criticalHigh = 250.0
+
     var now = Date()
 
     var body: some View {
@@ -26,9 +28,10 @@ struct ChartView: View {
             let yMax = estimateYMax(modelData)
             
             GraphGridView(
-                critical: critical,
+                criticalHigh: criticalHigh,
                 upper: upper,
                 lower: lower,
+                criticalLow: criticalLow,
                 now: now,
                 startDate: startDate,
                 xMax: xMax,
@@ -44,6 +47,28 @@ struct ChartView: View {
                 )
             }
             
+            if let basal = modelData.profile?.basal {
+                ScheduledBasalView(
+                    basal: basal,
+                    startDate: startDate,
+                    xMax: xMax
+                )
+                if let tempBasal = modelData.tempBasal {
+                    TempBasalView(
+                        tempBasal: tempBasal,
+                        basal: basal,
+                        startDate: startDate,
+                        xMax: xMax
+                    )
+                }
+            }
+
+            CarbView(
+                carbs: modelData.carbs,
+                startDate: startDate,
+                xMax: xMax
+            )
+
             InsulinView(
                 insulins: modelData.insulin,
                 startDate: startDate,
@@ -55,9 +80,10 @@ struct ChartView: View {
                 startDate: startDate,
                 xMax: xMax,
                 yMax: yMax,
-                critical: critical,
+                critical: criticalHigh,
                 upper: upper,
-                lower: lower
+                lower: lower,
+                criticalLow: criticalLow
             )
         }
     }

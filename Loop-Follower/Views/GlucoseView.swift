@@ -17,14 +17,16 @@ struct GlucoseView: View {
     var critical : Double
     var upper : Double
     var lower : Double
+    var criticalLow : Double
 
     var body: some View {
         GeometryReader { geo in
             let area = CGRect(origin: CGPoint(x:0,y:0), size: geo.size)
 
-            let criticalThreshold = (1 - critical / yMax) * geo.size.height
+            let criticalHighThreshold = (1 - critical / yMax) * geo.size.height
             let upperThreshold = (1 - upper / yMax) * geo.size.height
             let lowerThreshold = (1 - lower / yMax) * geo.size.height
+            let criticalLowThreshold = (1 - criticalLow / yMax) * geo.size.height
 
             let sgvs : [CGRect] = entries.map {
                 return CGRect(
@@ -43,21 +45,22 @@ struct GlucoseView: View {
                 }.fill(
                     estimateColorBySgv(
                         sgv: sgv.origin.y,
+                        criticalLow: criticalLowThreshold,
                         lower: lowerThreshold,
                         upper: upperThreshold,
-                        critical: criticalThreshold
+                        criticalHigh: criticalHighThreshold
                     ))
             }
         }
     }
 }
 
-func estimateColorBySgv(sgv : Double, lower: Double, upper : Double, critical : Double) -> Color {
-    if sgv > lower || sgv <= critical {
+func estimateColorBySgv(sgv : Double, criticalLow : Double, lower: Double, upper : Double, criticalHigh : Double) -> Color {
+    if sgv > criticalLow || sgv <= criticalHigh {
         return .red
     }
     
-    if sgv < upper {
+    if sgv > lower || sgv < upper {
         return .yellow
     }
     
@@ -68,6 +71,7 @@ struct GlucoseView_Previews: PreviewProvider {
     static var previews: some View {
         GlucoseView(
             entries: [
+                Entry(id: "schnurz", sgv: 44, dateString: "2022-07-18T23:55:00.000Z"),
                 Entry(id: "schnurz", sgv: 54, dateString: "2022-07-19T00:00:00.000Z"),
                 Entry(id: "schnurz", sgv: 70, dateString: "2022-07-19T00:05:00.000Z"),
                 Entry(id: "schnurz", sgv: 75, dateString: "2022-07-19T00:10:00.000Z"),
@@ -87,7 +91,8 @@ struct GlucoseView_Previews: PreviewProvider {
             yMax: 260,
             critical: 250,
             upper: 180,
-            lower: 70
+            lower: 70,
+            criticalLow: 50
         ).previewLayout(.sizeThatFits)
     }
 }

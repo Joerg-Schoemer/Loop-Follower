@@ -18,7 +18,13 @@ class ModelData : ObservableObject {
     
     @Published var currentLoopData : LoopData?
     
-    @Published var insulin : [Treatment] = []
+    @Published var insulin : [CorrectionBolus] = []
+
+    @Published var tempBasal : [TempBasal] = []
+
+    @Published var carbs : [CarbCorrection] = []
+
+    @Published var profile : Profile?
     
     func loadSvg(completionHandler: @escaping ([Entry]) -> ()) {
         let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
@@ -58,7 +64,7 @@ class ModelData : ObservableObject {
         }
     }
     
-    func loadInsulin(completionHandler: @escaping ([Treatment]) -> ()) {
+    func loadInsulin(completionHandler: @escaping ([CorrectionBolus]) -> ()) {
         let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
         let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
 
@@ -66,13 +72,136 @@ class ModelData : ObservableObject {
             completionHandler([])
             return
         }
-        
-        let format = ISO8601DateFormatter()
-        format.formatOptions = [.withFullDate]
-        
-        let today = format.string(from: Date())
 
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction%20Bolus&find[timestamp][$gte]=\(today)") {
+        let format = ISO8601DateFormatter()
+        format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
+        
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!)
+
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction%20Bolus&find[timestamp][$gte]=\(startMillis)") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+
+                if let error = error {
+                    print("Error fetching treatments: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+
+                if let data = data {
+                    let treatmentData = try! JSONDecoder().decode([CorrectionBolus].self, from: data)
+                    DispatchQueue.main.async {
+                        completionHandler(treatmentData)
+                    }
+                } else {
+                    print("no data")
+                    return
+                }
+            }).resume()
+        }
+    }
+    
+    func loadCarbs(completionHandler: @escaping ([CarbCorrection]) -> ()) {
+        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
+        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+
+        if baseUrl.isEmpty || token.isEmpty {
+            completionHandler([])
+            return
+        }
+
+        let format = ISO8601DateFormatter()
+        format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
+        
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!)
+
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Carb%20Correction&find[timestamp][$gte]=\(startMillis)") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+
+                if let error = error {
+                    print("Error fetching treatments: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+
+                if let data = data {
+                    let treatmentData = try! JSONDecoder().decode([CarbCorrection].self, from: data)
+                    DispatchQueue.main.async {
+                        completionHandler(treatmentData)
+                    }
+                } else {
+                    print("no data")
+                    return
+                }
+            }).resume()
+        }
+    }
+    
+    func loadTempBasal(completionHandler: @escaping ([TempBasal]) -> ()) {
+        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
+        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+
+        if baseUrl.isEmpty || token.isEmpty {
+            completionHandler([])
+            return
+        }
+
+        let format = ISO8601DateFormatter()
+        format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
+        
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!)
+
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp%20Basal&find[timestamp][$gte]=\(startMillis)") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+
+                if let error = error {
+                    print("Error fetching treatments: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+
+                if let data = data {
+                    let treatmentData = try! JSONDecoder().decode([TempBasal].self, from: data)
+                    DispatchQueue.main.async {
+                        completionHandler(treatmentData)
+                    }
+                } else {
+                    print("no data")
+                    return
+                }
+            }).resume()
+        }
+    }
+    
+    func loadScheduledBasal(completionHandler: @escaping ([Treatment]) -> ()) {
+        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
+        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+
+        if baseUrl.isEmpty || token.isEmpty {
+            completionHandler([])
+            return
+        }
+
+        let format = ISO8601DateFormatter()
+        format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
+        
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!)
+
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp%20Basal&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -98,8 +227,8 @@ class ModelData : ObservableObject {
             }).resume()
         }
     }
-    
-    func loadDevice(completionHandler: @escaping ([LoopData]) -> ()) {
+
+    func loadDeviceStatus(completionHandler: @escaping ([LoopData]) -> ()) {
         let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
         let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
 
@@ -134,6 +263,43 @@ class ModelData : ObservableObject {
             }).resume()
         }
     }
+    
+    func loadProfile(completionHandler: @escaping (Profile?) -> ()) {
+        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
+        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+
+        if baseUrl.isEmpty || token.isEmpty {
+            completionHandler(nil)
+            return
+        }
+
+        if let url = URL(string: "\(baseUrl)/api/v1/profile.json?token=\(token)") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+
+                if let error = error {
+                    print("Error with fetching devicestatus: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error with the response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+
+                if let data = data {
+                    let profiles = try! JSONDecoder().decode([Profiles].self, from: data)
+                    let activeProfile = profiles.first!
+                    DispatchQueue.main.async {
+                        completionHandler(activeProfile.store[activeProfile.defaultProfile]!)
+                    }
+                } else {
+                    print("no data")
+                    return
+                }
+            }).resume()
+        }
+    }
 
     init() {
         load()
@@ -155,12 +321,21 @@ class ModelData : ObservableObject {
             self.entries = entries
             self.lastEntry = entries.first
         }
-        loadDevice { loopData in
+        loadDeviceStatus { loopData in
             self.loopData = loopData
             self.currentLoopData = loopData.first
         }
         loadInsulin { treatments in
             self.insulin = treatments
+        }
+        loadCarbs { carbs in
+            self.carbs = carbs
+        }
+        loadTempBasal { treatments in
+            self.tempBasal = treatments
+        }
+        loadProfile { profile in
+            self.profile = profile
         }
     }
 }
