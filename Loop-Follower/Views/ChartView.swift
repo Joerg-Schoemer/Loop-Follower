@@ -21,7 +21,8 @@ struct ChartView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let startDate = Calendar.current.date(byAdding: .hour, value: -4, to: now)!
+            
+            let startDate = Calendar.current.date(byAdding: .hour, value: -6, to: now)!
             let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: now)!
             
             let xMax : TimeInterval = endDate - startDate
@@ -38,15 +39,6 @@ struct ChartView: View {
                 yMax: yMax
             )
             
-            if let predicted = modelData.currentLoopData?.loop.predicted {
-                PredictionView(
-                    predicted: predicted,
-                    startDate: startDate,
-                    xMax: xMax,
-                    yMax: yMax
-                )
-            }
-            
             if let basal = modelData.profile?.basal {
                 ScheduledBasalView(
                     basal: basal,
@@ -62,6 +54,15 @@ struct ChartView: View {
                     )
                 }
             }
+            
+            if let profile = modelData.profile {
+                TargetView(
+                    profile: profile,
+                    startDate: startDate,
+                    xMax: xMax,
+                    yMax: yMax
+                )
+            }
 
             CarbView(
                 carbs: modelData.carbs,
@@ -74,6 +75,15 @@ struct ChartView: View {
                 startDate: startDate,
                 xMax: xMax
             )
+            
+            if let predicted = modelData.currentLoopData?.loop.predicted {
+                PredictionView(
+                    predicted: predicted,
+                    startDate: startDate,
+                    xMax: xMax,
+                    yMax: yMax
+                )
+            }
             
             GlucoseView(
                 entries: modelData.entries,

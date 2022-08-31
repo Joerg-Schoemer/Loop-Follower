@@ -32,10 +32,9 @@ struct CarbView: View {
                 if area.contains(carb.origin) {
                     Path { path in
                         path.addRect(carb)
-                    }.fill(.green)
+                    }.fill(Color(.systemGreen.withAlphaComponent(0.5)))
                 }
             }
-
         }
     }
 }
@@ -60,6 +59,6 @@ struct CarbView_Previews: PreviewProvider {
             startDate: ISO8601DateFormatter().date(from: "2022-08-09T04:00:00Z")!,
             xMax: 21600
         )
-        .previewInterfaceOrientation(.landscapeLeft)
+        .previewInterfaceOrientation(.portrait)
     }
 }

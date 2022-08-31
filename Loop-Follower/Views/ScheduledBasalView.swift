@@ -28,37 +28,13 @@ struct ScheduledBasalView: View {
             )
             
             Path { path in
-                for basal in basals {
-                    path.addRect(basal)
+                path.move(to: basals.first!)
+                for basal in basals[1...] {
+                    path.addLine(to: basal)
                 }
-            }.fill(Color(.blue.withAlphaComponent(0.1)))
+            }.stroke(.blue, style: StrokeStyle(dash: [4]))
         }
     }
-}
-
-fileprivate func createRects(
-    _ basal: [Basal],
-    _ basalRects: inout [CGRect],
-    _ startOfDay: Date,
-    _ startDate: Date,
-    _ xScale: Double,
-    _ height: Double,
-    _ yScale: Double,
-    _ offset: Double) {
-    for i in 0..<(basal.count - 1) {
-        basalRects.append(CGRect(
-            x: ((startOfDay - startDate) + basal[i].timeAsSeconds + offset) * xScale,
-            y: height - basal[i].value * yScale,
-            width: (basal[i + 1].timeAsSeconds - basal[i].timeAsSeconds) * xScale,
-            height: basal[i].value * yScale))
-    }
-    
-    let lastBasal = basal.last!
-    basalRects.append(CGRect(
-        x: ((startOfDay - startDate) + lastBasal.timeAsSeconds + offset) * xScale,
-        y: height - lastBasal.value * yScale,
-        width: (86400 - lastBasal.timeAsSeconds) * xScale,
-        height: lastBasal.value * yScale))
 }
 
 fileprivate func estimateScheduledBasal(
@@ -68,46 +44,22 @@ fileprivate func estimateScheduledBasal(
     yScale : Double,
     width : Double,
     height : Double
-) -> [CGRect] {
-
-    let startOfDay = Calendar.current.startOfDay(for: startDate)
-    var basalRects : [CGRect] = []
+) -> [CGPoint] {
+    var basalPoints : [CGPoint] = []
     
-    createRects(basal, &basalRects, startOfDay, startDate, xScale, height, yScale, 0)
-    createRects(basal, &basalRects, startOfDay, startDate, xScale, height, yScale, 86400)
-
-    basalRects.removeAll(where: {$0.origin.x > width || $0.origin.x + $0.size.width <= 0})
-
-    if let first = basalRects.first {
-        if (first.origin.x < 0) {
-            basalRects.removeFirst()
-            basalRects.insert(
-                CGRect(
-                    x: 0,
-                    y: first.origin.y,
-                    width: first.size.width + first.origin.x,
-                    height: first.size.height
-                ),
-                at: 0
-            )
-        }
-    }
-    
-    if let last = basalRects.last {
-        let delta = width - (last.origin.x + last.size.width)
-        if (delta < 0) {
-            basalRects.removeLast()
-            basalRects.append(
-                CGRect(
-                    x: last.origin.x,
-                    y: last.origin.y,
-                    width: last.size.width + delta,
-                    height: last.size.height
-                ))
-        }
+    let basals = calculateTempBasal(basals: basal, startDate: startDate)
+    for b in basals {
+        basalPoints.append(CGPoint(
+            x: (b.startDate - startDate) * xScale,
+            y: height - b.rate * yScale
+        ))
+        basalPoints.append(CGPoint(
+            x: (b.endDate - startDate) * xScale,
+            y: height - b.rate * yScale
+        ))
     }
 
-    return basalRects
+    return reduceToView(basalPoints, width, height)
 }
 
 struct ScheduledBasal_Previews: PreviewProvider {
@@ -121,7 +73,7 @@ struct ScheduledBasal_Previews: PreviewProvider {
                 Basal(value: 0.05, timeAsSeconds: 64800),
             ],
             startDate: ISO8601DateFormatter().date(from: "2022-07-19T00:00:00Z")!,
-            xMax: 25200)
-        .previewInterfaceOrientation(.landscapeLeft)
+            xMax: 32400)
+        .previewInterfaceOrientation(.portrait)
     }
 }

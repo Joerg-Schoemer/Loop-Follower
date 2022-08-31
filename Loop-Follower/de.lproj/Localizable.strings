@@ -19,6 +19,9 @@
 /* abbreviated recommended bolus */
 "Rec. Bolus" = "Empf. Bolus";
 
+/* abbreviated recommended carbs */
+"Rec. Carbs" = "Empf. KH";
+
 /* No comment provided by engineer. */
 "Settings" = "Einstellungen";
 

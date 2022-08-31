@@ -33,7 +33,8 @@ struct MonitorView: View {
 
                     if let loopData = modelData.currentLoopData {
                         LoopParameterView(
-                            loopData: loopData
+                            loopData: loopData,
+                            cn: modelData.cn
                         ).padding([.leading, .trailing, .bottom])
                     }
 

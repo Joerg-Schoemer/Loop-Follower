@@ -9,7 +9,8 @@ import SwiftUI
 
 struct LoopParameterView: View {
     
-    let loopData : LoopData
+    let loopData: LoopData
+    let cn: Measurement<UnitMass>
     
     let insulinFormatStyle = Measurement<UnitInsulin>.FormatStyle(
         width: .abbreviated,
@@ -28,6 +29,9 @@ struct LoopParameterView: View {
             LoopParameterValue(
                 label: NSLocalizedString("COB", comment: "Carbs on board"),
                 data: loopData.cob.formatted(gramFormatStyle))
+            LoopParameterValue(
+                label: NSLocalizedString("Rec. Carbs", comment: "abbreviated recommended carbs"),
+                data: cn.formatted(gramFormatStyle))
             Divider()
             LoopParameterValue(
                 label: NSLocalizedString("IOB", comment: "Insulin on board"),
@@ -70,16 +74,20 @@ extension Date {
 
 struct LoopParameterView_Previews: PreviewProvider {
     static var previews: some View {
-        LoopParameterView(loopData: LoopData(
-            id: "",
-            loop: Loop(
-                cob: Cob(cob: 1.1),
-                iob: Iob(iob: 0.05),
-                recommendedBolus: 0.0,
-                predicted: nil
+        LoopParameterView(
+            loopData: LoopData(
+                id: "",
+                loop: Loop(
+                    cob: Cob(cob: 1.1),
+                    iob: Iob(iob: 0.05),
+                    recommendedBolus: 0.1,
+                    predicted: nil
+                ),
+                uploader: Uploader(battery: 75),
+                pump: Pump(reservoir: nil)
             ),
-            uploader: Uploader(battery: 75),
-            pump: Pump(reservoir: nil)))
+            cn: Measurement<UnitMass>(value: 2.5, unit: UnitMass.grams)
+        )
         .previewLayout(.sizeThatFits)
     }
 }

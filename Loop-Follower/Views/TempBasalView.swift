@@ -34,17 +34,17 @@ struct TempBasalView: View {
                 for point in points[1...] {
                     path.addLine(to: point)
                 }
-            }.stroke(.blue) //, style: StrokeStyle(lineWidth: 1, dash: [1]))
+            }.fill(Color(.systemBlue.withAlphaComponent(0.5)))
         }
     }
 }
 
-fileprivate func convertBasalToTempBasal(
+func convertBasalToTempBasal(
     _ basals: [Basal],
-    _ tempBasal: inout [TempBasal],
     _ startOfDay: Date,
     _ offset: Double
-) {
+) -> [TempBasal] {
+    var tempBasal : [TempBasal] = []
     for i in 0..<(basals.count - 1) {
         let currentBasal = basals[i]
         let nextBasal = basals[i + 1]
@@ -66,19 +66,53 @@ fileprivate func convertBasalToTempBasal(
             timestamp: ISO8601DateFormatter().string(from: startOfDay + lastBasal.timeAsSeconds + offset)
         )
     )
+    
+    return tempBasal
 }
 
-fileprivate func calculateTempBasal(basals : [Basal], startDate: Date) -> [TempBasal] {
+func calculateTempBasal(basals : [Basal], startDate: Date) -> [TempBasal] {
 
     let startOfDay = Calendar.current.startOfDay(for: startDate)
     var tempBasal : [TempBasal] = []
 
     // first day
-    convertBasalToTempBasal(basals, &tempBasal, startOfDay, 0)
+    tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDay, 0))
     // second day
-    convertBasalToTempBasal(basals, &tempBasal, startOfDay, 86400)
+    tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDay, 86400))
 
     return tempBasal
+}
+
+func reduceToView(_ points: [CGPoint], _ width: Double, _ height: Double, _ close : Bool = false) -> [CGPoint] {
+    var startIndex = points.firstIndex(where: {$0.x >= 0})!
+    if startIndex > 0 {
+        startIndex -= 1
+    }
+    
+    let endIndex = points.firstIndex(where: {$0.x >= width})!
+    
+    // get slice
+    var a : [CGPoint] = Array(points[startIndex ... endIndex])
+    
+    // adjust first to 0
+    if a.first!.x < 0 {
+        let first = a.removeFirst()
+        a.insert(CGPoint(x:0, y: first.y), at: 0)
+        if first.y < height && close {
+            a.insert(CGPoint(x:0, y: height), at: 0)
+        }
+    }
+    
+    // adjust last to width
+    if a.last!.x > width {
+        let last = a.removeLast()
+        a.append(CGPoint(x: width, y: last.y))
+        if last.y < height && close {
+            a.append(CGPoint(x: width, y: height))
+        }
+    }
+    
+    return a
 }
 
 fileprivate func estimatePoints(
@@ -145,26 +179,7 @@ fileprivate func estimatePoints(
         }
     }
     
-    var startIndex = tempBasalPoints.firstIndex(where: {$0.x >= 0})!
-    if startIndex > 0 {
-       startIndex -= 1
-    }
-    
-    let endIndex = tempBasalPoints.firstIndex(where: {$0.x >= width})!
-    
-    var a : [CGPoint] = Array(tempBasalPoints[startIndex ... endIndex])
-    
-    if a.first!.x < 0 {
-        let first = a.removeFirst()
-        a.insert(CGPoint(x:0, y: first.y), at: 0)
-    }
-
-    if a.last!.x > width {
-        let last = a.removeLast()
-        a.append(CGPoint(x: width, y: last.y))
-    }
-    
-    return a
+    return reduceToView(tempBasalPoints, width, height, true)
 }
 
 struct TempBasalView_Previews: PreviewProvider {
@@ -174,7 +189,7 @@ struct TempBasalView_Previews: PreviewProvider {
                 TempBasal(
                     id: "",
                     duration: 20,
-                    rate: 0,
+                    rate: 0.15,
                     timestamp: "2022-08-08T23:50:00Z"),
                 TempBasal(
                     id: "",
@@ -186,6 +201,11 @@ struct TempBasalView_Previews: PreviewProvider {
                     duration: 20,
                     rate: 0.15,
                     timestamp: "2022-08-09T01:30:00Z"),
+                TempBasal(
+                    id: "",
+                    duration: 20,
+                    rate: 0,
+                    timestamp: "2022-08-09T02:50:00Z"),
                 TempBasal(
                     id: "",
                     duration: 20,
@@ -202,6 +222,6 @@ struct TempBasalView_Previews: PreviewProvider {
             startDate: ISO8601DateFormatter().date(from: "2022-08-09T00:00:00Z")!,
             xMax: 25200
         )
-        .previewInterfaceOrientation(.landscapeLeft)
+        .previewInterfaceOrientation(.portrait)
     }
 }

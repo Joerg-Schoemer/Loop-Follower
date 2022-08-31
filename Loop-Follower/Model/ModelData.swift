@@ -34,30 +34,34 @@ class ModelData : ObservableObject {
             completionHandler([])
             return
         }
+        
+        let date = Calendar.current.date(byAdding: .hour, value: -7, to: Date())!.timeIntervalSince1970 * 1000
 
-        if let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&count=60") {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-                if let error = error {
-                    print("Error with fetching sgv: \(error)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("Error with the response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-                
-                if let data = data {
-                    let entries = try! JSONDecoder().decode([Entry].self, from: data)
-                    DispatchQueue.main.async {
-                        completionHandler(entries)
+        if let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&find[date][$gte]=\(date)&count=288") {
+            URLSession.shared.dataTask(
+                with: url,
+                completionHandler: { data, response, error in
+                    if let error = error {
+                        print("Error with fetching sgv: \(error)")
+                        return
                     }
-                } else {
-                    print("no data")
-                    return
+                    
+                    guard let httpResponse = response as? HTTPURLResponse,
+                          (200...299).contains(httpResponse.statusCode) else {
+                        print("Error with the response, unexpected status code: \(String(describing: response))")
+                        return
+                    }
+                    
+                    if let data = data {
+                        let entries = try! JSONDecoder().decode([Entry].self, from: data)
+                        DispatchQueue.main.async {
+                            completionHandler(entries)
+                        }
+                    } else {
+                        print("no data")
+                        return
+                    }
                 }
-            }
             ).resume()
         } else {
             completionHandler([])
@@ -76,7 +80,7 @@ class ModelData : ObservableObject {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction%20Bolus&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -117,7 +121,7 @@ class ModelData : ObservableObject {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Carb%20Correction&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -158,7 +162,7 @@ class ModelData : ObservableObject {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp%20Basal&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -199,7 +203,7 @@ class ModelData : ObservableObject {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -5, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp%20Basal&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -314,6 +318,32 @@ class ModelData : ObservableObject {
         self.currentLoopData = loopData.first
         
         self.insulin = initLoad("treatments.json")
+        
+        self.profile = Profile(
+            basal: [
+                Basal(value: 0.05, timeAsSeconds: 0),
+                Basal(value: 0.15, timeAsSeconds: 10800),
+                Basal(value: 0.05, timeAsSeconds: 14400),
+                Basal(value: 0.10, timeAsSeconds: 61200),
+                Basal(value: 0.05, timeAsSeconds: 64800),
+            ],
+            target_low: [
+                Target(value: 110, timeAsSeconds: 0),
+            ],
+            target_high: [
+                Target(value: 125, timeAsSeconds: 0),
+            ],
+            sens: [
+                Target(value: 270, timeAsSeconds: 0),
+                Target(value: 213, timeAsSeconds: 18000),
+                Target(value: 270, timeAsSeconds: 75600),
+            ],
+            carbratio: [
+                Target(value: 24, timeAsSeconds: 0),
+                Target(value: 16, timeAsSeconds: 21600),
+                Target(value: 24, timeAsSeconds: 32400),
+            ]
+        )
     }
 
     @objc func load() {
@@ -337,6 +367,32 @@ class ModelData : ObservableObject {
         loadProfile { profile in
             self.profile = profile
         }
+    }
+    
+    var cn : Measurement<UnitMass> {
+        if self.profile == nil || self.lastEntry == nil || self.currentLoopData == nil {
+            return Measurement(value: 0, unit: UnitMass.grams)
+        }
+
+        let now : Date = self.lastEntry!.date
+        let start = Calendar.current.startOfDay(for: now)
+        
+        let currentSens = profile?.sens.last(where: {(start + $0.timeAsSeconds) < now})
+        print("sens: \(currentSens.debugDescription)")
+        let currentCarbratio = profile?.carbratio.last(where: {(start + $0.timeAsSeconds) < now})
+        print("carbratio: \(currentCarbratio.debugDescription)")
+        let currentTarget = profile?.target_low.last(where: {(start + $0.timeAsSeconds) < now})
+        print("target: \(currentTarget.debugDescription)")
+        
+        let grams : Double = Double(((Double(lastEntry!.sgv) - max(currentLoopData!.iob.value,0) * currentSens!.value) - currentTarget!.value) / -currentSens!.value * currentCarbratio!.value)
+        print("gramms: \(grams.debugDescription)")
+        let rec_grams = currentLoopData!.cob.value - grams
+        print("rec_grams: \(rec_grams.debugDescription)")
+
+        return Measurement(
+            value: max(rec_grams, 0),
+            unit: UnitMass.grams
+        )
     }
 }
 

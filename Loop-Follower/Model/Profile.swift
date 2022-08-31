@@ -27,6 +27,8 @@ struct Profile : Codable {
     let basal : [Basal]
     let target_low : [Target]
     let target_high : [Target]
+    let sens : [Target]
+    let carbratio : [Target]
 }
 
 struct Basal : Codable {

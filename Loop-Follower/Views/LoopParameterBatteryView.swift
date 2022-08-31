@@ -74,6 +74,7 @@ struct LoopParameterBatteryView_Previews: PreviewProvider {
         ForEach(ColorScheme.allCases, id: \.self) {
             VStack {
                 LoopParameterBatteryView(label: "Battery", percentage: -10)
+                LoopParameterBatteryView(label: "Battery", percentage: 0)
                 LoopParameterBatteryView(label: "Battery", percentage: 10)
                 LoopParameterBatteryView(label: "Battery", percentage: 20)
                 LoopParameterBatteryView(label: "Battery", percentage: 30)

@@ -12,6 +12,7 @@
 		4B431A43288081CB00FC6185 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B431A42288081CB00FC6185 /* ChartView.swift */; };
 		4B70525E28A2FFA200BFBF84 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70525D28A2FFA200BFBF84 /* Profile.swift */; };
 		4B70526228A30DDA00BFBF84 /* ScheduledBasalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70526128A30DDA00BFBF84 /* ScheduledBasalView.swift */; };
+		4B83EEBC28B81D0300D52AAB /* TargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B83EEBB28B81D0300D52AAB /* TargetView.swift */; };
 		4B8A8AE128A390C30037F1F1 /* TempBasalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A8AE028A390C30037F1F1 /* TempBasalView.swift */; };
 		4B8A8AE328A3AFF30037F1F1 /* CarbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A8AE228A3AFF30037F1F1 /* CarbView.swift */; };
 		4B91FB2A288057E700792B24 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB28288057E700792B24 /* Localizable.strings */; };
@@ -63,6 +64,7 @@
 		4B431A42288081CB00FC6185 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		4B70525D28A2FFA200BFBF84 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		4B70526128A30DDA00BFBF84 /* ScheduledBasalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledBasalView.swift; sourceTree = "<group>"; };
+		4B83EEBB28B81D0300D52AAB /* TargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetView.swift; sourceTree = "<group>"; };
 		4B8A8AE028A390C30037F1F1 /* TempBasalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempBasalView.swift; sourceTree = "<group>"; };
 		4B8A8AE228A3AFF30037F1F1 /* CarbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarbView.swift; sourceTree = "<group>"; };
 		4B91FB29288057E700792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -213,6 +215,7 @@
 				4BCD62B328860E5D007D0B6A /* InsulinView.swift */,
 				4BCD62B528861120007D0B6A /* GlucoseView.swift */,
 				4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */,
+				4B83EEBB28B81D0300D52AAB /* TargetView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -374,6 +377,7 @@
 				4B2124A42885959400453B69 /* SettingsStore.swift in Sources */,
 				4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */,
 				4BCD62B628861120007D0B6A /* GlucoseView.swift in Sources */,
+				4B83EEBC28B81D0300D52AAB /* TargetView.swift in Sources */,
 				4B8A8AE128A390C30037F1F1 /* TempBasalView.swift in Sources */,
 				4B70525E28A2FFA200BFBF84 /* Profile.swift in Sources */,
 				4BF86DFE287EF97D003B9060 /* MonitorView.swift in Sources */,
