@@ -35,7 +35,7 @@ class ModelData : ObservableObject {
             return
         }
         
-        let date = Calendar.current.date(byAdding: .hour, value: -7, to: Date())!.timeIntervalSince1970 * 1000
+        let date = Calendar.current.date(byAdding: .hour, value: -8, to: Date())!.timeIntervalSince1970 * 1000
 
         if let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&find[date][$gte]=\(date)&count=288") {
             URLSession.shared.dataTask(
@@ -80,7 +80,7 @@ class ModelData : ObservableObject {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -8, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction%20Bolus&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -203,7 +203,7 @@ class ModelData : ObservableObject {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -8, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp%20Basal&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -373,24 +373,20 @@ class ModelData : ObservableObject {
         if self.profile == nil || self.lastEntry == nil || self.currentLoopData == nil {
             return Measurement(value: 0, unit: UnitMass.grams)
         }
-
-        let now : Date = self.lastEntry!.date
+        
+        let entry = self.lastEntry!
+        let loopData = self.currentLoopData!
+        let now : Date = entry.date
         let start = Calendar.current.startOfDay(for: now)
+        let currentSens = profile!.sens.last(where: {(start + $0.timeAsSeconds) < now})!
+        let currentCarbratio = profile!.carbratio.last(where: {(start + $0.timeAsSeconds) < now})!
+        let currentTarget = profile!.target_low.last(where: {(start + $0.timeAsSeconds) < now})!
         
-        let currentSens = profile?.sens.last(where: {(start + $0.timeAsSeconds) < now})
-        print("sens: \(currentSens.debugDescription)")
-        let currentCarbratio = profile?.carbratio.last(where: {(start + $0.timeAsSeconds) < now})
-        print("carbratio: \(currentCarbratio.debugDescription)")
-        let currentTarget = profile?.target_low.last(where: {(start + $0.timeAsSeconds) < now})
-        print("target: \(currentTarget.debugDescription)")
-        
-        let grams : Double = Double(((Double(lastEntry!.sgv) - max(currentLoopData!.iob.value,0) * currentSens!.value) - currentTarget!.value) / -currentSens!.value * currentCarbratio!.value)
-        print("gramms: \(grams.debugDescription)")
-        let rec_grams = currentLoopData!.cob.value - grams
-        print("rec_grams: \(rec_grams.debugDescription)")
+        let grams : Double = Double(((Double(entry.sgv) - max(loopData.iob.value, 0) * currentSens.value) - currentTarget.value) / -currentSens.value * currentCarbratio.value)
+        let rec_grams = grams - loopData.cob.value
 
         return Measurement(
-            value: max(rec_grams, 0),
+            value: max(ceil(rec_grams), 0),
             unit: UnitMass.grams
         )
     }
