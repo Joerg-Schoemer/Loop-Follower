@@ -25,7 +25,7 @@ struct CurrentValueView: View {
     
     var body: some View {
         let color = estimateFillColor(currentEntry.sgv, currentEntry.date)
-        let textColor = estimateTextColor(currentEntry.sgv)
+        let textColor = estimateTextColor(currentEntry.sgv, currentEntry.date)
 
         GeometryReader { geometry in
             let arrow = Path { path in
@@ -75,7 +75,7 @@ struct CurrentValueView: View {
 }
 
 private func estimateFillColor(_ sgv : Int, _ date: Date) -> Color {
-    if (Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 10) {
+    if (Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 6) {
         return Color(.systemGray)
     }
     
@@ -90,8 +90,8 @@ private func estimateFillColor(_ sgv : Int, _ date: Date) -> Color {
     return Color(.systemGreen)
 }
 
-private func estimateTextColor(_ sgv : Int) -> Color {
-    if (sgv < 70 || sgv >= 250) {
+private func estimateTextColor(_ sgv : Int, _ date: Date) -> Color {
+    if (sgv < 70 || sgv >= 250 || Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 6) {
         return .white
     }
     

@@ -22,7 +22,6 @@ struct MonitorView: View {
             
             if orientation.isLandscape || prevOrientation.isLandscape && orientation.isFlat {
                 NewChartView()
-                    .padding([.top], 10)
             } else {
                 VStack(spacing: 0) {
                     if let lastEntry = modelData.lastEntry {
@@ -37,12 +36,12 @@ struct MonitorView: View {
                             cn: modelData.cn,
                             siteChanged: modelData.siteChanged,
                             sensorChanged: modelData.sensorChanged
-                        ).padding([.leading, .trailing, .bottom])
+                        )
                     }
 
                     NewChartView()
-                        .padding([.leading, .trailing], 10)
                 }
+                .padding([.leading, .trailing])
             }
         }
         .onReceive(orientationChanged) { _ in

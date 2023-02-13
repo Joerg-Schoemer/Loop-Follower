@@ -9,25 +9,15 @@
 /* Begin PBXBuildFile section */
 		4B2124A2288593BA00453B69 /* NightScoutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */; };
 		4B2124A42885959400453B69 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2124A32885959400453B69 /* SettingsStore.swift */; };
-		4B431A43288081CB00FC6185 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B431A42288081CB00FC6185 /* ChartView.swift */; };
 		4B70525E28A2FFA200BFBF84 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70525D28A2FFA200BFBF84 /* Profile.swift */; };
-		4B70526228A30DDA00BFBF84 /* ScheduledBasalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70526128A30DDA00BFBF84 /* ScheduledBasalView.swift */; };
-		4B83EEBC28B81D0300D52AAB /* TargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B83EEBB28B81D0300D52AAB /* TargetView.swift */; };
-		4B8A8AE128A390C30037F1F1 /* TempBasalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A8AE028A390C30037F1F1 /* TempBasalView.swift */; };
-		4B8A8AE328A3AFF30037F1F1 /* CarbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B8A8AE228A3AFF30037F1F1 /* CarbView.swift */; };
 		4B91FB2A288057E700792B24 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB28288057E700792B24 /* Localizable.strings */; };
 		4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB2B28805A0800792B24 /* Loop-Follower-InfoPlist.strings */; };
-		4BA96F792970BB110089DDCC /* CurvatureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA96F782970BB110089DDCC /* CurvatureView.swift */; };
 		4BAAAFBA298EF3FF00CFE92C /* NewChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAAAFB9298EF3FF00CFE92C /* NewChartView.swift */; };
 		4BB8D29928875B0B006AAEE5 /* sgvData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E05287F15A0003B9060 /* sgvData.json */; };
 		4BB8D29A28875B0F006AAEE5 /* deviceData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E15287F4EDF003B9060 /* deviceData.json */; };
 		4BB8D29B28875B0F006AAEE5 /* treatments.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B961B5728868B1800E51DC0 /* treatments.json */; };
 		4BCD62B02885F6DD007D0B6A /* Treatment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62AF2885F6DD007D0B6A /* Treatment.swift */; };
-		4BCD62B228860C5E007D0B6A /* PredictionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62B128860C5E007D0B6A /* PredictionView.swift */; };
-		4BCD62B428860E5D007D0B6A /* InsulinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62B328860E5D007D0B6A /* InsulinView.swift */; };
-		4BCD62B628861120007D0B6A /* GlucoseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62B528861120007D0B6A /* GlucoseView.swift */; };
 		4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */; };
-		4BEDD0542884D70200224401 /* GraphGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BEDD0532884D70200224401 /* GraphGridView.swift */; };
 		4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DD3287EF911003B9060 /* Loop_FollowerApp.swift */; };
 		4BF86DD6287EF911003B9060 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DD5287EF911003B9060 /* ContentView.swift */; };
 		4BF86DD8287EF913003B9060 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86DD7287EF913003B9060 /* Assets.xcassets */; };
@@ -63,24 +53,14 @@
 /* Begin PBXFileReference section */
 		4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutSettingsView.swift; sourceTree = "<group>"; };
 		4B2124A32885959400453B69 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
-		4B431A42288081CB00FC6185 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		4B70525D28A2FFA200BFBF84 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
-		4B70526128A30DDA00BFBF84 /* ScheduledBasalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScheduledBasalView.swift; sourceTree = "<group>"; };
-		4B83EEBB28B81D0300D52AAB /* TargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TargetView.swift; sourceTree = "<group>"; };
-		4B8A8AE028A390C30037F1F1 /* TempBasalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TempBasalView.swift; sourceTree = "<group>"; };
-		4B8A8AE228A3AFF30037F1F1 /* CarbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarbView.swift; sourceTree = "<group>"; };
 		4B91FB29288057E700792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4B91FB2C28805A0800792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = "de.lproj/Loop-Follower-InfoPlist.strings"; sourceTree = "<group>"; };
 		4B961B5728868B1800E51DC0 /* treatments.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = treatments.json; sourceTree = "<group>"; };
-		4BA96F782970BB110089DDCC /* CurvatureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurvatureView.swift; sourceTree = "<group>"; };
 		4BAAAFB9298EF3FF00CFE92C /* NewChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewChartView.swift; sourceTree = "<group>"; };
 		4BCD62AF2885F6DD007D0B6A /* Treatment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Treatment.swift; sourceTree = "<group>"; };
-		4BCD62B128860C5E007D0B6A /* PredictionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredictionView.swift; sourceTree = "<group>"; };
-		4BCD62B328860E5D007D0B6A /* InsulinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinView.swift; sourceTree = "<group>"; };
-		4BCD62B528861120007D0B6A /* GlucoseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseView.swift; sourceTree = "<group>"; };
 		4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterBatteryView.swift; sourceTree = "<group>"; };
 		4BEB46902885D72D000773C1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		4BEDD0532884D70200224401 /* GraphGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphGridView.swift; sourceTree = "<group>"; };
 		4BF86DD0287EF911003B9060 /* Loop-Follower.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Loop-Follower.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BF86DD3287EF911003B9060 /* Loop_FollowerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loop_FollowerApp.swift; sourceTree = "<group>"; };
 		4BF86DD5287EF911003B9060 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -205,22 +185,12 @@
 		4BF86E17287F53EE003B9060 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				4B8A8AE228A3AFF30037F1F1 /* CarbView.swift */,
-				4B431A42288081CB00FC6185 /* ChartView.swift */,
 				4BF86E01287EFABB003B9060 /* CurrentValueView.swift */,
-				4BA96F782970BB110089DDCC /* CurvatureView.swift */,
-				4BCD62B528861120007D0B6A /* GlucoseView.swift */,
-				4BEDD0532884D70200224401 /* GraphGridView.swift */,
-				4BCD62B328860E5D007D0B6A /* InsulinView.swift */,
 				4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */,
 				4BF86E18287F5414003B9060 /* LoopParameterValue.swift */,
 				4BF86DFF287EFA6F003B9060 /* LoopParameterView.swift */,
 				4BF86DFD287EF97D003B9060 /* MonitorView.swift */,
 				4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */,
-				4BCD62B128860C5E007D0B6A /* PredictionView.swift */,
-				4B70526128A30DDA00BFBF84 /* ScheduledBasalView.swift */,
-				4B83EEBB28B81D0300D52AAB /* TargetView.swift */,
-				4B8A8AE028A390C30037F1F1 /* TempBasalView.swift */,
 				4BAAAFB9298EF3FF00CFE92C /* NewChartView.swift */,
 			);
 			path = Views;
@@ -371,22 +341,12 @@
 				4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */,
 				4BAAAFBA298EF3FF00CFE92C /* NewChartView.swift in Sources */,
 				4BF86E19287F5414003B9060 /* LoopParameterValue.swift in Sources */,
-				4B431A43288081CB00FC6185 /* ChartView.swift in Sources */,
-				4B8A8AE328A3AFF30037F1F1 /* CarbView.swift in Sources */,
-				4BEDD0542884D70200224401 /* GraphGridView.swift in Sources */,
 				4BF86DD6287EF911003B9060 /* ContentView.swift in Sources */,
 				4BCD62B02885F6DD007D0B6A /* Treatment.swift in Sources */,
 				4BF86E07287F15D3003B9060 /* ModelData.swift in Sources */,
 				4BF86E0B287F1653003B9060 /* Entries.swift in Sources */,
-				4B70526228A30DDA00BFBF84 /* ScheduledBasalView.swift in Sources */,
-				4BCD62B428860E5D007D0B6A /* InsulinView.swift in Sources */,
-				4BCD62B228860C5E007D0B6A /* PredictionView.swift in Sources */,
 				4B2124A42885959400453B69 /* SettingsStore.swift in Sources */,
 				4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */,
-				4BCD62B628861120007D0B6A /* GlucoseView.swift in Sources */,
-				4BA96F792970BB110089DDCC /* CurvatureView.swift in Sources */,
-				4B83EEBC28B81D0300D52AAB /* TargetView.swift in Sources */,
-				4B8A8AE128A390C30037F1F1 /* TempBasalView.swift in Sources */,
 				4B70525E28A2FFA200BFBF84 /* Profile.swift in Sources */,
 				4BF86DFE287EF97D003B9060 /* MonitorView.swift in Sources */,
 				4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */,

@@ -395,11 +395,16 @@ class ModelData : ObservableObject {
             baseUrl: baseUrl,
             token: token,
             completionHandler: { profiles in
-                let date = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: Date.now)!
+                let startDate = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: Date.now)!
+                let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: Date.now)!
 
                 self.profile = profiles!.store[profiles!.defaultProfile]!
                 self.loopSettings = profiles!.loopSettings
-                self.scheduledBasal = calculateTempBasal(basals: self.profile!.basal, startDate: date)
+                self.scheduledBasal = calculateTempBasal(
+                    basals: self.profile!.basal,
+                    startDate: startDate,
+                    endDate: endDate
+                )
             }
         )
         loadSiteChange(
@@ -472,4 +477,82 @@ func initLoad<T: Decodable>(_ filename: String) -> T {
     } catch {
         fatalError("Couldn't parse \(filename) as \(T.self):\n\(error)")
     }
+}
+
+func convertBasalToTempBasal(
+    _ basals: [Basal],
+    _ startOfDay: Date,
+    _ offset: Double
+) -> [TempBasal] {
+    var tempBasal : [TempBasal] = []
+    for i in 0..<(basals.count - 1) {
+        let currentBasal = basals[i]
+        let nextBasal = basals[i + 1]
+        tempBasal.append(
+            TempBasal(
+                id: UUID().uuidString,
+                duration: (nextBasal.timeAsSeconds - currentBasal.timeAsSeconds) / 60,
+                rate: currentBasal.value,
+                timestamp: ISO8601DateFormatter().string(from: startOfDay + currentBasal.timeAsSeconds + offset)
+            )
+        )
+    }
+    let lastBasal = basals.last!
+    tempBasal.append(
+        TempBasal(
+            id: UUID().uuidString,
+            duration: (86400 - lastBasal.timeAsSeconds) / 60,
+            rate: lastBasal.value,
+            timestamp: ISO8601DateFormatter().string(from: startOfDay + lastBasal.timeAsSeconds + offset)
+        )
+    )
+    
+    return tempBasal
+}
+
+func calculateTempBasal(
+    basals : [Basal],
+    startDate: Date,
+    endDate: Date
+) -> [TempBasal] {
+
+    let startOfDay = Calendar.current.startOfDay(for: startDate)
+    var tempBasal : [TempBasal] = []
+
+    // first day
+    tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDay, 0))
+    // second day
+    tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDay, 86400))
+
+    tempBasal = tempBasal.filter({ $0.endDate > startDate && $0.startDate < endDate })
+
+    if let first = tempBasal.first {
+        if first.startDate < startDate {
+            // replace with start of chart
+            let newFirst = TempBasal(
+                id: UUID().uuidString,
+                duration: Double(Calendar.current.dateComponents([.second], from: startDate, to: first.endDate).second!) / 60,
+                rate: first.rate,
+                timestamp: ISO8601DateFormatter().string(from: startDate)
+            )
+            tempBasal.remove(at: 0)
+            tempBasal.insert(newFirst, at: 0)
+        }
+    }
+    
+    if let last = tempBasal.last {
+        if last.endDate > endDate {
+            // replace with end of chart
+            let newLast = TempBasal(
+                id: UUID().uuidString,
+                duration: Double(Calendar.current.dateComponents([.second], from: last.startDate, to: endDate).second!) / 60,
+                rate: last.rate,
+                timestamp: last.timestamp
+            )
+            tempBasal.remove(at: tempBasal.count - 1)
+            tempBasal.append(newLast)
+        }
+    }
+
+    return tempBasal
 }

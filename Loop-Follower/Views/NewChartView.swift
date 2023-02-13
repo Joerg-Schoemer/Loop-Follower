@@ -115,6 +115,7 @@ struct NewChartView: View {
                 "insulin": Color(.systemOrange),
                 "carbs": Color(.systemTeal),
             ])
+            .padding([.top, .bottom])
 
             Chart {
                 ForEach(modelData.scheduledBasal) { basal in
@@ -123,31 +124,59 @@ struct NewChartView: View {
                         y: .value("rate", basal.rate)
                     ).lineStyle(
                         StrokeStyle(
-                            lineWidth: 0.5,
                             dash: [4]
                         )
                     )
                     LineMark(
                         x: .value("endDate", basal.endDate),
                         y: .value("rate", basal.rate)
+                    ).lineStyle(
+                        StrokeStyle(
+                            dash: [4]
+                        )
                     )
-                    /*
-                    RuleMark(
-                        xStart: .value("start", basal.startDate),
-                        xEnd: .value("end", basal.endDate),
-                        y: .value("rate", basal.rate)
-                    )
-                     */
                 }
-                ForEach(modelData.tempBasal.reversed()) { tempBasal in
+                ForEach(
+                    calculateResultingBasal(
+                        tempBasal: modelData.tempBasal,
+                        scheduledBasal: modelData.scheduledBasal,
+                        startDate: Calendar.current.date(byAdding: .hour, value: -6, to: Date.now)!,
+                        endDate: Calendar.current.date(byAdding: .hour, value: 3, to: Date.now)!
+                    ).sorted(by: {$0.startDate < $1.startDate})
+                ) { tempBasal in
                     AreaMark(
-                        xStart: .value("startDate", tempBasal.startDate),
-                        xEnd: .value("endDate", tempBasal.endDate),
+                        x: .value("startDate", tempBasal.startDate),
                         y: .value("rate", tempBasal.rate)
                     )
+                    AreaMark(
+                        x: .value("endDate", tempBasal.endDate),
+                        y: .value("rate", tempBasal.rate)
+                    )
+                    if let currentDate = modelData.currentDate {
+                        RuleMark(
+                            x: .value("now", currentDate)
+                        )
+                        .lineStyle(StrokeStyle(
+                            lineWidth: 0.5,
+                            dash: [4])
+                        )
+                        .foregroundStyle(Color(.systemGray))
+                    }
                 }
             }
+            .padding([.top, .bottom])
+
             Chart {
+                if let currentDate = modelData.currentDate {
+                    RuleMark(
+                        x: .value("now", currentDate)
+                    )
+                    .lineStyle(StrokeStyle(
+                        lineWidth: 0.5,
+                        dash: [4])
+                    )
+                    .foregroundStyle(Color(.systemGray))
+                }
                 ForEach(velocity) { velocity in
                     BarMark(
                         x: .value("timestamp", velocity.date),
@@ -163,6 +192,7 @@ struct NewChartView: View {
                     .foregroundStyle(by: .value("category", "accelleration"))
                 }
             }
+            .padding([.top, .bottom])
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
     }
@@ -208,80 +238,97 @@ struct NewChartView_Previews: PreviewProvider {
     }
 }
 
-
-/*
-fileprivate func estimatePoints(
-    tempBasal : [TempBasal],
-    scheduledBasal : [TempBasal]
+fileprivate func calculateResultingBasal(
+    tempBasal: [TempBasal],
+    scheduledBasal: [TempBasal],
+    startDate: Date,
+    endDate: Date
 ) -> [TempBasal] {
-
+    
+    let formatter = ISO8601DateFormatter()
+    
     var tempBasalPoints : [TempBasal] = []
-    for b in scheduledBasal {
-        var lastTempEndDate : Date = b.startDate
-        for t in tempBasal.filter({
-            (b.startDate ... b.endDate).contains($0.endDate)
-            || (b.startDate ... b.endDate).contains($0.startDate)
-        }).sorted(by: {$0.startDate < $1.startDate}) {
-            if (t.startDate < b.startDate) {
+    for sb in scheduledBasal {
+        
+        let tempWithinCurrentSchedule = tempBasal.filter({
+            (sb.startDate ... sb.endDate).contains($0.endDate)
+            || (sb.startDate ... sb.endDate).contains($0.startDate)
+        }).sorted(by: {$0.startDate < $1.startDate})
+        
+        if tempWithinCurrentSchedule.isEmpty {
+            // keine temp-basal einträge während scheduled, kann so übernommen werden
+            tempBasalPoints.append(sb)
+            continue
+        }
+        
+        var lastTempEndDate : Date = sb.startDate
+        for tb in tempWithinCurrentSchedule {
+            if tb.startDate <= sb.startDate {
+                // startet ausserhalb
+                // wird am Anfang gekürzt
                 tempBasalPoints.append(
                     TempBasal(
-                        id: "",
-                        duration: Double(Calendar.current.dateComponents([.minute], from: t.startDate, to: b.startDate).minute!),
-                        rate: t.rate,
-                        timestamp: t.startDate.formatted(ISO8601DateFormatter())!
+                        id: UUID().uuidString,
+                        duration: Double(Calendar.current.dateComponents([.second], from: sb.startDate, to: tb.endDate).second!) / 60,
+                        rate: tb.rate,
+                        timestamp: formatter.string(from: sb.startDate)
                     )
                 )
-                lastTempEndDate = t.endDate
-            } else {
-                if lastTempEndDate < t.startDate {
-                    let newBasalElement = TempBasal(
+                lastTempEndDate = tb.endDate
+                continue
+            }
+            
+            if lastTempEndDate < tb.startDate {
+                // Lücke muss gefüllt werden mit scheduled rate
+                tempBasalPoints.append(
+                    TempBasal(
                         id: UUID().uuidString,
-                        duration: Double(Calendar.current.dateComponents([.minute], from: lastTempEndDate, to: t.startDate).minute!),
-                        rate: b.rate,
-                        timestamp: t.startDate.formatted(ISO8601DateFormatter())!
+                        duration: Double(Calendar.current.dateComponents([.second], from: lastTempEndDate, to: tb.startDate).second!) / 60,
+                        rate: sb.rate,
+                        timestamp: formatter.string(from: lastTempEndDate)
                     )
-
-                    tempBasalPoints.append(newBasalElement)
-                    /*
-                    tempBasalPoints.append(CGPoint(
-                        x: (lastEndDate - startDate) * xScale,
-                        y: height - b.rate * yScale
-                    ))
-                    tempBasalPoints.append(CGPoint(
-                        x: (t.startDate - startDate) * xScale,
-                        y: height - b.rate * yScale
-                    ))
-                     */
-                }
-                tempBasalPoints.append(t)
-                /*
-                tempBasalPoints.append(CGPoint(
-                    x: (t.startDate - startDate) * xScale,
-                    y: height - t.rate * yScale
-                ))
-                tempBasalPoints.append(CGPoint(
-                    x: (t.endDate - startDate) * xScale,
-                    y: height - t.rate * yScale
-                ))
-                 */
-                lastTempEndDate = t.endDate
+                )
+            }
+            
+            if tb.endDate < sb.endDate {
+                // liegt komplett drin
+                tempBasalPoints.append(tb)
+                lastTempEndDate = tb.endDate
+            } else {
+                // endet ausserhalb
+                // wird am Ende gekürzt
+                tempBasalPoints.append(
+                    TempBasal(
+                        id: UUID().uuidString,
+                        duration: Double(Calendar.current.dateComponents([.second], from: tb.startDate, to: sb.endDate).second!) / 60,
+                        rate: tb.rate,
+                        timestamp: formatter.string(from: tb.startDate)
+                    )
+                )
             }
         }
-
-        if lastTempEndDate < b.endDate {
-            /*
-            tempBasalPoints.append(CGPoint(
-                x: (lastEndDate - startDate) * xScale,
-                y: height - b.rate * yScale
-            ))
-            tempBasalPoints.append(CGPoint(
-                x: (b.endDate - startDate) * xScale,
-                y: height - b.rate * yScale
-            ))
-             */
+        if lastTempEndDate < sb.endDate {
+            tempBasalPoints.append(
+                TempBasal(
+                    id: UUID().uuidString,
+                    duration: Double(Calendar.current.dateComponents([.second], from: lastTempEndDate, to: sb.endDate).second!) / 60,
+                    rate: sb.rate,
+                    timestamp: formatter.string(from: lastTempEndDate)
+                )
+            )
         }
     }
     
-    return tempBasalPoints
+    return tempBasalPoints.filter({ $0.startDate < endDate && $0.endDate > startDate })
 }
-*/
+
+func derive(_ values: [Entry]) -> [Entry] {
+    let diffs = zip(values.dropFirst(), values).map {
+        let difference = Int(Calendar.current.dateComponents([.minute], from: $1.date, to: $0.date).minute! / 5)
+        
+        return Entry(id: "-", sgv: Int(($1.sgv - $0.sgv) / (difference <= 0 ? 1 : difference)), dateString: $1.dateString)
+    }
+
+    return diffs
+}
+
