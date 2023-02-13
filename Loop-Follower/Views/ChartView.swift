@@ -27,7 +27,13 @@ struct ChartView: View {
             
             let xMax : TimeInterval = endDate - startDate
             let yMax = estimateYMax(modelData)
+            let velocity = derive(modelData.entries)
+            let acceleration = derive(velocity)
             
+            let yScale = geo.size.height / yMax
+            
+            let baseLine = geo.size.height - (criticalLow * yScale)
+
             GraphGridView(
                 criticalHigh: criticalHigh,
                 upper: upper,
@@ -85,6 +91,21 @@ struct ChartView: View {
                 )
             }
             
+            CurvatureView(
+                values: velocity,
+                startDate: startDate,
+                xMax: xMax,
+                baseLine: baseLine,
+                color: .systemPink
+            )
+            CurvatureView(
+                values: acceleration,
+                startDate: startDate,
+                xMax: xMax,
+                baseLine: baseLine,
+                color: .systemBlue
+            )
+
             GlucoseView(
                 entries: modelData.entries,
                 startDate: startDate,
@@ -109,6 +130,16 @@ func estimateYMax(_ data: ModelData) -> Double {
     }
     
     return yMax + 10
+}
+
+func derive(_ values: [Entry]) -> [Entry] {
+    let diffs = zip(values.dropFirst(), values).map {
+        let difference = Int(Calendar.current.dateComponents([.minute], from: $1.date, to: $0.date).minute! / 5)
+        
+        return Entry(id: "-", sgv: Int(($1.sgv - $0.sgv) / (difference <= 0 ? 1 : difference)), dateString: $1.dateString)
+    }
+
+    return diffs
 }
 
 extension CGPoint: Hashable {

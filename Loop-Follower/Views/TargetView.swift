@@ -31,7 +31,7 @@ struct TargetView: View {
                 for target in targets {
                     path.addRect(target)
                 }
-            }.fill(Color(.blue.withAlphaComponent(0.2)))
+            }.fill(Color(.systemBlue.withAlphaComponent(0.5)))
         }
     }
 }

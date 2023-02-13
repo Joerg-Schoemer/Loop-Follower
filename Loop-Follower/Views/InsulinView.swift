@@ -26,7 +26,7 @@ struct InsulinView: View {
                 )
             }
             
-            let fillColor = Color(UIColor.orange.withAlphaComponent(0.5))
+            let fillColor = Color(.systemOrange.withAlphaComponent(0.5))
 
             ForEach(insulins, id: \.self) { insulin in
                 if area.contains(insulin.origin) {

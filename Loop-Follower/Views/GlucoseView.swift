@@ -57,14 +57,14 @@ struct GlucoseView: View {
 
 func estimateColorBySgv(sgv : Double, criticalLow : Double, lower: Double, upper : Double, criticalHigh : Double) -> Color {
     if sgv > criticalLow || sgv <= criticalHigh {
-        return .red
+        return Color(.systemRed)
     }
     
     if sgv > lower || sgv < upper {
-        return .yellow
+        return Color(.systemYellow)
     }
     
-    return .green
+    return Color(.systemGreen)
 }
 
 struct GlucoseView_Previews: PreviewProvider {

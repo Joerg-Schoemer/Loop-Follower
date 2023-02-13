@@ -9,13 +9,14 @@ import Foundation
 
 struct LoopData : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
-        case id = "_id", loop, uploader, pump
+        case id = "_id", loop, uploader, pump, override
     }
 
     let id : String
     let loop : Loop
     let uploader : Uploader
     let pump : Pump
+    let override : LoopOverride
     
     var cob : Measurement<UnitMass> {
         return Measurement<UnitMass>(value: self.loop.cob.cob, unit: UnitMass.grams)
@@ -73,6 +74,39 @@ struct Uploader : Codable {
 
 struct Pump : Codable {
     let reservoir : Double?
+}
+
+struct LoopOverride : Codable {
+    let currentCorrectionRange : CorrectionRange?
+    let multiplier : Double?
+    let name : String?
+    let symbol : String?
+    let duration : TimeInterval?
+    let active : Bool
+    let timestamp : String
+    
+    var activeName : String {
+        var activeName : String = ""
+        if symbol != nil {
+            activeName += symbol!
+        }
+        if name != nil {
+            if !activeName.isEmpty && activeName.last != " " {
+                activeName += " "
+            }
+            activeName += name!
+        }
+        if activeName.isEmpty {
+            return "custom"
+        }
+        
+        return activeName.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+struct CorrectionRange : Codable {
+    let minValue : Double
+    let maxValue : Double
 }
 
 class UnitInsulin : Dimension {

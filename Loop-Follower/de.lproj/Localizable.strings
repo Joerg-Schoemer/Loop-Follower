@@ -13,6 +13,9 @@
 /* no recommended Bolus */
 "None" = "Keiner";
 
+/* Override Name */
+"Override" = "Modus";
+
 /* Pump reservoir volume */
 "Pump Volume" = "Pumpentank";
 

@@ -34,7 +34,7 @@ struct TempBasalView: View {
                 for point in points[1...] {
                     path.addLine(to: point)
                 }
-            }.fill(Color(.systemBlue.withAlphaComponent(0.5)))
+            }.fill(Color(.systemBlue.withAlphaComponent(0.6)))
         }
     }
 }

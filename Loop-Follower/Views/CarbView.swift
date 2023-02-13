@@ -46,13 +46,11 @@ struct CarbView_Previews: PreviewProvider {
                 CarbCorrection(
                     id: "",
                     carbs: 4,
-                    absorptionTime: 180,
                     timestamp: "2022-08-09T08:00:00Z"
                 ),
                 CarbCorrection(
                     id: "",
                     carbs: 62,
-                    absorptionTime: 180,
                     timestamp: "2022-08-09T05:00:00Z"
                 ),
             ],

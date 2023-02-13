@@ -37,7 +37,7 @@ struct ScheduledBasalView: View {
     }
 }
 
-fileprivate func estimateScheduledBasal(
+func estimateScheduledBasal(
     basal : [Basal],
     startDate : Date,
     xScale : Double,

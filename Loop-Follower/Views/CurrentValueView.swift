@@ -24,8 +24,8 @@ struct CurrentValueView: View {
     }
     
     var body: some View {
-        let color = estimateFillColor(currentEntry.sgv)
-        let textColor: Color = estimateTextColor(currentEntry.sgv)
+        let color = estimateFillColor(currentEntry.sgv, currentEntry.date)
+        let textColor = estimateTextColor(currentEntry.sgv)
 
         GeometryReader { geometry in
             let arrow = Path { path in
@@ -48,14 +48,14 @@ struct CurrentValueView: View {
             Indicator(color: color)
                 .padding(46)
 
-            if currentEntry.direction != nil {
+            if let directionDegree = currentEntry.directionDegree {
                 arrow
-                    .rotation(.degrees(currentEntry.directionDegree))
+                    .rotation(.degrees(directionDegree))
                     .fill(color)
                     .brightness(-0.15)
                     .shadow(radius: 2, x: 2, y: 2)
                 arrow
-                    .rotation(.degrees(currentEntry.directionDegree))
+                    .rotation(.degrees(directionDegree))
                     .stroke(color, lineWidth: 2)
                     .brightness(-0.10)
             }
@@ -74,18 +74,20 @@ struct CurrentValueView: View {
     }
 }
 
-private func estimateFillColor(_ sgv : Int) -> Color {
-    if (sgv < 70) {
-        return .red
-    }
-    if (sgv >= 250) {
-        return .red
-    }
-    if (sgv >= 180) {
-        return .yellow
+private func estimateFillColor(_ sgv : Int, _ date: Date) -> Color {
+    if (Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 10) {
+        return Color(.systemGray)
     }
     
-    return .green
+    if (sgv < 70 || sgv >= 250) {
+        return Color(.systemRed)
+    }
+    
+    if (sgv >= 180) {
+        return Color(.systemYellow)
+    }
+    
+    return Color(.systemGreen)
 }
 
 private func estimateTextColor(_ sgv : Int) -> Color {
@@ -138,8 +140,9 @@ struct CurrentValueView_Previews: PreviewProvider {
     static let date = Date() + -120
     
     static var previews: some View {
-        let sgvs = [ 50, 70, 101, 180, 202, 250, 303 ]
+        let sgvs = [ 50, 70, 101, 180, 250, 202, 303, 100 ]
         let dirs = Direction.allCases
+
         VStack {
             CurrentValueView(
                 currentEntry: Entry(

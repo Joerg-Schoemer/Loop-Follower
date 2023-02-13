@@ -15,9 +15,9 @@ struct TempBasal : Codable, Identifiable {
 
     let id: String
 
-    var duration: Double
+    let duration: Double
     let rate : Double
-    var timestamp: String
+    let timestamp: String
     
     var startDate : Date {
         return formatter.date(from: timestamp)!
@@ -46,12 +46,11 @@ struct CorrectionBolus : Codable, Identifiable {
 struct CarbCorrection : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id",
-             carbs, absorptionTime, timestamp
+             carbs, timestamp
     }
 
     let id: String
     let carbs: Double
-    let absorptionTime: Double
     let timestamp: String
     
     var date : Date {
@@ -77,6 +76,21 @@ struct Treatment : Codable, Identifiable {
     
     var date : Date {
         return formatter.date(from: timestamp)!
+    }
+}
+
+struct ChangeEvent : Codable, Identifiable {
+    enum CodingKeys: String, CodingKey {
+        case id = "_id",
+             eventType, created_at
+    }
+
+    let id: String
+    let eventType: String
+    let created_at: String
+
+    var date : Date {
+        return ISO8601DateFormatter([.withInternetDateTime, .withFractionalSeconds]).date(from: created_at)!
     }
 }
 

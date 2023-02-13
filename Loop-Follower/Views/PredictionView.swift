@@ -34,7 +34,7 @@ struct PredictionView: View {
                     if area.contains(dot.origin) {
                         path.addEllipse(in: dot)
                     }
-                }.fill(.purple)
+                }.fill(Color(.systemPurple))
             }
         }
     }

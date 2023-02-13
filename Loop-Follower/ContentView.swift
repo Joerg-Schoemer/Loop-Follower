@@ -14,11 +14,14 @@ struct ContentView: View {
             MonitorView()
                 .toolbar {
                     ToolbarItem(placement: .bottomBar) {
-                        NavigationLink(destination: {
-                            NightScoutSettingsView()
-                        }, label: {
-                            Image(systemName: "gear")
-                        })
+                        NavigationLink(
+                            destination: {
+                                NightScoutSettingsView()
+                            },
+                            label: {
+                                Image(systemName: "gear")
+                            }
+                        )
                     }
                 }
                 .navigationBarHidden(true)

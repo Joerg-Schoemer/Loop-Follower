@@ -21,7 +21,7 @@ struct MonitorView: View {
         Group {
             
             if orientation.isLandscape || prevOrientation.isLandscape && orientation.isFlat {
-                ChartView()
+                NewChartView()
                     .padding([.top], 10)
             } else {
                 VStack(spacing: 0) {
@@ -34,11 +34,14 @@ struct MonitorView: View {
                     if let loopData = modelData.currentLoopData {
                         LoopParameterView(
                             loopData: loopData,
-                            cn: modelData.cn
+                            cn: modelData.cn,
+                            siteChanged: modelData.siteChanged,
+                            sensorChanged: modelData.sensorChanged
                         ).padding([.leading, .trailing, .bottom])
                     }
 
-                    ChartView()
+                    NewChartView()
+                        .padding([.leading, .trailing], 10)
                 }
             }
         }

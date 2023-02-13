@@ -9,8 +9,10 @@ import SwiftUI
 
 struct LoopParameterView: View {
     
-    let loopData: LoopData
-    let cn: Measurement<UnitMass>
+    let loopData : LoopData
+    let cn : Measurement<UnitMass>
+    let siteChanged : Date?
+    let sensorChanged : Date?
     
     let insulinFormatStyle = Measurement<UnitInsulin>.FormatStyle(
         width: .abbreviated,
@@ -25,7 +27,18 @@ struct LoopParameterView: View {
     )
     
     var body : some View {
+
         VStack {
+            if let siteChanged = self.siteChanged {
+                LoopParameterValue(
+                    label: NSLocalizedString("CAGE", comment: "Canula age"),
+                    data: hoursBetween(start: siteChanged, end: Date.now))
+            }
+            if let sensorChanged = self.sensorChanged {
+                LoopParameterValue(
+                    label: NSLocalizedString("SAGE", comment: "Canula age"),
+                    data: hoursBetween(start: sensorChanged, end: Date.now))
+            }
             LoopParameterValue(
                 label: NSLocalizedString("COB", comment: "Carbs on board"),
                 data: loopData.cob.formatted(gramFormatStyle))
@@ -42,7 +55,14 @@ struct LoopParameterView: View {
             LoopParameterValue(
                 label: NSLocalizedString("Pump Volume", comment: "Pump reservoir volume"),
                 data: pumpVolume(loopData.pumpVolume))
-            Divider()
+            
+            if loopData.override.active {
+                LoopParameterValue(
+                    label: NSLocalizedString("Override", comment: "Override Name"),
+                    data: loopData.override.activeName)
+                Divider()
+            }
+
             LoopParameterBatteryView(
                 label: NSLocalizedString("Battery", comment: "Battery"),
                 percentage: loopData.uploader.battery)
@@ -72,6 +92,14 @@ extension Date {
     }
 }
 
+func hoursBetween(start: Date, end: Date) -> String {
+    let formatter = DateComponentsFormatter()
+    formatter.allowedUnits = [.day, .hour]
+    formatter.unitsStyle = .abbreviated
+    
+    return formatter.string(from: start, to: end)!
+}
+
 struct LoopParameterView_Previews: PreviewProvider {
     static var previews: some View {
         LoopParameterView(
@@ -84,9 +112,20 @@ struct LoopParameterView_Previews: PreviewProvider {
                     predicted: nil
                 ),
                 uploader: Uploader(battery: 75),
-                pump: Pump(reservoir: nil)
+                pump: Pump(reservoir: nil),
+                override: LoopOverride(
+                    currentCorrectionRange: nil,
+                    multiplier: nil,
+                    name: "Sport",
+                    symbol: "🏃🏻 ",
+                    duration: nil,
+                    active: true,
+                    timestamp: "2022-12-06T05:06:06Z"
+                )
             ),
-            cn: Measurement<UnitMass>(value: 2.5, unit: UnitMass.grams)
+            cn: Measurement<UnitMass>(value: 2.5, unit: UnitMass.grams),
+            siteChanged: (Date.now - 86400.0),
+            sensorChanged: (Date.now - 86400.0/2.0)
         )
         .previewLayout(.sizeThatFits)
     }

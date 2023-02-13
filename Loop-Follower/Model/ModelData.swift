@@ -22,20 +22,24 @@ class ModelData : ObservableObject {
 
     @Published var tempBasal : [TempBasal] = []
 
+    @Published var scheduledBasal : [TempBasal] = []
+
     @Published var carbs : [CarbCorrection] = []
 
     @Published var profile : Profile?
     
-    func loadSvg(completionHandler: @escaping ([Entry]) -> ()) {
-        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+    @Published var loopSettings : LoopSettings?
+    
+    @Published var siteChanged : Date?
 
-        if baseUrl.isEmpty || token.isEmpty {
-            completionHandler([])
-            return
-        }
-        
-        let date = Calendar.current.date(byAdding: .hour, value: -8, to: Date())!.timeIntervalSince1970 * 1000
+    @Published var sensorChanged : Date?
+    
+    @Published var currentDate : Date?
+    
+    let hourOfHistory : Int = -6;
+
+    func loadSgv(baseUrl : String, token : String, completionHandler: @escaping ([Entry]) -> ()) {
+        let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date.now)!.timeIntervalSince1970 * 1000
 
         if let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&find[date][$gte]=\(date)&count=288") {
             URLSession.shared.dataTask(
@@ -68,19 +72,11 @@ class ModelData : ObservableObject {
         }
     }
     
-    func loadInsulin(completionHandler: @escaping ([CorrectionBolus]) -> ()) {
-        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
-
-        if baseUrl.isEmpty || token.isEmpty {
-            completionHandler([])
-            return
-        }
-
+    func loadInsulin(baseUrl : String, token: String, completionHandler: @escaping ([CorrectionBolus]) -> ()) {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -8, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction%20Bolus&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -109,19 +105,11 @@ class ModelData : ObservableObject {
         }
     }
     
-    func loadCarbs(completionHandler: @escaping ([CarbCorrection]) -> ()) {
-        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
-
-        if baseUrl.isEmpty || token.isEmpty {
-            completionHandler([])
-            return
-        }
-
+    func loadCarbs(baseUrl : String, token : String, completionHandler: @escaping ([CarbCorrection]) -> ()) {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Carb%20Correction&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -150,19 +138,11 @@ class ModelData : ObservableObject {
         }
     }
     
-    func loadTempBasal(completionHandler: @escaping ([TempBasal]) -> ()) {
-        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
-
-        if baseUrl.isEmpty || token.isEmpty {
-            completionHandler([])
-            return
-        }
-
+    func loadTempBasal(baseUrl : String, token : String, completionHandler: @escaping ([TempBasal]) -> ()) {
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -7, to: Date())!)
+        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
         if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp%20Basal&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -191,56 +171,7 @@ class ModelData : ObservableObject {
         }
     }
     
-    func loadScheduledBasal(completionHandler: @escaping ([Treatment]) -> ()) {
-        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
-
-        if baseUrl.isEmpty || token.isEmpty {
-            completionHandler([])
-            return
-        }
-
-        let format = ISO8601DateFormatter()
-        format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
-        
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: -8, to: Date())!)
-
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp%20Basal&find[timestamp][$gte]=\(startMillis)") {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-
-                if let error = error {
-                    print("Error fetching treatments: \(error)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("Error response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-
-                if let data = data {
-                    let treatmentData = try! JSONDecoder().decode([Treatment].self, from: data)
-                    DispatchQueue.main.async {
-                        completionHandler(treatmentData)
-                    }
-                } else {
-                    print("no data")
-                    return
-                }
-            }).resume()
-        }
-    }
-
-    func loadDeviceStatus(completionHandler: @escaping ([LoopData]) -> ()) {
-        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
-
-        if baseUrl.isEmpty || token.isEmpty {
-            completionHandler([])
-            return
-        }
-
+    func loadDeviceStatus(baseUrl:String, token: String, completionHandler: @escaping ([LoopData]) -> ()) {
         if let url = URL(string: "\(baseUrl)/api/v1/devicestatus.json?token=\(token)&count=1") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
@@ -268,15 +199,7 @@ class ModelData : ObservableObject {
         }
     }
     
-    func loadProfile(completionHandler: @escaping (Profile?) -> ()) {
-        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
-
-        if baseUrl.isEmpty || token.isEmpty {
-            completionHandler(nil)
-            return
-        }
-
+    func loadProfile(baseUrl : String,token : String, completionHandler: @escaping (Profiles?) -> ()) {
         if let url = URL(string: "\(baseUrl)/api/v1/profile.json?token=\(token)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
@@ -295,11 +218,85 @@ class ModelData : ObservableObject {
                     let profiles = try! JSONDecoder().decode([Profiles].self, from: data)
                     let activeProfile = profiles.first!
                     DispatchQueue.main.async {
-                        completionHandler(activeProfile.store[activeProfile.defaultProfile]!)
+                        completionHandler(activeProfile)
                     }
                 } else {
                     print("no data")
                     return
+                }
+            }).resume()
+        }
+    }
+    
+    func loadSiteChange(baseUrl:String, token : String, completionHandler: @escaping (Date?) -> ()) {
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Site%20Change&count=1") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+
+                if let error = error {
+                    print("Error fetching treatments: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+                
+                if httpResponse.statusCode == 304 {
+                    return
+                }
+
+                if let data = data {
+                    let treatmentData = (try! JSONDecoder().decode([ChangeEvent].self, from: data)).first
+                    
+                    if treatmentData == nil {
+                        return
+                    }
+
+                    DispatchQueue.main.async {
+                        completionHandler(treatmentData!.date)
+                    }
+                } else {
+                    print("no data")
+                    completionHandler(nil)
+                }
+            }).resume()
+        }
+    }
+
+    func loadSensorChange(baseUrl : String, token : String, completionHandler: @escaping (Date?) -> ()) {
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Sensor%20Change&count=1") {
+            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
+
+                if let error = error {
+                    print("Error fetching treatments: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+                
+                if httpResponse.statusCode == 304 {
+                    return
+                }
+
+                if let data = data {
+                    let treatmentData = (try! JSONDecoder().decode([ChangeEvent].self, from: data)).first
+                    
+                    if treatmentData == nil {
+                        return
+                    }
+                    
+                    DispatchQueue.main.async {
+                        completionHandler(treatmentData!.date)
+                    }
+                } else {
+                    print("no data")
+                    completionHandler(nil)
                 }
             }).resume()
         }
@@ -344,29 +341,82 @@ class ModelData : ObservableObject {
                 Target(value: 24, timeAsSeconds: 32400),
             ]
         )
+        
+        self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: entries.first!.date)
     }
 
     @objc func load() {
-        loadSvg { entries in
-            self.entries = entries
-            self.lastEntry = entries.first
+        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
+        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+
+        if baseUrl.isEmpty || token.isEmpty {
+            // do nothing when not configured
+            return
         }
-        loadDeviceStatus { loopData in
-            self.loopData = loopData
-            self.currentLoopData = loopData.first
-        }
-        loadInsulin { treatments in
-            self.insulin = treatments
-        }
-        loadCarbs { carbs in
-            self.carbs = carbs
-        }
-        loadTempBasal { treatments in
-            self.tempBasal = treatments
-        }
-        loadProfile { profile in
-            self.profile = profile
-        }
+
+        loadSgv(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler: { entries in
+                self.entries = entries
+                self.lastEntry = entries.first
+            }
+        )
+        loadDeviceStatus(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler: { loopData in
+                self.loopData = loopData
+                self.currentLoopData = loopData.first
+            }
+        )
+        loadInsulin(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler: { correctionBolus in
+                self.insulin = correctionBolus
+            }
+        )
+        loadCarbs(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler:  { carbCorrections in
+                self.carbs = carbCorrections
+            }
+        )
+        loadTempBasal(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler:  { tempBasal in
+                self.tempBasal = tempBasal
+            }
+        )
+        loadProfile(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler: { profiles in
+                let date = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: Date.now)!
+
+                self.profile = profiles!.store[profiles!.defaultProfile]!
+                self.loopSettings = profiles!.loopSettings
+                self.scheduledBasal = calculateTempBasal(basals: self.profile!.basal, startDate: date)
+            }
+        )
+        loadSiteChange(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler: { date in
+                self.siteChanged = date
+            }
+        )
+        loadSensorChange(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler: { date in
+                self.sensorChanged = date
+            }
+        )
+        currentDate = Date.now
     }
     
     var cn : Measurement<UnitMass> {
@@ -380,9 +430,19 @@ class ModelData : ObservableObject {
         let start = Calendar.current.startOfDay(for: now)
         let currentSens = profile!.sens.last(where: {(start + $0.timeAsSeconds) < now})!
         let currentCarbratio = profile!.carbratio.last(where: {(start + $0.timeAsSeconds) < now})!
-        let currentTarget = profile!.target_low.last(where: {(start + $0.timeAsSeconds) < now})!
+        var currentTarget = profile!.target_low.last(where: {(start + $0.timeAsSeconds) < now})!
         
-        let grams : Double = Double(((Double(entry.sgv) - max(loopData.iob.value, 0) * currentSens.value) - currentTarget.value) / -currentSens.value * currentCarbratio.value)
+        var factor = 1.0;
+        if (loopData.override.active) {
+            if let multiplier = loopData.override.multiplier {
+                factor = multiplier
+            }
+            if let targetRange = loopData.override.currentCorrectionRange {
+                currentTarget = Target(value: targetRange.minValue, timeAsSeconds: 0)
+            }
+        }
+        
+        let grams : Double = Double(((Double(entry.sgv) - max(loopData.iob.value, 0) * currentSens.value / factor) - currentTarget.value) / -currentSens.value * currentCarbratio.value)
         let rec_grams = grams - loopData.cob.value
 
         return Measurement(

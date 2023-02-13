@@ -28,33 +28,37 @@ struct Entry: Hashable, Decodable, Identifiable {
     var direction : Direction?
     var delta : Int?
     
-    var directionDegree : Double {
-        switch direction {
-
-        case .doubleUp:
-            return 0
-
-        case .singleUp:
-            return 30
-
-        case .fortyFiveUp:
-            return 60
-
-        case .flat:
-            return 90
-
-        case .fortyFiveDown:
-            return 120
-
-        case .singleDown:
-            return 150
-
-        case .doubleDown:
-            return 180
-
-        default:
-            return 270
+    var directionDegree : Double? {
+        if let direction = self.direction {
+            switch direction {
+                
+            case .doubleUp:
+                return 0
+                
+            case .singleUp:
+                return 30
+                
+            case .fortyFiveUp:
+                return 60
+                
+            case .flat:
+                return 90
+                
+            case .fortyFiveDown:
+                return 120
+                
+            case .singleDown:
+                return 150
+                
+            case .doubleDown:
+                return 180
+                
+            default:
+                return nil
+            }
         }
+        
+        return nil
     }
     
     var dateString : String
