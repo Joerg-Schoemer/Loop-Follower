@@ -60,14 +60,15 @@ struct CurrentValueView: View {
                     .brightness(-0.10)
             }
         }
-        .frame(width: 300, height: 300)
+        .frame(width: 250, height: 250)
         .overlay {
-            VStack(spacing: -5.0) {
+            VStack {
                 Text(currentEntry.date.formatted(date: .omitted, time: .standard))
                 Text(String(currentEntry.sgv))
-                    .font(.system(size: 64, weight: .heavy, design: .default))
+                    .font(.largeTitle.weight(.heavy))
                 Text(formatDelta())
             }
+            .font(.subheadline)
             .foregroundColor(textColor)
             .shadow(radius: 2, x: 5, y:5)
         }
@@ -99,7 +100,7 @@ private func estimateTextColor(_ sgv : Int, _ date: Date) -> Color {
 }
 
 struct Indicator : View {
-    let length : CGFloat = 12
+    let length : CGFloat = 10
     let color : Color
 
     var body: some View {

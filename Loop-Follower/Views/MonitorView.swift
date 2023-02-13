@@ -27,7 +27,8 @@ struct MonitorView: View {
                     if let lastEntry = modelData.lastEntry {
                         CurrentValueView(
                             currentEntry: lastEntry,
-                            delta: calcDelta(modelData.entries))
+                            delta: calcDelta(modelData.entries)
+                        )
                     }
 
                     if let loopData = modelData.currentLoopData {
