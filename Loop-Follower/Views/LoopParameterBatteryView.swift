@@ -17,7 +17,7 @@ struct LoopParameterBatteryView: View {
         HStack {
             Text(label)
             Spacer()
-            HStack{
+            HStack {
                 Text(percentage.formatted(.percent))
                 VStack {
                     GeometryReader { geo in
@@ -30,7 +30,8 @@ struct LoopParameterBatteryView: View {
                             .fill(estimateColor(percentage))
                             .frame(
                                 width: (width * CGFloat(min(max(percentage, 20), 100))) / 100,
-                                height: geo.size.height)
+                                height: geo.size.height
+                            )
                         RoundedRectangle(cornerRadius: radius)
                             .stroke(.background, lineWidth: 3)
                             .frame(width: width, height: geo.size.height)
@@ -60,13 +61,13 @@ struct LoopParameterBatteryView: View {
 
 private func estimateColor(_ percentage : Int) -> Color {
     if percentage <= 20 {
-        return .red
+        return Color(.systemRed)
     }
     if percentage <= 30 {
-        return .yellow
+        return Color(.systemYellow)
     }
     
-    return .green
+    return Color(.systemGreen)
 }
 
 struct LoopParameterBatteryView_Previews: PreviewProvider {

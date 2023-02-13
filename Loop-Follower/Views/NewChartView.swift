@@ -67,6 +67,10 @@ struct NewChartView: View {
                         x: .value("timestamp", carb.date),
                         y: .value("carbs", carb.carbs * 2)
                     )
+                    .annotation(position: .top) {
+                        Text("\(carb.carbs, specifier: "%.0f") g")
+                            .font(.footnote)
+                    }
                     .foregroundStyle(by: .value("category", "carbs"))
                 }
                 

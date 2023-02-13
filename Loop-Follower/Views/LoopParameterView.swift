@@ -67,6 +67,7 @@ struct LoopParameterView: View {
                 label: NSLocalizedString("Battery", comment: "Battery"),
                 percentage: loopData.uploader.battery)
         }
+        .font(.footnote)
     }
     
     func recommendedBolus(_ bolus : Measurement<UnitInsulin>?) -> String {
