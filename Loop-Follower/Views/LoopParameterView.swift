@@ -29,43 +29,49 @@ struct LoopParameterView: View {
     var body : some View {
 
         VStack {
-            if let siteChanged = self.siteChanged {
+            Group {
+                if let siteChanged = self.siteChanged {
+                    LoopParameterValue(
+                        label: NSLocalizedString("CAGE", comment: "Canula age"),
+                        data: hoursBetween(start: siteChanged, end: Date.now))
+                }
+                if let sensorChanged = self.sensorChanged {
+                    LoopParameterValue(
+                        label: NSLocalizedString("SAGE", comment: "Canula age"),
+                        data: hoursBetween(start: sensorChanged, end: Date.now))
+                }
                 LoopParameterValue(
-                    label: NSLocalizedString("CAGE", comment: "Canula age"),
-                    data: hoursBetween(start: siteChanged, end: Date.now))
-            }
-            if let sensorChanged = self.sensorChanged {
+                    label: NSLocalizedString("COB", comment: "Carbs on board"),
+                    data: loopData.cob.formatted(gramFormatStyle))
                 LoopParameterValue(
-                    label: NSLocalizedString("SAGE", comment: "Canula age"),
-                    data: hoursBetween(start: sensorChanged, end: Date.now))
+                    label: NSLocalizedString("Rec. Carbs", comment: "abbreviated recommended carbs"),
+                    data: cn.formatted(gramFormatStyle))
             }
-            LoopParameterValue(
-                label: NSLocalizedString("COB", comment: "Carbs on board"),
-                data: loopData.cob.formatted(gramFormatStyle))
-            LoopParameterValue(
-                label: NSLocalizedString("Rec. Carbs", comment: "abbreviated recommended carbs"),
-                data: cn.formatted(gramFormatStyle))
             Divider()
-            LoopParameterValue(
-                label: NSLocalizedString("IOB", comment: "Insulin on board"),
-                data: loopData.iob.formatted(insulinFormatStyle))
-            LoopParameterValue(
-                label: NSLocalizedString("Rec. Bolus", comment: "abbreviated recommended bolus"),
-                data: recommendedBolus(loopData.recommendedBolus))
-            LoopParameterValue(
-                label: NSLocalizedString("Pump Volume", comment: "Pump reservoir volume"),
-                data: pumpVolume(loopData.pumpVolume))
-            
-            if loopData.override.active {
+            Group {
                 LoopParameterValue(
-                    label: NSLocalizedString("Override", comment: "Override Name"),
-                    data: loopData.override.activeName)
+                    label: NSLocalizedString("IOB", comment: "Insulin on board"),
+                    data: loopData.iob.formatted(insulinFormatStyle))
+                LoopParameterValue(
+                    label: NSLocalizedString("Rec. Bolus", comment: "abbreviated recommended bolus"),
+                    data: recommendedBolus(self.loopData.recommendedBolus))
+                LoopParameterValue(
+                    label: NSLocalizedString("Pump Volume", comment: "Pump reservoir volume"),
+                    data: pumpVolume(loopData.pumpVolume))
+                LoopParameterValue(
+                    label: NSLocalizedString("Predicted Min/Max", comment: "Predicted Min/Max sgv"),
+                    data: predictedMinMax(loopData.loop.predicted?.values))
                 Divider()
+                LoopParameterBatteryView(
+                    label: NSLocalizedString("Battery", comment: "Battery"),
+                    percentage: loopData.uploader.battery)
+                if loopData.override.active {
+                    LoopParameterValue(
+                        label: NSLocalizedString("Override", comment: "Override Name"),
+                        data: loopData.override.activeName)
+                }
             }
-
-            LoopParameterBatteryView(
-                label: NSLocalizedString("Battery", comment: "Battery"),
-                percentage: loopData.uploader.battery)
+                
         }
         .font(.footnote)
     }
@@ -91,6 +97,18 @@ extension Date {
     static func - (lhs: Date, rhs: Date) -> TimeInterval {
         return lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
     }
+}
+
+func predictedMinMax(_ values : [Double]?) -> String {
+    
+    if let values = values {
+        let min = Int(values.min()!)
+        let max = Int(values.max()!)
+        
+        return "\(min)/\(max)"
+    }
+    
+    return "-"
 }
 
 func hoursBetween(start: Date, end: Date) -> String {

@@ -53,7 +53,7 @@ struct LoopParameterBatteryView: View {
                         .stroke(.gray, lineWidth: 1)
                     }
                 }
-                .frame(width: 48, height: 16)
+                .frame(width: 32, height: 12)
             }
         }
     }

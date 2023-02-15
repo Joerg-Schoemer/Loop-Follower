@@ -60,12 +60,12 @@ struct CurrentValueView: View {
                     .brightness(-0.10)
             }
         }
-        .frame(width: 250, height: 250)
+        .frame(width: 300, height: 300)
         .overlay {
             VStack {
                 Text(currentEntry.date.formatted(date: .omitted, time: .standard))
                 Text(String(currentEntry.sgv))
-                    .font(.largeTitle.weight(.heavy))
+                    .font(.system(size: 64, weight: .heavy, design: .default))
                 Text(formatDelta())
             }
             .font(.subheadline)

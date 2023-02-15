@@ -21,26 +21,28 @@ struct MonitorView: View {
         Group {
             
             if orientation.isLandscape || prevOrientation.isLandscape && orientation.isFlat {
-                NewChartView()
+                ChartsView()
             } else {
                 VStack(spacing: 0) {
-                    if let lastEntry = modelData.lastEntry {
-                        CurrentValueView(
-                            currentEntry: lastEntry,
-                            delta: calcDelta(modelData.entries)
-                        )
+                    ZStack {
+                        if let loopData = modelData.currentLoopData {
+                            LoopParameterView(
+                                loopData: loopData,
+                                cn: modelData.cn,
+                                siteChanged: modelData.siteChanged,
+                                sensorChanged: modelData.sensorChanged
+                            )
+                        }
+                        if let lastEntry = modelData.lastEntry {
+                            CurrentValueView(
+                                currentEntry: lastEntry,
+                                delta: calcDelta(modelData.entries)
+                            )
+                            .scaleEffect(0.707)
+                        }
                     }
 
-                    if let loopData = modelData.currentLoopData {
-                        LoopParameterView(
-                            loopData: loopData,
-                            cn: modelData.cn,
-                            siteChanged: modelData.siteChanged,
-                            sensorChanged: modelData.sensorChanged
-                        )
-                    }
-
-                    NewChartView()
+                    ChartsView()
                 }
                 .padding([.leading, .trailing])
             }

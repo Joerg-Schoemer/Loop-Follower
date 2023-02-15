@@ -12,7 +12,7 @@
 		4B70525E28A2FFA200BFBF84 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B70525D28A2FFA200BFBF84 /* Profile.swift */; };
 		4B91FB2A288057E700792B24 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB28288057E700792B24 /* Localizable.strings */; };
 		4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4B91FB2B28805A0800792B24 /* Loop-Follower-InfoPlist.strings */; };
-		4BAAAFBA298EF3FF00CFE92C /* NewChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAAAFB9298EF3FF00CFE92C /* NewChartView.swift */; };
+		4BAAAFBA298EF3FF00CFE92C /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAAAFB9298EF3FF00CFE92C /* ChartsView.swift */; };
 		4BB8D29928875B0B006AAEE5 /* sgvData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E05287F15A0003B9060 /* sgvData.json */; };
 		4BB8D29A28875B0F006AAEE5 /* deviceData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E15287F4EDF003B9060 /* deviceData.json */; };
 		4BB8D29B28875B0F006AAEE5 /* treatments.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B961B5728868B1800E51DC0 /* treatments.json */; };
@@ -31,6 +31,9 @@
 		4BF86E0B287F1653003B9060 /* Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E0A287F1653003B9060 /* Entries.swift */; };
 		4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E13287F4E51003B9060 /* LoopData.swift */; };
 		4BF86E19287F5414003B9060 /* LoopParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E18287F5414003B9060 /* LoopParameterValue.swift */; };
+		98D15237299B781500B53913 /* BasalChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D15236299B781500B53913 /* BasalChart.swift */; };
+		98D15239299B789400B53913 /* DerivedChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D15238299B789400B53913 /* DerivedChart.swift */; };
+		98D1523B299B796000B53913 /* BloodGlucoseChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D1523A299B796000B53913 /* BloodGlucoseChart.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +60,7 @@
 		4B91FB29288057E700792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4B91FB2C28805A0800792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = "de.lproj/Loop-Follower-InfoPlist.strings"; sourceTree = "<group>"; };
 		4B961B5728868B1800E51DC0 /* treatments.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = treatments.json; sourceTree = "<group>"; };
-		4BAAAFB9298EF3FF00CFE92C /* NewChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewChartView.swift; sourceTree = "<group>"; };
+		4BAAAFB9298EF3FF00CFE92C /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
 		4BCD62AF2885F6DD007D0B6A /* Treatment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Treatment.swift; sourceTree = "<group>"; };
 		4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterBatteryView.swift; sourceTree = "<group>"; };
 		4BEB46902885D72D000773C1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -79,6 +82,9 @@
 		4BF86E13287F4E51003B9060 /* LoopData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopData.swift; sourceTree = "<group>"; };
 		4BF86E15287F4EDF003B9060 /* deviceData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = deviceData.json; sourceTree = "<group>"; };
 		4BF86E18287F5414003B9060 /* LoopParameterValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterValue.swift; sourceTree = "<group>"; };
+		98D15236299B781500B53913 /* BasalChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasalChart.swift; sourceTree = "<group>"; };
+		98D15238299B789400B53913 /* DerivedChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedChart.swift; sourceTree = "<group>"; };
+		98D1523A299B796000B53913 /* BloodGlucoseChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloodGlucoseChart.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,7 +197,10 @@
 				4BF86DFF287EFA6F003B9060 /* LoopParameterView.swift */,
 				4BF86DFD287EF97D003B9060 /* MonitorView.swift */,
 				4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */,
-				4BAAAFB9298EF3FF00CFE92C /* NewChartView.swift */,
+				4BAAAFB9298EF3FF00CFE92C /* ChartsView.swift */,
+				98D15236299B781500B53913 /* BasalChart.swift */,
+				98D15238299B789400B53913 /* DerivedChart.swift */,
+				98D1523A299B796000B53913 /* BloodGlucoseChart.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -262,7 +271,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1330;
-				LastUpgradeCheck = 1330;
+				LastUpgradeCheck = 1420;
 				TargetAttributes = {
 					4BF86DCF287EF911003B9060 = {
 						CreatedOnToolsVersion = 13.3.1;
@@ -335,11 +344,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98D15237299B781500B53913 /* BasalChart.swift in Sources */,
 				4BF86E02287EFABB003B9060 /* CurrentValueView.swift in Sources */,
 				4BF86E00287EFA6F003B9060 /* LoopParameterView.swift in Sources */,
 				4B2124A2288593BA00453B69 /* NightScoutSettingsView.swift in Sources */,
 				4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */,
-				4BAAAFBA298EF3FF00CFE92C /* NewChartView.swift in Sources */,
+				4BAAAFBA298EF3FF00CFE92C /* ChartsView.swift in Sources */,
+				98D15239299B789400B53913 /* DerivedChart.swift in Sources */,
 				4BF86E19287F5414003B9060 /* LoopParameterValue.swift in Sources */,
 				4BF86DD6287EF911003B9060 /* ContentView.swift in Sources */,
 				4BCD62B02885F6DD007D0B6A /* Treatment.swift in Sources */,
@@ -347,6 +358,7 @@
 				4BF86E0B287F1653003B9060 /* Entries.swift in Sources */,
 				4B2124A42885959400453B69 /* SettingsStore.swift in Sources */,
 				4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */,
+				98D1523B299B796000B53913 /* BloodGlucoseChart.swift in Sources */,
 				4B70525E28A2FFA200BFBF84 /* Profile.swift in Sources */,
 				4BF86DFE287EF97D003B9060 /* MonitorView.swift in Sources */,
 				4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */,
@@ -410,6 +422,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -456,7 +469,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -470,6 +483,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
@@ -510,7 +524,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -531,6 +545,7 @@
 				DEVELOPMENT_TEAM = 94QQZX9U85;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -544,9 +559,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-Follower";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -561,6 +579,7 @@
 				DEVELOPMENT_TEAM = 94QQZX9U85;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -574,9 +593,12 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-Follower";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

@@ -1,8 +1,39 @@
+/* No comment provided by engineer. */
+"acceleration" = "Beschleunigung";
+
+/* No comment provided by engineer. */
+"Basal" = "Basal";
+
 /* Battery */
 "Battery" = "Batterie";
 
+/* No comment provided by engineer. */
+"BG" = "BZ";
+
+/* No comment provided by engineer. */
+"Blood Glucose" = "Blutzucker";
+
+/* Canula age */
+"CAGE" = "CAGE";
+
+/* No comment provided by engineer. */
+"carbs" = "KH";
+
+"Carbs" = "KH";
+
+/* No comment provided by engineer. */
+"category" = "Kategorie";
+
 /* Carbs on board */
 "COB" = "COB";
+
+/* No comment provided by engineer. */
+"Derived" = "Ableitungen";
+
+/* No comment provided by engineer. */
+"insulin" = "Insulin";
+
+"Insulin" = "Insulin";
 
 /* Insulin on board */
 "IOB" = "IOB";
@@ -16,6 +47,11 @@
 /* Override Name */
 "Override" = "Modus";
 
+/* No comment provided by engineer. */
+"prediction" = "Vorhersage";
+
+"Prediction" = "Vorhersage";
+
 /* Pump reservoir volume */
 "Pump Volume" = "Pumpentank";
 
@@ -24,6 +60,9 @@
 
 /* abbreviated recommended carbs */
 "Rec. Carbs" = "Empf. KH";
+
+/* Canula age */
+"SAGE" = "SAGE";
 
 /* No comment provided by engineer. */
 "Settings" = "Einstellungen";
@@ -36,6 +75,9 @@
 
 /* No comment provided by engineer. */
 "URL" = "URL";
+
+/* No comment provided by engineer. */
+"velocity" = "Geschwindigkeit";
 
 /* No comment provided by engineer. */
 "your Nightscout token" = "Dein Nightscout Token";

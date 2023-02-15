@@ -23,6 +23,8 @@ class ModelData : ObservableObject {
     @Published var tempBasal : [TempBasal] = []
 
     @Published var scheduledBasal : [TempBasal] = []
+    
+    @Published var resultingBasal : [TempBasal] = []
 
     @Published var carbs : [CarbCorrection] = []
 
@@ -400,11 +402,19 @@ class ModelData : ObservableObject {
 
                 self.profile = profiles!.store[profiles!.defaultProfile]!
                 self.loopSettings = profiles!.loopSettings
+                
                 self.scheduledBasal = calculateTempBasal(
                     basals: self.profile!.basal,
                     startDate: startDate,
                     endDate: endDate
                 )
+
+                self.resultingBasal = calculateResultingBasal(
+                    tempBasal: self.tempBasal,
+                    scheduledBasal: self.scheduledBasal,
+                    startDate: startDate,
+                    endDate: endDate
+                ).sorted(by: {$0.startDate < $1.startDate})
             }
         )
         loadSiteChange(
@@ -493,7 +503,8 @@ func convertBasalToTempBasal(
                 id: UUID().uuidString,
                 duration: (nextBasal.timeAsSeconds - currentBasal.timeAsSeconds) / 60,
                 rate: currentBasal.value,
-                timestamp: ISO8601DateFormatter().string(from: startOfDay + currentBasal.timeAsSeconds + offset)
+                timestamp: ISO8601DateFormatter().string(from: startOfDay + currentBasal.timeAsSeconds + offset),
+                type: "scheduled"
             )
         )
     }
@@ -503,7 +514,8 @@ func convertBasalToTempBasal(
             id: UUID().uuidString,
             duration: (86400 - lastBasal.timeAsSeconds) / 60,
             rate: lastBasal.value,
-            timestamp: ISO8601DateFormatter().string(from: startOfDay + lastBasal.timeAsSeconds + offset)
+            timestamp: ISO8601DateFormatter().string(from: startOfDay + lastBasal.timeAsSeconds + offset),
+            type: "scheduled"
         )
     )
     
@@ -533,7 +545,8 @@ func calculateTempBasal(
                 id: UUID().uuidString,
                 duration: Double(Calendar.current.dateComponents([.second], from: startDate, to: first.endDate).second!) / 60,
                 rate: first.rate,
-                timestamp: ISO8601DateFormatter().string(from: startDate)
+                timestamp: ISO8601DateFormatter().string(from: startDate),
+                type: "scheduled"
             )
             tempBasal.remove(at: 0)
             tempBasal.insert(newFirst, at: 0)
@@ -547,7 +560,8 @@ func calculateTempBasal(
                 id: UUID().uuidString,
                 duration: Double(Calendar.current.dateComponents([.second], from: last.startDate, to: endDate).second!) / 60,
                 rate: last.rate,
-                timestamp: last.timestamp
+                timestamp: last.timestamp,
+                type: "scheduled"
             )
             tempBasal.remove(at: tempBasal.count - 1)
             tempBasal.append(newLast)
@@ -555,4 +569,91 @@ func calculateTempBasal(
     }
 
     return tempBasal
+}
+
+func calculateResultingBasal(
+    tempBasal: [TempBasal],
+    scheduledBasal: [TempBasal],
+    startDate: Date,
+    endDate: Date
+) -> [TempBasal] {
+    
+    let formatter = ISO8601DateFormatter()
+    
+    var tempBasalPoints : [TempBasal] = []
+    for sb in scheduledBasal {
+        
+        let tempWithinCurrentSchedule = tempBasal.filter({
+            (sb.startDate ... sb.endDate).contains($0.endDate)
+            || (sb.startDate ... sb.endDate).contains($0.startDate)
+        }).sorted(by: {$0.startDate < $1.startDate})
+        
+        if tempWithinCurrentSchedule.isEmpty {
+            // keine temp-basal einträge während scheduled, kann so übernommen werden
+            tempBasalPoints.append(sb)
+            continue
+        }
+        
+        var lastTempEndDate : Date = sb.startDate
+        for tb in tempWithinCurrentSchedule {
+            if tb.startDate < sb.startDate {
+                // startet ausserhalb
+                // wird am Anfang gekürzt
+                tempBasalPoints.append(
+                    TempBasal(
+                        id: UUID().uuidString,
+                        duration: Double(Calendar.current.dateComponents([.second], from: sb.startDate, to: tb.endDate).second!) / 60,
+                        rate: tb.rate,
+                        timestamp: formatter.string(from: sb.startDate)
+                    )
+                )
+                lastTempEndDate = tb.endDate
+                continue
+            }
+            
+            if lastTempEndDate < tb.startDate {
+                // Lücke muss gefüllt werden mit scheduled rate
+                tempBasalPoints.append(
+                    TempBasal(
+                        id: UUID().uuidString,
+                        duration: Double(Calendar.current.dateComponents([.second], from: lastTempEndDate, to: tb.startDate).second!) / 60,
+                        rate: sb.rate,
+                        timestamp: formatter.string(from: lastTempEndDate),
+                        type: "scheduled"
+                    )
+                )
+            }
+            
+            if tb.endDate < sb.endDate {
+                // liegt komplett drin
+                tempBasalPoints.append(tb)
+                lastTempEndDate = tb.endDate
+            } else {
+                // endet ausserhalb
+                // wird am Ende gekürzt
+                tempBasalPoints.append(
+                    TempBasal(
+                        id: UUID().uuidString,
+                        duration: Double(Calendar.current.dateComponents([.second], from: tb.startDate, to: sb.endDate).second!) / 60,
+                        rate: tb.rate,
+                        timestamp: formatter.string(from: tb.startDate)
+                    )
+                )
+                lastTempEndDate = tb.endDate
+            }
+        }
+        if lastTempEndDate < sb.endDate {
+            tempBasalPoints.append(
+                TempBasal(
+                    id: UUID().uuidString,
+                    duration: Double(Calendar.current.dateComponents([.second], from: lastTempEndDate, to: sb.endDate).second!) / 60,
+                    rate: sb.rate,
+                    timestamp: formatter.string(from: lastTempEndDate),
+                    type: "scheduled"
+                )
+            )
+        }
+    }
+    
+    return tempBasalPoints.filter({ $0.startDate < endDate && $0.endDate > startDate })
 }

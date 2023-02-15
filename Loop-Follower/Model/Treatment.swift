@@ -13,12 +13,13 @@ struct TempBasal : Codable, Identifiable {
              duration, timestamp, rate
     }
 
-    let id: String
+    let id : String
 
-    let duration: Double
+    let duration : Double
     let rate : Double
-    let timestamp: String
-    
+    let timestamp : String
+    var type : String = "temporary"
+        
     var startDate : Date {
         return formatter.date(from: timestamp)!
     }
