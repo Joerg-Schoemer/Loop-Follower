@@ -14,11 +14,11 @@ struct BloodGlucoseChart: View {
     
     let dashedLineStyle : [CGFloat] = [5, 2]
     
-    let criticalMin : Int = 55
-    let criticalMax : Int = 260
+    let criticalMin : Int
+    let criticalMax : Int
     
-    let rangeMin : Int = 70
-    let rangeMax : Int = 180
+    let rangeMin : Int
+    let rangeMax : Int
 
     let series: KeyValuePairs<String, Color> = [
         "Blood Glucose": Color(.systemBlue),
@@ -178,7 +178,12 @@ func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
 
 struct BloodGlucoseChart_Previews: PreviewProvider {
     static var previews: some View {
-        BloodGlucoseChart()
+        BloodGlucoseChart(
+            criticalMin: 55,
+            criticalMax: 260,
+            rangeMin: 70,
+            rangeMax: 180
+        )
             .environmentObject(ModelData(test: true))
     }
 }

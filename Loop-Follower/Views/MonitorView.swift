@@ -12,6 +12,12 @@ struct MonitorView: View {
     @EnvironmentObject var modelData : ModelData
     @State var orientation = UIDevice.current.orientation
     @State var prevOrientation = UIDevice.current.orientation
+    
+    let criticalMax : Int = 260
+    let criticalMin : Int = 55
+    
+    let rangeMin : Int = 70
+    let rangeMax : Int = 180
 
     let orientationChanged = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
         .makeConnectable()
@@ -19,9 +25,13 @@ struct MonitorView: View {
     
     var body: some View {
         Group {
-            
             if orientation.isLandscape || prevOrientation.isLandscape && orientation.isFlat {
-                ChartsView()
+                ChartsView(
+                    criticalMin: criticalMin,
+                    criticalMax: criticalMax,
+                    rangeMin: rangeMin,
+                    rangeMax: rangeMax
+                )
             } else {
                 VStack(spacing: 0) {
                     ZStack {
@@ -36,13 +46,22 @@ struct MonitorView: View {
                         if let lastEntry = modelData.lastEntry {
                             CurrentValueView(
                                 currentEntry: lastEntry,
-                                delta: calcDelta(modelData.entries)
+                                delta: calcDelta(modelData.entries),
+                                criticalMin: criticalMin,
+                                criticalMax: criticalMax,
+                                rangeMin: rangeMin,
+                                rangeMax: rangeMax
                             )
                             .scaleEffect(0.707)
                         }
                     }
 
-                    ChartsView()
+                    ChartsView(
+                        criticalMin: criticalMin,
+                        criticalMax: criticalMax,
+                        rangeMin: rangeMin,
+                        rangeMax: rangeMax
+                    )
                 }
                 .padding([.leading, .trailing])
             }

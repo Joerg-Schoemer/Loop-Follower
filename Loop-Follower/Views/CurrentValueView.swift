@@ -11,6 +11,12 @@ struct CurrentValueView: View {
     
     let currentEntry : Entry
     let delta : Int?
+
+    let criticalMin : Int
+    let criticalMax : Int
+
+    let rangeMin : Int
+    let rangeMax : Int
     
     fileprivate func formatDelta() -> String {
         if let delta = self.delta {
@@ -24,7 +30,7 @@ struct CurrentValueView: View {
     }
     
     var body: some View {
-        let color = estimateFillColor(currentEntry.sgv, currentEntry.date)
+        let color = estimateColorBySgv(currentEntry.sgv, currentEntry.date)
         let textColor = estimateTextColor(currentEntry.sgv, currentEntry.date)
 
         GeometryReader { geometry in
@@ -73,22 +79,23 @@ struct CurrentValueView: View {
             .shadow(radius: 2, x: 5, y:5)
         }
     }
-}
+    
+    func estimateColorBySgv(_ sgv : Int, _ date: Date) -> Color {
+        if (Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 6) {
+            return Color(.systemGray)
+        }
 
-private func estimateFillColor(_ sgv : Int, _ date: Date) -> Color {
-    if (Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 6) {
-        return Color(.systemGray)
+        if sgv < criticalMin || sgv >= criticalMax {
+            return Color(.systemRed)
+        }
+        
+        if sgv < rangeMin || sgv > rangeMax {
+            return Color(.systemYellow)
+        }
+        
+        return Color(.systemGreen)
     }
-    
-    if (sgv < 70 || sgv >= 250) {
-        return Color(.systemRed)
-    }
-    
-    if (sgv >= 180) {
-        return Color(.systemYellow)
-    }
-    
-    return Color(.systemGreen)
+
 }
 
 private func estimateTextColor(_ sgv : Int, _ date: Date) -> Color {
@@ -138,13 +145,13 @@ struct Tick : Shape {
 struct CurrentValueView_Previews: PreviewProvider {
     static var modelData = ModelData()
     static let df = ISO8601DateFormatter([.withFractionalSeconds])
-    static let date = Date() + -120
+    static let date = Date() + -720
     
     static var previews: some View {
         let sgvs = [ 50, 70, 101, 180, 250, 202, 303, 100 ]
         let dirs = Direction.allCases
 
-        VStack {
+        ScrollView {
             CurrentValueView(
                 currentEntry: Entry(
                     id: "wurscht",
@@ -152,7 +159,11 @@ struct CurrentValueView_Previews: PreviewProvider {
                     direction: nil,
                     dateString: df.string(from: date)
                 ),
-                delta: nil
+                delta: nil,
+                criticalMin: 55,
+                criticalMax: 260,
+                rangeMin: 70,
+                rangeMax: 180
             )
             
             ForEach(0 ..< dirs.count, id: \.self) { i in
@@ -166,7 +177,11 @@ struct CurrentValueView_Previews: PreviewProvider {
                         direction: dir,
                         dateString: df.string(from: date)
                     ),
-                    delta: Int.random(in: -10...10)
+                    delta: Int.random(in: -10...10),
+                    criticalMin: 55,
+                    criticalMax: 260,
+                    rangeMin: 70,
+                    rangeMax: 180
                 )
             }
         }.previewLayout(.sizeThatFits)
