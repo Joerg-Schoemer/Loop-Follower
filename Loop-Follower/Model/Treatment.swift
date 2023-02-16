@@ -47,15 +47,24 @@ struct CorrectionBolus : Codable, Identifiable {
 struct CarbCorrection : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id",
-             carbs, timestamp
+             carbs, timestamp, foodType
     }
 
     let id: String
+    let foodType: String?
     let carbs: Double
     let timestamp: String
     
     var date : Date {
         return formatter.date(from: timestamp)!
+    }
+    
+    var description : String {
+        if let footType = foodType {
+            return footType + String(format: " %.0f g", carbs)
+        }
+
+        return String(format: "%.0f g", carbs)
     }
 }
 

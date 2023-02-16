@@ -16,7 +16,7 @@ struct ChartsView: View {
     let rangeMin : Int
     let rangeMax : Int
 
-    @State private var selection : String = "BG"
+    @Binding var selection : String
     
     @EnvironmentObject var modelData : ModelData
     
@@ -29,14 +29,14 @@ struct ChartsView: View {
                 rangeMin: rangeMin,
                 rangeMax: rangeMax
             )
-                .tag("BG")
+            .tag("BG")
 
             BasalChart(
                 scheduledBasal: modelData.scheduledBasal,
                 resultingBasal: modelData.resultingBasal,
                 currentDate: modelData.currentDate
             )
-                .tag("basal")
+            .tag("basal")
             
             DerivedChart()
                 .tag("derived")
@@ -45,16 +45,19 @@ struct ChartsView: View {
     }
 }
 
-struct NewChartView_Previews: PreviewProvider {
+struct ChartsView_Previews: PreviewProvider {
+
+    @State static var tabSelection : String = "BG"
    
     static var previews: some View {
         ChartsView(
             criticalMin: 55,
             criticalMax: 260,
             rangeMin: 70,
-            rangeMax: 180
+            rangeMax: 180,
+            selection: $tabSelection
         )
-            .environmentObject(ModelData(test: true))
+        .environmentObject(ModelData(test: true))
     }
 }
 

@@ -79,7 +79,7 @@ struct BloodGlucoseChart: View {
                         y: .value("carbs", carb.carbs * 2)
                     )
                     .annotation(position: .topTrailing) {
-                        Text("\(carb.carbs, specifier: "%.0f") g")
+                        Text(carb.description)
                             .font(.footnote)
                     }
                     .foregroundStyle(by: .value("category", "Carbs"))
@@ -140,7 +140,7 @@ struct BloodGlucoseChart: View {
         }
         .padding([.top, .bottom])
     }
-
+    
     func estimateColorBySgv(_ sgv : Int) -> Color {
         if sgv < criticalMin || sgv >= criticalMax {
             return Color(.systemRed)

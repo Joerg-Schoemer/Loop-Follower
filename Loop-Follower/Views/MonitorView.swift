@@ -12,6 +12,7 @@ struct MonitorView: View {
     @EnvironmentObject var modelData : ModelData
     @State var orientation = UIDevice.current.orientation
     @State var prevOrientation = UIDevice.current.orientation
+    @State var tabSelection : String = "BG"
     
     let criticalMax : Int = 260
     let criticalMin : Int = 55
@@ -30,7 +31,8 @@ struct MonitorView: View {
                     criticalMin: criticalMin,
                     criticalMax: criticalMax,
                     rangeMin: rangeMin,
-                    rangeMax: rangeMax
+                    rangeMax: rangeMax,
+                    selection: $tabSelection
                 )
             } else {
                 VStack(spacing: 0) {
@@ -60,7 +62,8 @@ struct MonitorView: View {
                         criticalMin: criticalMin,
                         criticalMax: criticalMax,
                         rangeMin: rangeMin,
-                        rangeMax: rangeMax
+                        rangeMax: rangeMax,
+                        selection: $tabSelection
                     )
                 }
                 .padding([.leading, .trailing])
