@@ -78,7 +78,7 @@ struct BloodGlucoseChart: View {
                         x: .value("timestamp", carb.date),
                         y: .value("carbs", carb.carbs * 2)
                     )
-                    .annotation(position: .top) {
+                    .annotation(position: .topTrailing) {
                         Text("\(carb.carbs, specifier: "%.0f") g")
                             .font(.footnote)
                     }
@@ -152,7 +152,6 @@ struct BloodGlucoseChart: View {
         
         return Color(.systemGreen)
     }
-
 }
 
 func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
@@ -184,6 +183,6 @@ struct BloodGlucoseChart_Previews: PreviewProvider {
             rangeMin: 70,
             rangeMax: 180
         )
-            .environmentObject(ModelData(test: true))
+        .environmentObject(ModelData(test: true))
     }
 }
