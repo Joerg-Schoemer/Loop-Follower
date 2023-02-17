@@ -39,6 +39,51 @@ class ModelData : ObservableObject {
     @Published var currentDate : Date?
     
     let hourOfHistory : Int = -6;
+    
+    init() {
+        load()
+        Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(load), userInfo: nil, repeats: true)
+    }
+    
+    init(test: Bool) {
+        self.entries = initLoad("sgvData.json")
+        self.lastEntry = entries.first
+
+        self.loopData = initLoad("deviceData.json")
+        self.currentLoopData = loopData.first
+        
+        self.insulin = initLoad("CorrectionBolus.json")
+        self.carbs = initLoad("CarbCorrection.json")
+
+        self.profile = Profile(
+            basal: [
+                Basal(value: 0.05, timeAsSeconds: 0),
+                Basal(value: 0.15, timeAsSeconds: 10800),
+                Basal(value: 0.05, timeAsSeconds: 14400),
+                Basal(value: 0.10, timeAsSeconds: 61200),
+                Basal(value: 0.05, timeAsSeconds: 64800),
+            ],
+            target_low: [
+                Target(value: 110, timeAsSeconds: 0),
+            ],
+            target_high: [
+                Target(value: 125, timeAsSeconds: 0),
+            ],
+            sens: [
+                Target(value: 270, timeAsSeconds: 0),
+                Target(value: 213, timeAsSeconds: 18000),
+                Target(value: 270, timeAsSeconds: 75600),
+            ],
+            carbratio: [
+                Target(value: 24, timeAsSeconds: 0),
+                Target(value: 16, timeAsSeconds: 21600),
+                Target(value: 24, timeAsSeconds: 32400),
+            ]
+        )
+        self.scheduledBasal = calculateTempBasal(basals: (self.profile?.basal)!, startDate: (entries.last?.date)!, endDate: (lastEntry?.date)!)
+        
+        self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: entries.first!.date)
+    }
 
     func loadSgv(baseUrl : String, token : String, completionHandler: @escaping ([Entry]) -> ()) {
         let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date.now)!.timeIntervalSince1970 * 1000
@@ -302,51 +347,6 @@ class ModelData : ObservableObject {
                 }
             }).resume()
         }
-    }
-
-    init() {
-        load()
-        Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(load), userInfo: nil, repeats: true)
-    }
-    
-    init(test: Bool) {
-        self.entries = initLoad("sgvData.json")
-        self.lastEntry = entries.first
-
-        self.loopData = initLoad("deviceData.json")
-        self.currentLoopData = loopData.first
-        
-        self.insulin = initLoad("CorrectionBolus.json")
-        self.carbs = initLoad("CarbCorrection.json")
-
-        self.profile = Profile(
-            basal: [
-                Basal(value: 0.05, timeAsSeconds: 0),
-                Basal(value: 0.15, timeAsSeconds: 10800),
-                Basal(value: 0.05, timeAsSeconds: 14400),
-                Basal(value: 0.10, timeAsSeconds: 61200),
-                Basal(value: 0.05, timeAsSeconds: 64800),
-            ],
-            target_low: [
-                Target(value: 110, timeAsSeconds: 0),
-            ],
-            target_high: [
-                Target(value: 125, timeAsSeconds: 0),
-            ],
-            sens: [
-                Target(value: 270, timeAsSeconds: 0),
-                Target(value: 213, timeAsSeconds: 18000),
-                Target(value: 270, timeAsSeconds: 75600),
-            ],
-            carbratio: [
-                Target(value: 24, timeAsSeconds: 0),
-                Target(value: 16, timeAsSeconds: 21600),
-                Target(value: 24, timeAsSeconds: 32400),
-            ]
-        )
-        self.scheduledBasal = calculateTempBasal(basals: (self.profile?.basal)!, startDate: (entries.last?.date)!, endDate: (lastEntry?.date)!)
-        
-        self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: entries.first!.date)
     }
 
     @objc func load() {
