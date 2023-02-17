@@ -40,14 +40,15 @@ struct LoopParameterView: View {
                         label: NSLocalizedString("SAGE", comment: "Canula age"),
                         data: hoursBetween(start: sensorChanged, end: Date.now))
                 }
+                Divider()
                 LoopParameterValue(
                     label: NSLocalizedString("COB", comment: "Carbs on board"),
                     data: loopData.cob.formatted(gramFormatStyle))
                 LoopParameterValue(
                     label: NSLocalizedString("Rec. Carbs", comment: "abbreviated recommended carbs"),
                     data: cn.formatted(gramFormatStyle))
+                Divider()
             }
-            Divider()
             Group {
                 LoopParameterValue(
                     label: NSLocalizedString("IOB", comment: "Insulin on board"),
@@ -58,8 +59,9 @@ struct LoopParameterView: View {
                 LoopParameterValue(
                     label: NSLocalizedString("Pump Volume", comment: "Pump reservoir volume"),
                     data: pumpVolume(loopData.pumpVolume))
+                Divider()
                 LoopParameterValue(
-                    label: NSLocalizedString("Predicted Min/Max", comment: "Predicted Min/Max sgv"),
+                    label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
                     data: predictedMinMax(loopData.loop.predicted?.values))
                 Divider()
                 LoopParameterBatteryView(
@@ -104,8 +106,9 @@ func predictedMinMax(_ values : [Double]?) -> String {
     if let values = values {
         let min = Int(values.min()!)
         let max = Int(values.max()!)
+        let last = Int(values.last!)
         
-        return "\(min)/\(max)"
+        return "\(min)/\(max)/\(last)"
     }
     
     return "-"
