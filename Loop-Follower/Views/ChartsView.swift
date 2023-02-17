@@ -24,6 +24,11 @@ struct ChartsView: View {
         
         TabView(selection: $selection) {
             BloodGlucoseChart(
+                currentDate: modelData.currentDate,
+                prediction: modelData.currentLoopData?.loop.predicted,
+                insulin: modelData.insulin,
+                carbs: modelData.carbs,
+                entries: modelData.entries,
                 criticalMin: criticalMin,
                 criticalMax: criticalMax,
                 rangeMin: rangeMin,
@@ -32,14 +37,17 @@ struct ChartsView: View {
             .tag("BG")
 
             BasalChart(
+                currentDate: modelData.currentDate,
                 scheduledBasal: modelData.scheduledBasal,
-                resultingBasal: modelData.resultingBasal,
-                currentDate: modelData.currentDate
+                resultingBasal: modelData.resultingBasal
             )
             .tag("basal")
             
-            DerivedChart()
-                .tag("derived")
+            DerivedChart(
+                currentDate: modelData.currentDate,
+                entries: modelData.entries
+            )
+            .tag("derived")
         }
         .tabViewStyle(.page(indexDisplayMode: .never))
     }

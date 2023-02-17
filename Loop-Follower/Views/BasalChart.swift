@@ -10,9 +10,9 @@ import Charts
 
 struct BasalChart: View {
 
+    let currentDate: Date?
     let scheduledBasal : [TempBasal]
     let resultingBasal : [TempBasal]
-    let currentDate: Date?
     
     let dashedLine : [CGFloat] = [10, 4]
 
@@ -78,9 +78,9 @@ struct BasalChart_Previews: PreviewProvider {
             TempBasal(id: "", duration: 200, rate: 0.05, timestamp: "2023-02-15T04:40:00Z")
         ]
         BasalChart(
+            currentDate: ISO8601DateFormatter().date(from: "2023-02-15T05:15:00Z"),
             scheduledBasal: sb,
-            resultingBasal: rb,
-            currentDate: ISO8601DateFormatter().date(from: "2023-02-15T05:15:00Z")
+            resultingBasal: rb
         )
     }
 }

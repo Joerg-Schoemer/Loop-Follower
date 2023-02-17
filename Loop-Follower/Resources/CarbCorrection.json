@@ -1,0 +1,32 @@
+[
+  {
+    "enteredBy": "loop://Diabetes iPhone 7",
+    "userEnteredAt": "2022-07-19T05:36:34Z",
+    "foodType": "🍭",
+    "eventType": "Carb Correction",
+    "absorptionTime": 30,
+    "carbs": 15,
+    "syncIdentifier": "08D9F6FF-9F9F-488F-99D5-778255DE25A5",
+    "created_at": "2022-07-19T05:21:27.000Z",
+    "timestamp": "2022-07-19T05:21:27Z",
+    "utcOffset": 0,
+    "_id": "62d680f21f9734d558dd3cb9",
+    "srvModified": 1658208087000,
+    "srvCreated": 1658208087000
+  },
+  {
+    "timestamp": "2022-07-19T05:14:12Z",
+    "eventType": "Carb Correction",
+    "syncIdentifier": "81D70E04-FF32-42AE-B3F0-C7A0204A4CFD",
+    "foodType": "🌮",
+    "carbs": 45,
+    "userEnteredAt": "2022-07-19T05:14:18Z",
+    "absorptionTime": 180,
+    "created_at": "2022-07-19T05:14:12.000Z",
+    "enteredBy": "loop://Diabetes iPhone 7",
+    "utcOffset": 0,
+    "_id": "62d680f21f9734d558dd3c64",
+    "srvModified": 1658207652000,
+    "srvCreated": 1658207652000
+  }
+]

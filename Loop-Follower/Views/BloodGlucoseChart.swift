@@ -10,9 +10,13 @@ import Charts
 
 struct BloodGlucoseChart: View {
 
-    @EnvironmentObject var modelData : ModelData
-    
     let dashedLineStyle : [CGFloat] = [5, 2]
+    
+    let currentDate : Date?
+    let prediction: Predicted?
+    let insulin : [CorrectionBolus]
+    let carbs : [CarbCorrection]
+    let entries : [Entry]
     
     let criticalMin : Int
     let criticalMax : Int
@@ -34,7 +38,7 @@ struct BloodGlucoseChart: View {
                 .foregroundStyle(.secondary)
 
             Chart {
-                if let currentDate = modelData.currentDate {
+                if let currentDate = currentDate {
                     RuleMark(
                         x: .value("now", currentDate)
                     )
@@ -66,14 +70,14 @@ struct BloodGlucoseChart: View {
                 .lineStyle(StrokeStyle(dash: dashedLineStyle))
                 .foregroundStyle(.red)
                 
-                ForEach(modelData.insulin) { insulin in
+                ForEach(insulin) { insulin in
                     BarMark(
                         x: .value("timestamp", insulin.date),
                         y: .value("insulin", insulin.insulin * 100)
                     )
                     .foregroundStyle(by: .value("category", "Insulin"))
                 }
-                ForEach(modelData.carbs) { carb in
+                ForEach(carbs) { carb in
                     BarMark(
                         x: .value("timestamp", carb.date),
                         y: .value("carbs", carb.carbs * 2)
@@ -85,18 +89,17 @@ struct BloodGlucoseChart: View {
                     .foregroundStyle(by: .value("category", "Carbs"))
                 }
                 
-                let prediction = modelData.currentLoopData?.loop.predicted
-                if let predictionDate = prediction?.date {
+                if let prediction = prediction {
                     RuleMark(
-                        x: .value("prediction", predictionDate)
+                        x: .value("prediction", prediction.date)
                     )
                     .lineStyle(StrokeStyle(dash: dashedLineStyle, dashPhase: 3))
                     .foregroundStyle(Color(.systemPurple))
                     
                     ForEach(
                         predictedValues(
-                            startDate: predictionDate,
-                            values: (prediction?.values)!
+                            startDate: prediction.date,
+                            values: prediction.values
                         )
                     ) { entry in
                         LineMark(
@@ -110,7 +113,7 @@ struct BloodGlucoseChart: View {
                     }
                 }
                 
-                ForEach(modelData.entries) { entry in
+                ForEach(entries) { entry in
                     LineMark(
                         x: .value("timestamp", entry.date),
                         y: .value("BG", entry.sgv),
@@ -177,12 +180,17 @@ func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
 
 struct BloodGlucoseChart_Previews: PreviewProvider {
     static var previews: some View {
+        let data = ModelData(test: true)
         BloodGlucoseChart(
+            currentDate: data.currentDate,
+            prediction: data.currentLoopData?.loop.predicted,
+            insulin: data.insulin,
+            carbs: data.carbs,
+            entries: data.entries,
             criticalMin: 55,
             criticalMax: 260,
             rangeMin: 70,
             rangeMax: 180
         )
-        .environmentObject(ModelData(test: true))
     }
 }

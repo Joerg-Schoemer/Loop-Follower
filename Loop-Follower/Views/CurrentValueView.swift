@@ -96,15 +96,15 @@ struct CurrentValueView: View {
         return Color(.systemGreen)
     }
 
+    private func estimateTextColor(_ sgv : Int, _ date: Date) -> Color {
+        if (sgv < criticalMin || sgv >= criticalMax || Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 6) {
+            return .white
+        }
+        
+        return .black
+    }
 }
 
-private func estimateTextColor(_ sgv : Int, _ date: Date) -> Color {
-    if (sgv < 70 || sgv >= 250 || Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 6) {
-        return .white
-    }
-    
-    return .black
-}
 
 struct Indicator : View {
     let length : CGFloat = 10

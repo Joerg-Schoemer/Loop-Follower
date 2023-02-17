@@ -316,8 +316,9 @@ class ModelData : ObservableObject {
         self.loopData = initLoad("deviceData.json")
         self.currentLoopData = loopData.first
         
-        self.insulin = initLoad("treatments.json")
-        
+        self.insulin = initLoad("CorrectionBolus.json")
+        self.carbs = initLoad("CarbCorrection.json")
+
         self.profile = Profile(
             basal: [
                 Basal(value: 0.05, timeAsSeconds: 0),
@@ -343,6 +344,7 @@ class ModelData : ObservableObject {
                 Target(value: 24, timeAsSeconds: 32400),
             ]
         )
+        self.scheduledBasal = calculateTempBasal(basals: (self.profile?.basal)!, startDate: (entries.last?.date)!, endDate: (lastEntry?.date)!)
         
         self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: entries.first!.date)
     }

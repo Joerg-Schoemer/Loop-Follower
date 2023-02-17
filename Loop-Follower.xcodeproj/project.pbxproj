@@ -15,7 +15,7 @@
 		4BAAAFBA298EF3FF00CFE92C /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAAAFB9298EF3FF00CFE92C /* ChartsView.swift */; };
 		4BB8D29928875B0B006AAEE5 /* sgvData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E05287F15A0003B9060 /* sgvData.json */; };
 		4BB8D29A28875B0F006AAEE5 /* deviceData.json in Resources */ = {isa = PBXBuildFile; fileRef = 4BF86E15287F4EDF003B9060 /* deviceData.json */; };
-		4BB8D29B28875B0F006AAEE5 /* treatments.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B961B5728868B1800E51DC0 /* treatments.json */; };
+		4BB8D29B28875B0F006AAEE5 /* CorrectionBolus.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B961B5728868B1800E51DC0 /* CorrectionBolus.json */; };
 		4BCD62B02885F6DD007D0B6A /* Treatment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62AF2885F6DD007D0B6A /* Treatment.swift */; };
 		4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */; };
 		4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DD3287EF911003B9060 /* Loop_FollowerApp.swift */; };
@@ -31,6 +31,7 @@
 		4BF86E0B287F1653003B9060 /* Entries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E0A287F1653003B9060 /* Entries.swift */; };
 		4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E13287F4E51003B9060 /* LoopData.swift */; };
 		4BF86E19287F5414003B9060 /* LoopParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E18287F5414003B9060 /* LoopParameterValue.swift */; };
+		981B344F299F8F5900C1F1B3 /* CarbCorrection.json in Resources */ = {isa = PBXBuildFile; fileRef = 981B344E299F8F5900C1F1B3 /* CarbCorrection.json */; };
 		98D15237299B781500B53913 /* BasalChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D15236299B781500B53913 /* BasalChart.swift */; };
 		98D15239299B789400B53913 /* DerivedChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D15238299B789400B53913 /* DerivedChart.swift */; };
 		98D1523B299B796000B53913 /* BloodGlucoseChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D1523A299B796000B53913 /* BloodGlucoseChart.swift */; };
@@ -59,7 +60,7 @@
 		4B70525D28A2FFA200BFBF84 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 		4B91FB29288057E700792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4B91FB2C28805A0800792B24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = "de.lproj/Loop-Follower-InfoPlist.strings"; sourceTree = "<group>"; };
-		4B961B5728868B1800E51DC0 /* treatments.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = treatments.json; sourceTree = "<group>"; };
+		4B961B5728868B1800E51DC0 /* CorrectionBolus.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = CorrectionBolus.json; sourceTree = "<group>"; };
 		4BAAAFB9298EF3FF00CFE92C /* ChartsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsView.swift; sourceTree = "<group>"; };
 		4BCD62AF2885F6DD007D0B6A /* Treatment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Treatment.swift; sourceTree = "<group>"; };
 		4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterBatteryView.swift; sourceTree = "<group>"; };
@@ -82,6 +83,7 @@
 		4BF86E13287F4E51003B9060 /* LoopData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopData.swift; sourceTree = "<group>"; };
 		4BF86E15287F4EDF003B9060 /* deviceData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = deviceData.json; sourceTree = "<group>"; };
 		4BF86E18287F5414003B9060 /* LoopParameterValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterValue.swift; sourceTree = "<group>"; };
+		981B344E299F8F5900C1F1B3 /* CarbCorrection.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CarbCorrection.json; sourceTree = "<group>"; };
 		98D15236299B781500B53913 /* BasalChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasalChart.swift; sourceTree = "<group>"; };
 		98D15238299B789400B53913 /* DerivedChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedChart.swift; sourceTree = "<group>"; };
 		98D1523A299B796000B53913 /* BloodGlucoseChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloodGlucoseChart.swift; sourceTree = "<group>"; };
@@ -170,7 +172,8 @@
 			children = (
 				4BF86E05287F15A0003B9060 /* sgvData.json */,
 				4BF86E15287F4EDF003B9060 /* deviceData.json */,
-				4B961B5728868B1800E51DC0 /* treatments.json */,
+				981B344E299F8F5900C1F1B3 /* CarbCorrection.json */,
+				4B961B5728868B1800E51DC0 /* CorrectionBolus.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -318,7 +321,8 @@
 				4BB8D29928875B0B006AAEE5 /* sgvData.json in Resources */,
 				4B91FB2D28805A0800792B24 /* Loop-Follower-InfoPlist.strings in Resources */,
 				4BF86DD8287EF913003B9060 /* Assets.xcassets in Resources */,
-				4BB8D29B28875B0F006AAEE5 /* treatments.json in Resources */,
+				4BB8D29B28875B0F006AAEE5 /* CorrectionBolus.json in Resources */,
+				981B344F299F8F5900C1F1B3 /* CarbCorrection.json in Resources */,
 				4BB8D29A28875B0F006AAEE5 /* deviceData.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

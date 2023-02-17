@@ -10,8 +10,9 @@ import Charts
 
 struct DerivedChart: View {
     
-    @EnvironmentObject var modelData : ModelData
-
+    let currentDate : Date?
+    let entries : [Entry]
+    
     let series: KeyValuePairs<String, Color> = [
         "velocity": Color(.systemBlue),
         "acceleration": Color(.systemGreen)
@@ -19,7 +20,7 @@ struct DerivedChart: View {
 
     var body: some View {
 
-        let velocity = derive(modelData.entries)
+        let velocity = derive(entries)
         let acceleration = derive(velocity)
 
         VStack {
@@ -27,7 +28,7 @@ struct DerivedChart: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
             Chart {
-                if let currentDate = modelData.currentDate {
+                if let currentDate = currentDate {
                     RuleMark(
                         x: .value("now", currentDate)
                     )
@@ -68,8 +69,29 @@ struct DerivedChart: View {
 
 struct DerivedChart_Previews: PreviewProvider {
     static var previews: some View {
-        DerivedChart()
-            .environmentObject(ModelData(test: true))
+        let entries = createEntries()
+        DerivedChart(
+            currentDate: entries.first!.date,
+            entries: entries
+        )
+    }
+    
+    static func createEntries() -> [Entry] {
+        var date = Date.now
+        let cal = Calendar.current
+        var entries : [Entry] = []
+        let formatter = ISO8601DateFormatter(.withFractionalSeconds)
+        
+        for _ in 1...50 {
+            entries.append(Entry(
+                id: "",
+                sgv: Int.random(in: 70...180),
+                dateString: formatter.string(from: date))
+            )
+            date = cal.date(byAdding: .minute, value: 5, to: date)!
+        }
+        
+        return entries
     }
 }
 
