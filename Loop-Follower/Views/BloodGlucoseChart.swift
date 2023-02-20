@@ -13,6 +13,7 @@ struct BloodGlucoseChart: View {
     let dashedLineStyle : [CGFloat] = [5, 2]
     
     let currentDate : Date?
+    
     let prediction: Predicted?
     let insulin : [CorrectionBolus]
     let carbs : [CarbCorrection]
@@ -73,22 +74,11 @@ struct BloodGlucoseChart: View {
                 ForEach(insulin) { insulin in
                     BarMark(
                         x: .value("timestamp", insulin.date),
-                        y: .value("insulin", insulin.insulin * 100)
+                        y: .value("insulin", insulin.insulin * 100),
+                        width: 4
                     )
                     .foregroundStyle(by: .value("category", "Insulin"))
                 }
-                ForEach(carbs) { carb in
-                    BarMark(
-                        x: .value("timestamp", carb.date),
-                        y: .value("carbs", carb.carbs * 2)
-                    )
-                    .annotation(position: .topTrailing) {
-                        Text(carb.description)
-                            .font(.footnote)
-                    }
-                    .foregroundStyle(by: .value("category", "Carbs"))
-                }
-                
                 if let prediction = prediction {
                     RuleMark(
                         x: .value("prediction", prediction.date)
@@ -126,6 +116,23 @@ struct BloodGlucoseChart: View {
                     }
                     .interpolationMethod(.catmullRom)
                 }
+                ForEach(carbs) { carb in
+                    BarMark(
+                        x: .value("timestamp", carb.date),
+                        y: .value("carbs", carb.carbs * 2),
+                        width: 4
+                    )
+                    .annotation(position: .topTrailing) {
+                        Text(carb.description)
+                            .font(.footnote)
+                            .rotationEffect(
+                                Angle(degrees: -45),
+                                anchor: .bottomLeading
+                            )
+                    }
+                    .foregroundStyle(by: .value("category", "Carbs"))
+                }
+                
             }
             .chartForegroundStyleScale(series)
             .chartLegend() {

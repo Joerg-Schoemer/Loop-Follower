@@ -47,11 +47,12 @@ struct CorrectionBolus : Codable, Identifiable {
 struct CarbCorrection : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id",
-             carbs, timestamp, foodType
+             carbs, timestamp, foodType, absorptionTime
     }
 
     let id: String
     let foodType: String?
+    let absorptionTime: Int?
     let carbs: Double
     let timestamp: String
     
@@ -60,11 +61,50 @@ struct CarbCorrection : Codable, Identifiable {
     }
     
     var description : String {
-        if let footType = foodType {
-            return footType + String(format: " %.0f g", carbs)
+        var foodTypeString : String = ""
+        var timeInHours : String = ""
+        
+        if let foodType = foodType {
+            foodTypeString = foodType
         }
 
-        return String(format: "%.0f g", carbs)
+        if let absorptionTime = absorptionTime {
+            let timeFormatter = NumberFormatter()
+            timeFormatter.minimumFractionDigits = 1
+            timeFormatter.maximumFractionDigits = 1
+            timeFormatter.roundingMode = .halfUp
+
+            let time = (Double(absorptionTime) / 60)
+            timeInHours = timeFormatter.string(from: NSNumber.init(value: time))!
+
+            if foodTypeString.isEmpty {
+                foodTypeString = {switch (timeInHours) {
+                case timeFormatter.string(from: 0.5):
+                    return "🍭";
+                case timeFormatter.string(from: 3.0):
+                    return "🌮";
+                case timeFormatter.string(from: 5.0):
+                    return "🍕";
+                default:
+                    return "🍽"
+                }}()
+            }
+        } else {
+            timeInHours = ""
+        }
+
+        var description = ""
+        description.append(foodTypeString)
+        if !description.isEmpty {
+            description.append(" ")
+        }
+
+        description.append(String(format: "%.0fg", self.carbs))
+        if !timeInHours.isEmpty {
+            description.append(" " + timeInHours + "h")
+        }
+        
+        return description
     }
 }
 
