@@ -37,15 +37,15 @@ struct ChartsView: View {
             .tag("BG")
 
             BasalChart(
-                currentDate: modelData.currentDate,
+                currentDate: $modelData.currentDate,
                 scheduledBasal: modelData.scheduledBasal,
                 resultingBasal: modelData.resultingBasal
             )
             .tag("basal")
             
             DerivedChart(
-                currentDate: modelData.currentDate,
-                entries: modelData.entries
+                currentDate: $modelData.currentDate,
+                entries: $modelData.entries
             )
             .tag("derived")
         }

@@ -82,13 +82,13 @@ class ModelData : ObservableObject {
         )
         self.scheduledBasal = calculateTempBasal(basals: (self.profile?.basal)!, startDate: (entries.last?.date)!, endDate: (lastEntry?.date)!)
         
-        self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: entries.first!.date)
+        self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: (lastEntry?.date)!)
     }
 
     func loadSgv(baseUrl : String, token : String, completionHandler: @escaping ([Entry]) -> ()) {
         let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date.now)!.timeIntervalSince1970 * 1000
 
-        if let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&find[date][$gte]=\(date)&count=288") {
+        if let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&find[date][$gte]=\(date)&count=1000") {
             URLSession.shared.dataTask(
                 with: url,
                 completionHandler: { data, response, error in

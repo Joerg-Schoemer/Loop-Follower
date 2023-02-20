@@ -10,8 +10,17 @@ import Charts
 
 struct DerivedChart: View {
     
-    let currentDate : Date?
-    let entries : [Entry]
+    @Binding var currentDate : Date?
+    @Binding var entries : [Entry]
+
+    @State var orientation = UIDevice.current.orientation
+    @State var prevOrientation = UIDevice.current.orientation
+
+    @State var width : MarkDimension = estimateBarWidth(prev: UIDevice.current.orientation, current: UIDevice.current.orientation)
+    
+    let orientationChanged = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
+        .makeConnectable()
+        .autoconnect()
     
     let series: KeyValuePairs<String, Color> = [
         "velocity": Color(.systemBlue),
@@ -20,8 +29,8 @@ struct DerivedChart: View {
 
     var body: some View {
 
-        let velocity = derive(entries)
-        let acceleration = derive(velocity)
+        let velocity = derive(entries, "veloc")
+        let acceleration = derive(velocity, "accel")
 
         VStack {
             Text("Derived")
@@ -38,14 +47,16 @@ struct DerivedChart: View {
                 ForEach(velocity) { velocity in
                     BarMark(
                         x: .value("timestamp", velocity.date),
-                        y: .value("BG", velocity.sgv)
+                        y: .value("BG", velocity.sgv),
+                        width: width
                     )
                     .foregroundStyle(by: .value("category", "velocity"))
                 }
-                ForEach(acceleration) { accelleration in
+                ForEach(acceleration) { acceleration in
                     BarMark(
-                        x: .value("timestamp", accelleration.date),
-                        y: .value("BG", accelleration.sgv)
+                        x: .value("timestamp", acceleration.date),
+                        y: .value("BG", acceleration.sgv),
+                        width: width
                     )
                     .foregroundStyle(by: .value("category", "acceleration"))
                 }
@@ -64,15 +75,27 @@ struct DerivedChart: View {
             }
         }
         .padding([.top, .bottom])
+        .onReceive(orientationChanged) { _ in
+            self.prevOrientation = self.orientation
+            self.orientation = UIDevice.current.orientation
+            width = estimateBarWidth(prev: prevOrientation, current: orientation)
+        }
     }
+
+}
+
+fileprivate func estimateBarWidth(prev: UIDeviceOrientation, current:  UIDeviceOrientation)  -> MarkDimension {
+    return current.isLandscape || prev.isLandscape && current.isFlat ? .automatic : 3
 }
 
 struct DerivedChart_Previews: PreviewProvider {
+    @State static var entries = createEntries()
+    @State static var currentDate : Date? = entries.first!.date
+
     static var previews: some View {
-        let entries = createEntries()
         DerivedChart(
-            currentDate: entries.first!.date,
-            entries: entries
+            currentDate: $currentDate,
+            entries: $entries
         )
     }
     
@@ -82,24 +105,37 @@ struct DerivedChart_Previews: PreviewProvider {
         var entries : [Entry] = []
         let formatter = ISO8601DateFormatter(.withFractionalSeconds)
         
-        for _ in 1...50 {
-            entries.append(Entry(
-                id: "",
-                sgv: Int.random(in: 70...180),
-                dateString: formatter.string(from: date))
+        for i in 0...72 {
+            entries.append(
+                Entry(
+                    id: UUID().uuidString,
+                    sgv: Int((sin(Double.pi * Double(-i) / 36.0) * 800.0 + 1500.0).nextUp.rounded()),
+                    dateString: formatter.string(from: date)
+                )
             )
-            date = cal.date(byAdding: .minute, value: 5, to: date)!
+            date = cal.date(byAdding: .minute, value: -5, to: date)!
         }
         
         return entries
     }
+
 }
 
-func derive(_ values: [Entry]) -> [Entry] {
+func derive(_ values: [Entry], _ name: String) -> [Entry] {
     let diffs = zip(values.dropFirst(), values).map {
-        let difference = Int(Calendar.current.dateComponents([.minute], from: $1.date, to: $0.date).minute! / 5)
+        let dateDifference = Calendar.current.dateComponents([.second], from: $0.date, to: $1.date).second!
         
-        return Entry(id: UUID().uuidString, sgv: Int(($1.sgv - $0.sgv) / (difference <= 0 ? 1 : difference)), dateString: $1.dateString)
+        let entry = Entry(
+            id: UUID().uuidString,
+            sgv: Int(
+                (Double(($1.sgv - $0.sgv) * 300) /
+                Double(dateDifference <= 0 ? 1 : dateDifference)
+                ).nextUp.rounded()
+            ),
+            dateString: $1.dateString
+        )
+
+        return entry
     }
 
     return diffs

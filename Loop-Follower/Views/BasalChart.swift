@@ -10,7 +10,7 @@ import Charts
 
 struct BasalChart: View {
 
-    let currentDate: Date?
+    @Binding var currentDate: Date?
     let scheduledBasal : [TempBasal]
     let resultingBasal : [TempBasal]
     
@@ -62,6 +62,7 @@ struct BasalChart: View {
 }
 
 struct BasalChart_Previews: PreviewProvider {
+    @State static var currentDate = ISO8601DateFormatter().date(from: "2023-02-15T05:15:00Z")
     static var previews: some View {
         let sb = [
             TempBasal(id: "", duration: 60, rate: 0.05, timestamp: "2023-02-14T23:00:00Z"),
@@ -78,7 +79,7 @@ struct BasalChart_Previews: PreviewProvider {
             TempBasal(id: "", duration: 200, rate: 0.05, timestamp: "2023-02-15T04:40:00Z")
         ]
         BasalChart(
-            currentDate: ISO8601DateFormatter().date(from: "2023-02-15T05:15:00Z"),
+            currentDate: $currentDate,
             scheduledBasal: sb,
             resultingBasal: rb
         )
