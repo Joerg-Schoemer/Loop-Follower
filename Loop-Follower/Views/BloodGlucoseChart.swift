@@ -129,6 +129,12 @@ struct BloodGlucoseChart: View {
                                 Angle(degrees: -45),
                                 anchor: .bottomLeading
                             )
+                            .shadow(
+                                color: Color(.systemGray),
+                                radius: 2,
+                                x: 1,
+                                y: 1
+                            )
                     }
                     .foregroundStyle(by: .value("category", "Carbs"))
                 }
