@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CurrentValueView: View {
     
+    @Binding var currentDate : Date?
     let currentEntry : Entry
     let delta : Int?
 
@@ -30,7 +31,7 @@ struct CurrentValueView: View {
     }
     
     var body: some View {
-        let color = estimateColorBySgv(currentEntry.sgv, currentEntry.date)
+        let color = estimateColorBySgv(currentEntry.sgv, currentDate!)
         let textColor = estimateTextColor(currentEntry.sgv, currentEntry.date)
 
         GeometryReader { geometry in
@@ -81,7 +82,7 @@ struct CurrentValueView: View {
     }
     
     func estimateColorBySgv(_ sgv : Int, _ date: Date) -> Color {
-        if (Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 6) {
+        if (Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute! > 5) {
             return Color(.systemGray)
         }
 
@@ -146,6 +147,7 @@ struct CurrentValueView_Previews: PreviewProvider {
     static var modelData = ModelData()
     static let df = ISO8601DateFormatter([.withFractionalSeconds])
     static let date = Date() + -720
+    @State static var currentDate : Date? = Date.now
     
     static var previews: some View {
         let sgvs = [ 50, 70, 101, 180, 250, 202, 303, 100 ]
@@ -153,6 +155,7 @@ struct CurrentValueView_Previews: PreviewProvider {
 
         ScrollView {
             CurrentValueView(
+                currentDate: $currentDate,
                 currentEntry: Entry(
                     id: "wurscht",
                     sgv: 44,
@@ -171,6 +174,7 @@ struct CurrentValueView_Previews: PreviewProvider {
                 let sgv = sgvs[i]
                 let date = Date() + Double.random(in: -300 ... -10)
                 CurrentValueView(
+                    currentDate: $currentDate,
                     currentEntry: Entry(
                         id: "wurscht",
                         sgv: sgv,

@@ -21,35 +21,49 @@ struct ChartsView: View {
     @EnvironmentObject var modelData : ModelData
     
     var body: some View {
-        
-        TabView(selection: $selection) {
-            BloodGlucoseChart(
-                currentDate: modelData.currentDate,
-                prediction: modelData.currentLoopData?.loop.predicted,
-                insulin: modelData.insulin,
-                carbs: modelData.carbs,
-                entries: modelData.entries,
-                criticalMin: criticalMin,
-                criticalMax: criticalMax,
-                rangeMin: rangeMin,
-                rangeMax: rangeMax
-            )
-            .tag("BG")
+        GeometryReader { proxy in
+            TabView(selection: $selection) {
+                Group {
+                    DerivedChart(
+                        currentDate: $modelData.currentDate,
+                        entries: $modelData.entries
+                    )
+                    .tag("derived")
 
-            BasalChart(
-                currentDate: $modelData.currentDate,
-                scheduledBasal: modelData.scheduledBasal,
-                resultingBasal: modelData.resultingBasal
+                    BloodGlucoseChart(
+                        currentDate: modelData.currentDate,
+                        prediction: modelData.currentLoopData?.loop.predicted,
+                        insulin: modelData.insulin,
+                        carbs: modelData.carbs,
+                        entries: modelData.entries,
+                        criticalMin: criticalMin,
+                        criticalMax: criticalMax,
+                        rangeMin: rangeMin,
+                        rangeMax: rangeMax
+                    )
+                    .tag("BG")
+                    
+                    BasalChart(
+                        currentDate: $modelData.currentDate,
+                        scheduledBasal: modelData.scheduledBasal,
+                        resultingBasal: modelData.resultingBasal
+                    )
+                    .tag("basal")
+                }
+                .rotationEffect(.degrees(-90))
+                .frame(
+                    width: proxy.size.width,
+                    height: proxy.size.height
+                )
+            }
+            .frame(
+                width: proxy.size.height, // Height & width swap
+                height: proxy.size.width
             )
-            .tag("basal")
-            
-            DerivedChart(
-                currentDate: $modelData.currentDate,
-                entries: $modelData.entries
-            )
-            .tag("derived")
+            .rotationEffect(.degrees(90), anchor: .topLeading)
+            .offset(x: proxy.size.width) // Offset back into screens bounds
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .tabViewStyle(.page(indexDisplayMode: .never))
     }
 }
 

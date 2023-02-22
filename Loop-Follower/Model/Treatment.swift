@@ -63,27 +63,27 @@ struct CarbCorrection : Codable, Identifiable {
     var description : String {
         var foodTypeString : String = ""
         var timeInHours : String = ""
-        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.minimumFractionDigits = 1
+        numberFormatter.maximumFractionDigits = 1
+        numberFormatter.roundingMode = .halfUp
+
         if let foodType = foodType {
             foodTypeString = foodType
         }
 
         if let absorptionTime = absorptionTime {
-            let timeFormatter = NumberFormatter()
-            timeFormatter.minimumFractionDigits = 1
-            timeFormatter.maximumFractionDigits = 1
-            timeFormatter.roundingMode = .halfUp
 
             let time = (Double(absorptionTime) / 60)
-            timeInHours = timeFormatter.string(from: NSNumber.init(value: time))!
+            timeInHours = numberFormatter.string(from: NSNumber.init(value: time))!
 
             if foodTypeString.isEmpty {
                 foodTypeString = {switch (timeInHours) {
-                case timeFormatter.string(from: 0.5):
+                case numberFormatter.string(from: 0.5):
                     return "🍭";
-                case timeFormatter.string(from: 3.0):
+                case numberFormatter.string(from: 3.0):
                     return "🌮";
-                case timeFormatter.string(from: 5.0):
+                case numberFormatter.string(from: 5.0):
                     return "🍕";
                 default:
                     return "🍽"
@@ -93,18 +93,17 @@ struct CarbCorrection : Codable, Identifiable {
             timeInHours = ""
         }
 
-        var description = ""
-        description.append(foodTypeString)
-        if !description.isEmpty {
-            description.append(" ")
+        var descriptionString = ""
+        descriptionString.append(foodTypeString)
+        if !descriptionString.isEmpty {
+            descriptionString.append(" ")
+        }
+        descriptionString.append(numberFormatter.string(from: NSNumber.init(value: self.carbs))! + "g")
+        if !timeInHours.isEmpty {
+            descriptionString.append(" \(timeInHours)h")
         }
 
-        description.append(String(format: "%.0fg", self.carbs))
-        if !timeInHours.isEmpty {
-            description.append(" " + timeInHours + "h")
-        }
-        
-        return description
+        return descriptionString
     }
 }
 

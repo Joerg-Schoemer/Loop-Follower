@@ -47,6 +47,7 @@ struct MonitorView: View {
                         }
                         if let lastEntry = modelData.lastEntry {
                             CurrentValueView(
+                                currentDate: $modelData.currentDate,
                                 currentEntry: lastEntry,
                                 delta: calcDelta(modelData.entries),
                                 criticalMin: criticalMin,

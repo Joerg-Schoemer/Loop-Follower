@@ -41,8 +41,11 @@ struct DerivedChart: View {
                     RuleMark(
                         x: .value("now", currentDate)
                     )
-                    .lineStyle(StrokeStyle(lineWidth: 0.5))
                     .foregroundStyle(Color(.systemGray))
+                    RuleMark(
+                        x: .value("future", Calendar.current.date(byAdding: .hour, value: 3, to: currentDate)!)
+                    )
+                    .foregroundStyle(Color(.systemFill))
                 }
                 ForEach(velocity) { velocity in
                     BarMark(
@@ -85,7 +88,7 @@ struct DerivedChart: View {
 }
 
 fileprivate func estimateBarWidth(prev: UIDeviceOrientation, current:  UIDeviceOrientation)  -> MarkDimension {
-    return current.isLandscape || prev.isLandscape && current.isFlat ? .automatic : 3
+    return current.isLandscape || prev.isLandscape && current.isFlat ? 5 : 2
 }
 
 struct DerivedChart_Previews: PreviewProvider {

@@ -41,8 +41,17 @@ class ModelData : ObservableObject {
     let hourOfHistory : Int = -6;
     
     init() {
-        load()
-        Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(load), userInfo: nil, repeats: true)
+        _ = load()
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { timer in
+            print("running timer event...")
+            if let nextRun = self.load() {
+                print("rescheduling timer at: \(nextRun)")
+                timer.fireDate = nextRun
+            } else {
+                print("invalidating timer")
+                timer.invalidate()
+            }
+        }
     }
     
     init(test: Bool) {
@@ -349,15 +358,15 @@ class ModelData : ObservableObject {
         }
     }
 
-    @objc func load() {
+    @objc func load() -> Date? {
         let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
         let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
 
         if baseUrl.isEmpty || token.isEmpty {
             // do nothing when not configured
-            return
+            return nil
         }
-
+        
         loadSgv(
             baseUrl: baseUrl,
             token: token,
@@ -434,6 +443,28 @@ class ModelData : ObservableObject {
             }
         )
         currentDate = Date.now
+        
+        var nextRun : Date? = nil
+        if let lastEntry = self.lastEntry {
+            nextRun = Calendar.current.date(
+                byAdding: .minute,
+                value: 5,
+                to: lastEntry.date
+            )!
+            while nextRun! > Calendar.current.date(byAdding: .minute, value: 1, to: currentDate!)! {
+                nextRun = Calendar.current.date(byAdding: .minute, value: -1, to: nextRun!)
+            }
+        }
+
+        if nextRun == nil || nextRun! < currentDate! {
+            nextRun = Calendar.current.date(
+                byAdding: .second,
+                value: 20,
+                to: currentDate!
+            )!
+        }
+
+        return nextRun
     }
     
     var cn : Measurement<UnitMass> {
