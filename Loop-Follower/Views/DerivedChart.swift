@@ -92,13 +92,13 @@ fileprivate func estimateBarWidth(prev: UIDeviceOrientation, current:  UIDeviceO
 }
 
 struct DerivedChart_Previews: PreviewProvider {
-    @State static var entries = createEntries()
-    @State static var currentDate : Date? = entries.first!.date
+    static var entries = createEntries()
+    static var currentDate : Date? = entries.first?.date
 
     static var previews: some View {
         DerivedChart(
-            currentDate: $currentDate,
-            entries: $entries
+            currentDate: .constant(currentDate),
+            entries: .constant(entries)
         )
     }
     

@@ -45,10 +45,10 @@ struct MonitorView: View {
                                 sensorChanged: modelData.sensorChanged
                             )
                         }
-                        if let lastEntry = modelData.lastEntry {
+                        if modelData.lastEntry != nil {
                             CurrentValueView(
                                 currentDate: $modelData.currentDate,
-                                currentEntry: lastEntry,
+                                currentEntry: $modelData.lastEntry,
                                 delta: calcDelta(modelData.entries),
                                 criticalMin: criticalMin,
                                 criticalMax: criticalMax,

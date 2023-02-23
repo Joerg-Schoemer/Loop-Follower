@@ -69,18 +69,14 @@ struct ChartsView: View {
 
 struct ChartsView_Previews: PreviewProvider {
 
-    @State static var tabSelection : String = "BG"
-   
     static var previews: some View {
         ChartsView(
             criticalMin: 55,
             criticalMax: 260,
             rangeMin: 70,
             rangeMax: 180,
-            selection: $tabSelection
+            selection: .constant("BG")
         )
         .environmentObject(ModelData(test: true))
     }
 }
-
-
