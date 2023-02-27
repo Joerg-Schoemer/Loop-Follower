@@ -25,7 +25,7 @@ struct ChartsView: View {
             TabView(selection: $selection) {
                 Group {
                     DerivedChart(
-                        currentDate: $modelData.currentDate,
+                        currentDate: modelData.currentDate,
                         entries: $modelData.entries
                     )
                     .tag("derived")

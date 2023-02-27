@@ -39,13 +39,6 @@ struct BloodGlucoseChart: View {
                 .foregroundStyle(.secondary)
 
             Chart {
-                if let currentDate = currentDate {
-                    RuleMark(
-                        x: .value("now", currentDate)
-                    )
-                    .foregroundStyle(Color(.systemGray))
-                }
-                
                 // Zielbereich
                 RuleMark(
                     y: .value("min", rangeMin)
@@ -101,6 +94,13 @@ struct BloodGlucoseChart: View {
                         .lineStyle(StrokeStyle(dash: dashedLineStyle))
                         .interpolationMethod(.monotone)
                     }
+                }
+
+                if let currentDate = currentDate {
+                    RuleMark(
+                        x: .value("now", currentDate)
+                    )
+                    .foregroundStyle(Color(.systemOrange))
                 }
 
                 ForEach(entries) { entry in

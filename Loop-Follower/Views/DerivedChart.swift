@@ -10,12 +10,11 @@ import Charts
 
 struct DerivedChart: View {
     
-    @Binding var currentDate : Date?
+    var currentDate : Date?
     @Binding var entries : [Entry]
 
     @State var orientation = UIDevice.current.orientation
     @State var prevOrientation = UIDevice.current.orientation
-
     @State var width : MarkDimension = estimateBarWidth(prev: UIDevice.current.orientation, current: UIDevice.current.orientation)
     
     let orientationChanged = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
@@ -37,13 +36,13 @@ struct DerivedChart: View {
                 .font(.callout)
                 .foregroundStyle(.secondary)
             Chart {
-                if let currentDate = currentDate {
+                if currentDate != nil {
                     RuleMark(
-                        x: .value("now", currentDate)
+                        x: .value("now", currentDate!)
                     )
-                    .foregroundStyle(Color(.systemGray))
+                    .foregroundStyle(Color(.systemOrange))
                     RuleMark(
-                        x: .value("future", Calendar.current.date(byAdding: .hour, value: 3, to: currentDate)!)
+                        x: .value("future", Calendar.current.date(byAdding: .hour, value: 3, to: currentDate!)!)
                     )
                     .foregroundStyle(Color(.systemFill))
                 }
@@ -97,7 +96,7 @@ struct DerivedChart_Previews: PreviewProvider {
 
     static var previews: some View {
         DerivedChart(
-            currentDate: .constant(currentDate),
+            currentDate: currentDate,
             entries: .constant(entries)
         )
     }

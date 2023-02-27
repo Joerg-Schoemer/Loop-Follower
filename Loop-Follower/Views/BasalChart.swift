@@ -48,11 +48,11 @@ struct BasalChart: View {
                     )
                 }
 
-                if let currentDate = currentDate {
+                if currentDate != nil {
                     RuleMark(
-                        x: .value("now", currentDate)
+                        x: .value("now", self.currentDate!)
                     )
-                    .foregroundStyle(Color(.systemGray))
+                    .foregroundStyle(Color(.systemOrange))
                 }
             }
         }

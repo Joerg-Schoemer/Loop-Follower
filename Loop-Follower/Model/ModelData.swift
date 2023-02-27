@@ -14,13 +14,9 @@ class ModelData : ObservableObject {
     
     @Published var lastEntry : Entry?
     
-    @Published var loopData : [LoopData] = []
-    
     @Published var currentLoopData : LoopData?
     
     @Published var insulin : [CorrectionBolus] = []
-
-    @Published var tempBasal : [TempBasal] = []
 
     @Published var scheduledBasal : [TempBasal] = []
     
@@ -38,8 +34,10 @@ class ModelData : ObservableObject {
     
     @Published var currentDate : Date?
     
-    let hourOfHistory : Int = -6;
+    private let hourOfHistory : Int = -6;
     
+    private var tempBasal : [TempBasal] = []
+
     init() {
         _ = load()
         Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { timer in
@@ -58,7 +56,7 @@ class ModelData : ObservableObject {
         self.entries = initLoad("sgvData.json")
         self.lastEntry = entries.first
 
-        self.loopData = initLoad("deviceData.json")
+        let loopData: [LoopData] = initLoad("deviceData.json")
         self.currentLoopData = loopData.first
         
         self.insulin = initLoad("CorrectionBolus.json")
@@ -379,7 +377,7 @@ class ModelData : ObservableObject {
             baseUrl: baseUrl,
             token: token,
             completionHandler: { loopData in
-                self.loopData = loopData
+                let loopData: [LoopData] = loopData
                 self.currentLoopData = loopData.first
             }
         )
