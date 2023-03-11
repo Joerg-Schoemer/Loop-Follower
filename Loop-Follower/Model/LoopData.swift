@@ -41,11 +41,62 @@ struct LoopData : Codable, Identifiable {
     }
 }
 
+enum LoopState {
+    case error,
+         warning,
+         enacted,
+         looping,
+         recommendation
+}
+
 struct Loop: Codable {
     let cob: Cob
     let iob: Iob
-    let recommendedBolus : Double?
+    let timestamp: String
+    let recommendedBolus: Double?
     let predicted: Predicted?
+    let enacted: Enacted?
+    let failureReason: String?
+
+    var date: Date {
+        return formatter.date(from: timestamp)!
+    }
+    
+    var state: LoopState {
+        guard failureReason == nil else {
+            return .error
+        }
+
+        let diff = Calendar.current.dateComponents([.minute], from: date, to: Date.now).minute!
+
+        if let enacted = enacted {
+            if !enacted.received {
+                return .error
+            }
+            
+            if diff < 15 {
+                return .enacted
+            }
+        }
+        
+        if diff < 15 {
+            return .looping
+        }
+
+        return .warning
+    }
+}
+
+struct Enacted: Codable {
+    let rate: Int
+    let bolusVolume: Int
+    let duration: TimeInterval
+    let received: Bool
+    let timestamp: String
+
+    var date: Date {
+        return formatter.date(from: timestamp)!
+    }
 }
 
 struct Predicted : Codable {

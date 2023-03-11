@@ -38,6 +38,9 @@
 /* Insulin on board */
 "IOB" = "IOB";
 
+/* loop state label */
+"Loop state" = "Loopstatus";
+
 /* No comment provided by engineer. */
 "Nightscout" = "Nightscout";
 

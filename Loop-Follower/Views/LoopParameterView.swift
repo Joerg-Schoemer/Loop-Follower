@@ -61,6 +61,9 @@ struct LoopParameterView: View {
                     data: pumpVolume(loopData.pumpVolume))
                 Divider()
                 LoopParameterValue(
+                    label: NSLocalizedString("Loop state", comment: "loop state label"),
+                    data: loopState(state: loopData.loop.state))
+                LoopParameterValue(
                     label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
                     data: predictedMinMax(loopData.loop.predicted?.values))
                 Divider()
@@ -101,6 +104,21 @@ extension Date {
     }
 }
 
+func loopState(state: LoopState) -> String {
+    switch (state) {
+    case .looping:
+        return "↻"
+    case .error:
+        return "x"
+    case .enacted:
+        return "⌁"
+    case .warning:
+        return "⚠"
+    case .recommendation:
+        return "⏀"
+    }
+}
+
 func predictedMinMax(_ values : [Double]?) -> String {
     
     if let values = values {
@@ -130,8 +148,11 @@ struct LoopParameterView_Previews: PreviewProvider {
                 loop: Loop(
                     cob: Cob(cob: 1.1),
                     iob: Iob(iob: 0.05),
+                    timestamp: "2022-12-06T05:06:06Z",
                     recommendedBolus: 0.1,
-                    predicted: nil
+                    predicted: nil,
+                    enacted: nil,
+                    failureReason: nil
                 ),
                 uploader: Uploader(battery: 75),
                 pump: Pump(reservoir: nil),
@@ -139,7 +160,7 @@ struct LoopParameterView_Previews: PreviewProvider {
                     currentCorrectionRange: nil,
                     multiplier: nil,
                     name: "Sport",
-                    symbol: "🏃🏻 ",
+                    symbol: "🏃🏻",
                     duration: nil,
                     active: true,
                     timestamp: "2022-12-06T05:06:06Z"
