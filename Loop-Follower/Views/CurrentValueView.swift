@@ -82,7 +82,7 @@ struct CurrentValueView: View {
                     .font(.system(size: 72, weight: .bold, design: .default))
                     .onAppear {
                         progress = progressValue()
-                        Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+                        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
                             progress = progressValue()
                         }
                     }

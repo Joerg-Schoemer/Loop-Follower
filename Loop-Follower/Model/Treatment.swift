@@ -21,7 +21,7 @@ struct TempBasal : Codable, Identifiable {
     var type : String = "temporary"
         
     var startDate : Date {
-        return formatter.date(from: timestamp)!
+        return ISO8601DateFormatter().date(from: timestamp)!
     }
 
     var endDate : Date {

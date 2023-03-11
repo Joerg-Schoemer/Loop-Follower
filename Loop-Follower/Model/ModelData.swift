@@ -371,6 +371,20 @@ public class ModelData : ObservableObject {
             completionHandler: { entries in
                 self.entries = entries
                 self.lastEntry = entries.first
+                
+                let alert = processSgvForAlerts(
+                    entries,
+                    alertSettings: AlertSettings(
+                        veryLowThreshold: 55,
+                        lowThreshold: 70,
+                        lowTime: 300.0,
+                        highThreshold: 180,
+                        highTime: 3600.0,
+                        veryHighThreshold: 260
+                    )
+                )
+                
+                print(alert)
             }
         )
         loadDeviceStatus(
@@ -449,7 +463,12 @@ public class ModelData : ObservableObject {
                 value: 5,
                 to: lastEntry.date
             )!
-            while nextRun! > Calendar.current.date(byAdding: .minute, value: 1, to: currentDate!)! {
+            nextRun = Calendar.current.date(
+                byAdding: .second,
+                value: 10,
+                to: nextRun!)!
+            let oneMinuteInFuture = Calendar.current.date(byAdding: .minute, value: 1, to: currentDate!)!
+            while nextRun! > oneMinuteInFuture {
                 nextRun = Calendar.current.date(byAdding: .minute, value: -1, to: nextRun!)
             }
         }
@@ -457,7 +476,7 @@ public class ModelData : ObservableObject {
         if nextRun == nil || nextRun! < currentDate! {
             nextRun = Calendar.current.date(
                 byAdding: .second,
-                value: 20,
+                value: 10,
                 to: currentDate!
             )!
         }
@@ -616,7 +635,7 @@ func calculateResultingBasal(
         
         let tempWithinCurrentSchedule = tempBasal.filter({
             (sb.startDate ... sb.endDate).contains($0.endDate)
-            || (sb.startDate ... sb.endDate).contains($0.startDate)
+            || (sb.startDate ..< sb.endDate).contains($0.startDate)
         }).sorted(by: {$0.startDate < $1.startDate})
         
         if tempWithinCurrentSchedule.isEmpty {
@@ -647,7 +666,7 @@ func calculateResultingBasal(
                 tempBasalPoints.append(
                     TempBasal(
                         id: UUID().uuidString,
-                        duration: Double(Calendar.current.dateComponents([.second], from: lastTempEndDate, to: tb.startDate).second!) / 60,
+                        duration: (tb.startDate - lastTempEndDate) / 60.0,
                         rate: sb.rate,
                         timestamp: formatter.string(from: lastTempEndDate),
                         type: "scheduled"
@@ -670,10 +689,11 @@ func calculateResultingBasal(
                         timestamp: formatter.string(from: tb.startDate)
                     )
                 )
-                lastTempEndDate = tb.endDate
+                lastTempEndDate = sb.endDate
             }
         }
         if lastTempEndDate < sb.endDate {
+            // der Rest muss mit dem scheduled aufgefüllt werden.
             tempBasalPoints.append(
                 TempBasal(
                     id: UUID().uuidString,
@@ -687,4 +707,76 @@ func calculateResultingBasal(
     }
     
     return tempBasalPoints.filter({ $0.startDate < endDate && $0.endDate > startDate })
+}
+
+enum AlertType {
+    case veryHigh, high, low, veryLow, data, none
+}
+
+struct Alert {
+    let type: AlertType
+}
+
+struct AlertSettings {
+    let veryLowThreshold : Int
+    
+    let lowThreshold : Int
+    let lowTime : TimeInterval?
+    
+    let highThreshold : Int
+    let highTime : TimeInterval?
+
+    let veryHighThreshold : Int
+}
+
+struct AlertState {
+    var veryLow : Entry?
+    var low : Entry?
+    var high : Entry?
+    var veryHigh : Entry?
+}
+
+func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> AlertType {
+    
+    if let first = entries.first {
+        // on first we decide which threshold to check
+        if first.sgv < alertSettings.veryLowThreshold {
+            return .veryLow
+        } else if first.sgv < alertSettings.lowThreshold {
+            if let firstAboveThresholdIndex = entries.firstIndex(where: { $0.sgv >= alertSettings.lowThreshold }) {
+                let lastBelowThreshold = entries[firstAboveThresholdIndex - 1]
+                let diff = lastBelowThreshold.date.distance(to: first.date)
+                if let lowTime = alertSettings.lowTime {
+                    if diff > lowTime {
+                        return .low
+                    }
+                } else {
+                    return .none
+                }
+            } else {
+                return .low
+            }
+        } else if first.sgv > alertSettings.veryHighThreshold {
+            return .veryHigh
+        } else if first.sgv > alertSettings.highThreshold {
+            if let firstBelowThresholdIndex = entries.firstIndex(where: { $0.sgv <= alertSettings.highThreshold }) {
+                let lastAboveThreshold = entries[firstBelowThresholdIndex - 1]
+                let diff = lastAboveThreshold.date.distance(to: first.date)
+                print("diff=\(diff),\nlastAboveThreshold=\(lastAboveThreshold),\nfirst=\(first)")
+                if let highTime = alertSettings.highTime {
+                    if diff > highTime {
+                        return .high
+                    }
+                } else {
+                    return .none
+                }
+            } else {
+                return .high
+            }
+        }
+    } else {
+        return .data
+    }
+
+    return .none
 }

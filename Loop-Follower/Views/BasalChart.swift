@@ -41,9 +41,9 @@ struct BasalChart: View {
                     AreaMark(
                         x: .value("startDate", tempBasal.startDate),
                         y: .value("rate", tempBasal.rate)
-                    )
+                    ).foregroundStyle(Color(.systemBlue).opacity(0.5))
                     AreaMark(
-                        x: .value("endDate", tempBasal.endDate - 1),
+                        x: .value("endDate", tempBasal.endDate - 0.001),
                         y: .value("rate", tempBasal.rate)
                     )
                 }

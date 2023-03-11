@@ -88,8 +88,8 @@ struct Loop: Codable {
 }
 
 struct Enacted: Codable {
-    let rate: Int
-    let bolusVolume: Int
+    let rate: Double
+    let bolusVolume: Double
     let duration: TimeInterval
     let received: Bool
     let timestamp: String
