@@ -78,16 +78,31 @@ struct CarbCorrection : Codable, Identifiable {
             timeInHours = numberFormatter.string(from: NSNumber.init(value: time))!
 
             if foodTypeString.isEmpty {
-                foodTypeString = {switch (timeInHours) {
-                case numberFormatter.string(from: 0.5):
-                    return "🍭";
-                case numberFormatter.string(from: 3.0):
-                    return "🌮";
-                case numberFormatter.string(from: 5.0):
-                    return "🍕";
-                default:
-                    return "🍽"
-                }}()
+                foodTypeString = {
+                    switch (timeInHours) {
+                    case
+                        numberFormatter.string(from: 0.5),
+                        numberFormatter.string(from: 1.0):
+                        return "🍭";
+                    case
+                        numberFormatter.string(from: 1.5),
+                        numberFormatter.string(from: 2.0),
+                        numberFormatter.string(from: 2.5),
+                        numberFormatter.string(from: 3.0),
+                        numberFormatter.string(from: 3.5),
+                        numberFormatter.string(from: 4.0),
+                        numberFormatter.string(from: 4.5):
+                        return "🌮";
+                    case
+                        numberFormatter.string(from: 5.0),
+                        numberFormatter.string(from: 5.5):
+                        return "🍕";
+                    case numberFormatter.string(from: 6.0):
+                        return "🥣";
+                    default:
+                        return "🍽"
+                    }
+                }()
             }
         } else {
             timeInHours = ""

@@ -63,6 +63,14 @@ struct BloodGlucoseChart: View {
                 .lineStyle(StrokeStyle(dash: dashedLineStyle))
                 .foregroundStyle(.red)
                 
+                if let currentDate = currentDate {
+                    RuleMark(
+                        x: .value("now", currentDate)
+                    )
+                    .lineStyle(StrokeStyle(lineWidth: 3))
+                    .foregroundStyle(Color(.systemYellow).opacity(0.75))
+                }
+
                 ForEach(insulin) { insulin in
                     BarMark(
                         x: .value("timestamp", insulin.date),
@@ -95,14 +103,6 @@ struct BloodGlucoseChart: View {
                         .interpolationMethod(.monotone)
                     }
                 }
-
-                if let currentDate = currentDate {
-                    RuleMark(
-                        x: .value("now", currentDate)
-                    )
-                    .foregroundStyle(Color(.systemOrange))
-                }
-
                 ForEach(entries) { entry in
                     LineMark(
                         x: .value("timestamp", entry.date),
@@ -133,8 +133,8 @@ struct BloodGlucoseChart: View {
                             .shadow(
                                 color: Color(.systemGray),
                                 radius: 2,
-                                x: 1,
-                                y: 1
+                                x: 2,
+                                y: 2
                             )
                     }
                 }
@@ -169,9 +169,11 @@ struct BloodGlucoseChart: View {
     }
 }
 
+fileprivate let formatter = ISO8601DateFormatter(.withFractionalSeconds)
+
 func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
     var currentDate = startDate
-    let formatter = ISO8601DateFormatter(.withFractionalSeconds)
+    let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: startDate)!
     
     let predictions : [Entry] = values.map {
         let entry = Entry(
@@ -185,7 +187,7 @@ func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
 
     return Array(
         predictions.prefix(
-            while: { $0.date <= Calendar.current.date(byAdding: .hour, value: 3, to: startDate)! }
+            while: { $0.date <= endDate}
         )
     )
 }

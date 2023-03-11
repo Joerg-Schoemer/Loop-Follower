@@ -32,6 +32,7 @@
 		4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E13287F4E51003B9060 /* LoopData.swift */; };
 		4BF86E19287F5414003B9060 /* LoopParameterValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86E18287F5414003B9060 /* LoopParameterValue.swift */; };
 		981B344F299F8F5900C1F1B3 /* CarbCorrection.json in Resources */ = {isa = PBXBuildFile; fileRef = 981B344E299F8F5900C1F1B3 /* CarbCorrection.json */; };
+		98573D4B29B7347D00101FAD /* CarbCorrectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98573D4A29B7347D00101FAD /* CarbCorrectionTests.swift */; };
 		98D15237299B781500B53913 /* BasalChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D15236299B781500B53913 /* BasalChart.swift */; };
 		98D15239299B789400B53913 /* DerivedChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D15238299B789400B53913 /* DerivedChart.swift */; };
 		98D1523B299B796000B53913 /* BloodGlucoseChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 98D1523A299B796000B53913 /* BloodGlucoseChart.swift */; };
@@ -53,6 +54,19 @@
 			remoteInfo = "Loop-Follower";
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		987E7E1C29ACB479006FC069 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutSettingsView.swift; sourceTree = "<group>"; };
@@ -84,6 +98,7 @@
 		4BF86E15287F4EDF003B9060 /* deviceData.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = deviceData.json; sourceTree = "<group>"; };
 		4BF86E18287F5414003B9060 /* LoopParameterValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterValue.swift; sourceTree = "<group>"; };
 		981B344E299F8F5900C1F1B3 /* CarbCorrection.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = CarbCorrection.json; sourceTree = "<group>"; };
+		98573D4A29B7347D00101FAD /* CarbCorrectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarbCorrectionTests.swift; sourceTree = "<group>"; };
 		98D15236299B781500B53913 /* BasalChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasalChart.swift; sourceTree = "<group>"; };
 		98D15238299B789400B53913 /* DerivedChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerivedChart.swift; sourceTree = "<group>"; };
 		98D1523A299B796000B53913 /* BloodGlucoseChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloodGlucoseChart.swift; sourceTree = "<group>"; };
@@ -154,6 +169,7 @@
 			isa = PBXGroup;
 			children = (
 				4BF86DE4287EF913003B9060 /* Loop_FollowerTests.swift */,
+				98573D4A29B7347D00101FAD /* CarbCorrectionTests.swift */,
 			);
 			path = "Loop-FollowerTests";
 			sourceTree = "<group>";
@@ -218,6 +234,7 @@
 				4BF86DCC287EF911003B9060 /* Sources */,
 				4BF86DCD287EF911003B9060 /* Frameworks */,
 				4BF86DCE287EF911003B9060 /* Resources */,
+				987E7E1C29ACB479006FC069 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -273,7 +290,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1330;
+				LastSwiftUpdateCheck = 1420;
 				LastUpgradeCheck = 1420;
 				TargetAttributes = {
 					4BF86DCF287EF911003B9060 = {
@@ -374,6 +391,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4BF86DE5287EF913003B9060 /* Loop_FollowerTests.swift in Sources */,
+				98573D4B29B7347D00101FAD /* CarbCorrectionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -541,6 +559,7 @@
 		4BF86DF5287EF913003B9060 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -560,7 +579,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-Follower";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -575,6 +594,7 @@
 		4BF86DF6287EF913003B9060 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -594,7 +614,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-Follower";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -615,7 +635,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 94QQZX9U85;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-FollowerTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -635,7 +655,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 94QQZX9U85;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "joerg-schoemer.de.Loop-FollowerTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";

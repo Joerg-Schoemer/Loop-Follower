@@ -8,7 +8,7 @@
 import Foundation
 import Combine
 
-class ModelData : ObservableObject {
+public class ModelData : ObservableObject {
 
     @Published var entries : [Entry] = []
     
