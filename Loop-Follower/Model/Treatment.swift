@@ -42,6 +42,10 @@ struct CorrectionBolus : Codable, Identifiable {
     var date : Date {
         return formatter.date(from: timestamp)!
     }
+    
+    var amount : Measurement<UnitInsulin> {
+        return Measurement<UnitInsulin>(value: insulin, unit: .insulin)
+    }
 }
 
 struct CarbCorrection : Codable, Identifiable {
@@ -58,6 +62,10 @@ struct CarbCorrection : Codable, Identifiable {
     
     var date : Date {
         return formatter.date(from: timestamp)!
+    }
+    
+    var mass : Measurement<UnitMass> {
+        return Measurement(value: carbs, unit: .grams)
     }
     
     var description : String {
@@ -115,10 +123,20 @@ struct CarbCorrection : Codable, Identifiable {
         }
         descriptionString.append(numberFormatter.string(from: NSNumber.init(value: self.carbs))! + "g")
         if !timeInHours.isEmpty {
-            descriptionString.append(" \(timeInHours)h")
+            descriptionString.append(self.absorption.formatted())
         }
 
         return descriptionString
+    }
+
+    var absorption : Measurement<UnitDuration> {
+        var timeInHours : Measurement<UnitDuration> = Measurement<UnitDuration>(value: Double(3), unit: .hours)
+
+        if let time = absorptionTime {
+            timeInHours = Measurement<UnitDuration>(value: Double(time), unit: .minutes)
+        }
+
+        return timeInHours.converted(to: .hours)
     }
 }
 

@@ -11,6 +11,7 @@ import Charts
 struct BloodGlucoseChart: View {
 
     let dashedLineStyle : [CGFloat] = [7, 3]
+    let barWidth : Int = 3
     
     let currentDate : Date?
     
@@ -29,7 +30,7 @@ struct BloodGlucoseChart: View {
         "Blood Glucose": Color(.systemBlue),
         "Prediction": Color(.systemPurple),
         "Insulin": Color(.systemOrange),
-        "Carbs": Color(.systemTeal),
+        "Carbs": Color(.systemGreen),
     ]
 
     var body: some View {
@@ -73,11 +74,23 @@ struct BloodGlucoseChart: View {
 
                 ForEach(insulin) { insulin in
                     BarMark(
-                        x: .value("timestamp", insulin.date),
+                        x: .value("timestamp", truncateMinutes(date: insulin.date)),
                         y: .value("insulin", insulin.insulin * 100),
-                        width: 4
+                        width: MarkDimension(integerLiteral: barWidth)
                     )
                     .foregroundStyle(by: .value("category", "Insulin"))
+                    .cornerRadius(0)
+                    .position(by: .value("category", "Insulin"))
+                }
+                ForEach(carbs) { carb in
+                    BarMark(
+                        x: .value("timestamp", truncateMinutes(date: carb.date)),
+                        y: .value("carbs", carb.carbs * 2),
+                        width: MarkDimension(integerLiteral: barWidth)
+                    )
+                    .foregroundStyle(by: .value("category", "Carbs"))
+                    .cornerRadius(0)
+                    .position(by: .value("category", "Carbs"))
                 }
 
                 if let prediction = prediction {
@@ -116,28 +129,6 @@ struct BloodGlucoseChart: View {
                     }
                     .interpolationMethod(.monotone)
                 }
-                ForEach(carbs) { carb in
-                    BarMark(
-                        x: .value("timestamp", carb.date),
-                        y: .value("carbs", carb.carbs * 2),
-                        width: 4
-                    )
-                    .foregroundStyle(by: .value("category", "Carbs"))
-                    .annotation(position: .topTrailing) {
-                        Text(carb.description)
-                            .font(.footnote)
-                            .rotationEffect(
-                                Angle(degrees: -45),
-                                anchor: .bottomLeading
-                            )
-                            .shadow(
-                                color: Color(.systemGray),
-                                radius: 2,
-                                x: 2,
-                                y: 2
-                            )
-                    }
-                }
             }
             .chartForegroundStyleScale(series)
             .chartLegend() {
@@ -148,7 +139,7 @@ struct BloodGlucoseChart: View {
                             .frame(width: 9)
                         Text(NSLocalizedString(key, comment: "Legend of blood glucose chart"))
                             .font(.footnote)
-                            .foregroundColor(Color(.systemGray))
+                            .foregroundColor(Color(.secondaryLabel))
                     }
                 }
             }
@@ -157,7 +148,7 @@ struct BloodGlucoseChart: View {
     }
     
     func estimateColorBySgv(_ sgv : Int) -> Color {
-        if sgv < criticalMin || sgv >= criticalMax {
+        if sgv < criticalMin || sgv > criticalMax {
             return Color(.systemRed)
         }
         
@@ -190,6 +181,10 @@ func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
             while: { $0.date <= endDate}
         )
     )
+}
+
+func truncateMinutes(date: Date) -> Date {
+    return Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date))!
 }
 
 struct BloodGlucoseChart_Previews: PreviewProvider {

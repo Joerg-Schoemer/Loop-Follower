@@ -13,7 +13,34 @@ struct ContentView: View {
         NavigationView {
             MonitorView()
                 .toolbar {
-                    ToolbarItem(placement: .bottomBar) {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        NavigationLink(
+                            destination: {
+                                InsulinListView()
+                            },
+                            label: {
+                                Image(systemName: "syringe")
+                            }
+                        )
+                        Spacer()
+                        NavigationLink(
+                            destination: {
+                                CarbonListView()
+                            },
+                            label: {
+                                Image(systemName: "fork.knife")
+                            }
+                        )
+                        Spacer()
+                        NavigationLink(
+                            destination: {
+                                ProfileView()
+                            },
+                            label: {
+                                Image(systemName: "slider.horizontal.3")
+                            }
+                        )
+                        Spacer()
                         NavigationLink(
                             destination: {
                                 NightScoutSettingsView()
@@ -25,6 +52,7 @@ struct ContentView: View {
                     }
                 }
                 .navigationBarHidden(true)
+                .navigationTitle("Overview")
         }
     }
 }

@@ -1,7 +1,4 @@
 /* No comment provided by engineer. */
-"acceleration" = "Beschleunigung";
-
-/* No comment provided by engineer. */
 "Basal" = "Basal";
 
 /* Battery */
@@ -19,6 +16,7 @@
 /* No comment provided by engineer. */
 "carbs" = "KH";
 
+/* No comment provided by engineer. */
 "Carbs" = "KH";
 
 /* No comment provided by engineer. */
@@ -33,6 +31,7 @@
 /* No comment provided by engineer. */
 "insulin" = "Insulin";
 
+/* No comment provided by engineer. */
 "Insulin" = "Insulin";
 
 /* Insulin on board */
@@ -47,16 +46,23 @@
 /* no recommended Bolus */
 "None" = "Keiner";
 
+/* No comment provided by engineer. */
+"now" = "jetzt";
+
 /* Override Name */
 "Override" = "Modus";
 
 /* No comment provided by engineer. */
-"prediction" = "Vorhersage";
+"Overview" = "Übersicht";
 
-"Prediction" = "Vorhersage";
+/* No comment provided by engineer. */
+"prediction" = "Vorhersage";
 
 /* Pump reservoir volume */
 "Pump Volume" = "Pumpentank";
+
+/* No comment provided by engineer. */
+"rate" = "Rate";
 
 /* abbreviated recommended bolus */
 "Rec. Bolus" = "Empf. Bolus";
@@ -80,11 +86,11 @@
 "URL" = "URL";
 
 /* No comment provided by engineer. */
-"velocity" = "Geschwindigkeit";
-
-/* No comment provided by engineer. */
 "your Nightscout token" = "Dein Nightscout Token";
 
 /* No comment provided by engineer. */
 "your Nightscout URL" = "Deine Nightscout URL";
 
+"Profile" = "Profil";
+
+"Carbohydrate ratios" = "KH-Faktoren";

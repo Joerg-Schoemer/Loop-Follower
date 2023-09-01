@@ -125,22 +125,12 @@ struct DerivedChart_Previews: PreviewProvider {
 }
 
 func derive(_ values: [Entry], _ name: String) -> [Entry] {
-    let diffs = zip(values.dropFirst(), values).map {
-        let dateDifference = Calendar.current.dateComponents([.second], from: $0.date, to: $1.date).second!
-        
-        let entry = Entry(
+    return zip(values.dropFirst(), values).map {
+        return Entry(
             id: UUID().uuidString,
-            sgv: Int(
-                (Double(($1.sgv - $0.sgv) * 300) /
-                Double(dateDifference <= 0 ? 1 : dateDifference)
-                ).nextUp.rounded()
-            ),
+            sgv: $1.sgv - $0.sgv,
             dateString: $1.dateString
         )
-
-        return entry
     }
-
-    return diffs
 }
 

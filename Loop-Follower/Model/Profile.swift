@@ -40,6 +40,10 @@ struct Basal : Codable {
 struct Target : Codable {
     let value : Double
     let timeAsSeconds : Double
+    
+    var time : Date {
+        return Calendar.current.startOfDay(for: Date()) + timeAsSeconds
+    }
 }
 
 struct LoopSettings : Codable {
