@@ -13,7 +13,7 @@ struct CarbonListView: View {
 
     var body: some View {
         List(modelData.carbs, id: \.id) { carb in
-            CarbonItem(carb: carb)
+            CarbonItem(carb: carb, profile: modelData.profile!)
         }
         .navigationBarTitle("Carbs")
     }

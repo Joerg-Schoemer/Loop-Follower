@@ -11,6 +11,8 @@ struct CarbonItem: View {
     
     var carb : CarbCorrection
     
+    var profile : Profile
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             Label(
@@ -35,15 +37,36 @@ struct CarbonItem: View {
                 )
                 .font(.subheadline)
             }
-            Label(
-                carb.date.formatted(
-                    date: .abbreviated,
-                    time: .shortened
-                ),
-                systemImage: "clock"
-            ).font(.subheadline)
+            HStack {
+                Label(
+                    carb.date.formatted(
+                        date: .abbreviated,
+                        time: .shortened
+                    ),
+                    systemImage: "clock"
+                )
+                if let ratio = findCarbRatio(profile: profile, carb: carb) {
+                    Spacer()
+                    Label(
+                        Measurement<UnitInsulin>(value: carb.mass.value / ratio.value, unit: .insulin)
+                            .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
+                        systemImage: "syringe"
+                    )
+                }
+            }
+            .font(.subheadline)
         }
     }
+}
+
+func findCarbRatio(profile: Profile, carb: CarbCorrection) -> Target? {
+    for c in profile.carbratio.reversed() {
+        if (Calendar.current.startOfDay(for: carb.date) + c.timeAsSeconds <= carb.date) {
+            return c
+        }
+    }
+
+    return nil;
 }
 
 struct CarbonItem_Previews: PreviewProvider {
@@ -55,6 +78,15 @@ struct CarbonItem_Previews: PreviewProvider {
                 absorptionTime: 180,
                 carbs: 12.0,
                 timestamp: "2023-08-28T12:00:00Z"
+            ),
+            profile: Profile(
+                basal: [],
+                target_low: [],
+                target_high: [],
+                sens: [],
+                carbratio: [
+                    Target(value: 10, timeAsSeconds: 0)
+                ]
             )
         )
     }

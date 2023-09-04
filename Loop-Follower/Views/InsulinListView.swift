@@ -17,8 +17,9 @@ struct InsulinListView: View {
                 InsulinItem(insulin: insulin)
             }
             Spacer()
-            Text(
-                "Summe Insulin: \(sum.formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))))"
+            Label(
+                sum.formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
+                systemImage: "sum"
             ).font(.headline)
         }
         .navigationBarTitle("Insulin")

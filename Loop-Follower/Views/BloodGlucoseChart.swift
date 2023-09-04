@@ -75,7 +75,7 @@ struct BloodGlucoseChart: View {
                 ForEach(insulin) { insulin in
                     BarMark(
                         x: .value("timestamp", truncateMinutes(date: insulin.date)),
-                        y: .value("insulin", insulin.insulin * 100),
+                        y: .value("insulin", 25),
                         width: MarkDimension(integerLiteral: barWidth)
                     )
                     .foregroundStyle(by: .value("category", "Insulin"))
@@ -85,7 +85,7 @@ struct BloodGlucoseChart: View {
                 ForEach(carbs) { carb in
                     BarMark(
                         x: .value("timestamp", truncateMinutes(date: carb.date)),
-                        y: .value("carbs", carb.carbs * 2),
+                        y: .value("carbs", 25),
                         width: MarkDimension(integerLiteral: barWidth)
                     )
                     .foregroundStyle(by: .value("category", "Carbs"))
@@ -114,6 +114,13 @@ struct BloodGlucoseChart: View {
                         .foregroundStyle(Color(.systemPurple))
                         .lineStyle(StrokeStyle(dash: dashedLineStyle))
                         .interpolationMethod(.monotone)
+                        .symbol {
+                            if entry.sgv == 0 {
+                                Circle()
+                                    .fill(Color(.systemRed))
+                                    .frame(width: 5)
+                            }
+                        }
                     }
                 }
                 ForEach(entries) { entry in
@@ -169,7 +176,7 @@ func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
     let predictions : [Entry] = values.map {
         let entry = Entry(
             id: UUID().uuidString,
-            sgv: Int($0),
+            sgv: max(Int($0), 0),
             dateString: formatter.string(from: currentDate)
         )
         currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: currentDate)!
