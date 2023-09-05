@@ -75,7 +75,7 @@ struct CarbonItem_Previews: PreviewProvider {
             carb: CarbCorrection(
                 id: "x",
                 foodType: "🌮",
-                absorptionTime: 180,
+                absorptionTime: 210,
                 carbs: 12.0,
                 timestamp: "2023-08-28T12:00:00Z"
             ),

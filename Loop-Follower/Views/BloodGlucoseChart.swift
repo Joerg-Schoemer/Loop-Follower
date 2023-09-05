@@ -95,7 +95,7 @@ struct BloodGlucoseChart: View {
 
                 if let prediction = prediction {
                     RuleMark(
-                        x: .value("prediction", prediction.date)
+                        x: .value("prediction-start", prediction.date)
                     )
                     .lineStyle(StrokeStyle(dash: dashedLineStyle, dashPhase: 3))
                     .foregroundStyle(Color(.systemPurple))

@@ -64,7 +64,7 @@ struct DerivedChart: View {
                     .foregroundStyle(by: .value("category", "acceleration"))
                 }
             }
-            .chartLegend(position: .overlay, alignment: .topLeading) {
+            .chartLegend() {
                 HStack {
                     ForEach(series, id: \.key) { key, value in
                         Circle()

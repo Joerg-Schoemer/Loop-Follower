@@ -1,3 +1,5 @@
+"acceleration" = "Beschleunigung";
+
 /* No comment provided by engineer. */
 "Basal" = "Basal";
 
@@ -56,7 +58,7 @@
 "Overview" = "Übersicht";
 
 /* No comment provided by engineer. */
-"prediction" = "Vorhersage";
+"Prediction" = "Vorhersage";
 
 /* Pump reservoir volume */
 "Pump Volume" = "Pumpentank";
@@ -94,3 +96,5 @@
 "Profile" = "Profil";
 
 "Carbohydrate ratios" = "KH-Faktoren";
+
+"velocity" = "Geschwindigkeit";
