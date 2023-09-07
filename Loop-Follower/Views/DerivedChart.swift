@@ -64,6 +64,7 @@ struct DerivedChart: View {
                     .foregroundStyle(by: .value("category", "acceleration"))
                 }
             }
+            .chartForegroundStyleScale(series)
             .chartLegend() {
                 HStack {
                     ForEach(series, id: \.key) { key, value in
