@@ -8,7 +8,9 @@
 import SwiftUI
 
 struct CarbonItem: View {
-    
+
+    @EnvironmentObject var settings: SettingsStore
+
     var carb : CarbCorrection
     
     var profile : Profile
@@ -30,7 +32,7 @@ struct CarbonItem: View {
                 Label(
                     carb.absorption.formatted(
                         .measurement(
-                            width: .abbreviated,
+                            width: .narrow,
                             numberFormatStyle: .number.precision(.fractionLength(1)))
                     ),
                     systemImage: "stopwatch"
@@ -48,7 +50,7 @@ struct CarbonItem: View {
                 if let ratio = findCarbRatio(profile: profile, carb: carb) {
                     Spacer()
                     Label(
-                        Measurement<UnitInsulin>(value: carb.mass.value / ratio.value, unit: .insulin)
+                        Measurement<UnitInsulin>(value: calculateInsulinNeeds(carbs: carb.mass.value, factor: ratio.value, pumpResolution: settings.pumpRes), unit: .insulin)
                             .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
                         systemImage: "syringe"
                     )
@@ -67,6 +69,12 @@ func findCarbRatio(profile: Profile, carb: CarbCorrection) -> Target? {
     }
 
     return nil;
+}
+
+func calculateInsulinNeeds(carbs: Double, factor: Double, pumpResolution: Double) -> Double {
+    let needs = Int(carbs / pumpResolution / factor)
+    
+    return Double(needs) * pumpResolution
 }
 
 struct CarbonItem_Previews: PreviewProvider {
@@ -89,5 +97,6 @@ struct CarbonItem_Previews: PreviewProvider {
                 ]
             )
         )
+        .environmentObject(SettingsStore())
     }
 }

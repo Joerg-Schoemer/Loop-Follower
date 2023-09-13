@@ -30,11 +30,19 @@ struct Profile : Codable {
     let target_high : [Target]
     let sens : [Target]
     let carbratio : [Target]
+    
+    var targets : [ (low: Target, high: Target) ] {
+        return Array(zip(target_low, target_high))
+    }
 }
 
 struct Basal : Codable {
     let value : Double
     let timeAsSeconds : Double
+    
+    var time : Date {
+        return Calendar.current.startOfDay(for: Date()) + timeAsSeconds
+    }
 }
 
 struct Target : Codable {

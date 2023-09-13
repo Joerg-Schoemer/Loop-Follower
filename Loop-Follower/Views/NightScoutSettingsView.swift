@@ -35,6 +35,18 @@ struct NightScoutSettingsView: View {
                     .disableAutocorrection(true)
                 }
             }
+            
+            Section(header: Text("Pump Settings")) {
+                HStack {
+                    Text("Resolution")
+                    TextField(
+                        "Resolution",
+                        value: $settings.pumpRes,
+                        format: .number.precision(.fractionLength(3))
+                    )
+                }
+            }
+            
         }.navigationBarTitle("Settings")
     }
 }

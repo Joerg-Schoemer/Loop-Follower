@@ -13,6 +13,7 @@ class SettingsStore  : ObservableObject  {
     enum Keys {
         static let url = "url"
         static let token = "token"
+        static let pumpRes = "pumpResolution"
     }
     
     private let cancellable: Cancellable
@@ -25,7 +26,8 @@ class SettingsStore  : ObservableObject  {
         
         defaults.register(defaults: [
             Keys.url: "",
-            Keys.token: ""
+            Keys.token: "",
+            Keys.pumpRes: 0.05
         ])
         
         cancellable = NotificationCenter.default
@@ -42,6 +44,11 @@ class SettingsStore  : ObservableObject  {
     var token: String {
         set { defaults.set(newValue, forKey: Keys.token) }
         get { defaults.string(forKey: Keys.token)! }
+    }
+    
+    var pumpRes: Double {
+        set { defaults.set(newValue, forKey: Keys.pumpRes) }
+        get { defaults.double(forKey: Keys.pumpRes) }
     }
 }
 

@@ -1,4 +1,5 @@
-"acceleration" = "Beschleunigung";
+/* No comment provided by engineer. */
+"basal" = "Basal";
 
 /* No comment provided by engineer. */
 "Basal" = "Basal";
@@ -16,6 +17,9 @@
 "CAGE" = "CAGE";
 
 /* No comment provided by engineer. */
+"Carbohydrate ratios" = "KH-Faktoren";
+
+/* No comment provided by engineer. */
 "carbs" = "KH";
 
 /* No comment provided by engineer. */
@@ -26,6 +30,9 @@
 
 /* Carbs on board */
 "COB" = "COB";
+
+/* No comment provided by engineer. */
+"correction target" = "Blutzucker-Zielbereich";
 
 /* No comment provided by engineer. */
 "Derived" = "Ableitungen";
@@ -58,7 +65,7 @@
 "Overview" = "Übersicht";
 
 /* No comment provided by engineer. */
-"Prediction" = "Vorhersage";
+"Profile" = "Profil";
 
 /* Pump reservoir volume */
 "Pump Volume" = "Pumpentank";
@@ -93,8 +100,12 @@
 /* No comment provided by engineer. */
 "your Nightscout URL" = "Deine Nightscout URL";
 
-"Profile" = "Profil";
+"Prediction" = "Vorhersage";
 
-"Carbohydrate ratios" = "KH-Faktoren";
+"acceleration" = "Beschleunigung";
 
 "velocity" = "Geschwindigkeit";
+
+"Pump Settings" = "Pumpeneinstellungen";
+
+"Resolution" = "Auflösung";

@@ -14,28 +14,65 @@ struct ProfileView: View {
     var body: some View {
         VStack {
             if let profile = modelData.profile {
-                
-                List {
-                    Section(header: Text("Carbohydrate ratios")) {
-                        ForEach(profile.carbratio, id: \.timeAsSeconds) { ratio in
-                            HStack {
-                                Text(ratio.time.formatted(date: .omitted, time: .shortened))
-                                Spacer()
-                                Text(ratio.value.formatted(.number.precision(.fractionLength(1))))
+                TabView {
+                    List {
+                        Section(header: Text("Carbohydrate ratios")) {
+                            ForEach(profile.carbratio, id: \.timeAsSeconds) { ratio in
+                                HStack {
+                                    Text(ratio.time.formatted(date: .omitted, time: .shortened))
+                                    Spacer()
+                                    Text(ratio.value.formatted(.number.precision(.fractionLength(1))))
+                                }
                             }
                         }
                     }
+                    .tag("carbs")
 
-                    Section(header: Text("Insulin Sensitivity Factors")) {
-                        ForEach(profile.sens, id: \.timeAsSeconds) { sens in
-                            HStack {
-                                Text(sens.time.formatted(date: .omitted, time: .shortened))
-                                Spacer()
-                                Text(sens.value.formatted(.number.precision(.fractionLength(1))))
+                    List {
+                        Section(header: Text("Insulin Sensitivity Factors")) {
+                            ForEach(profile.sens, id: \.timeAsSeconds) { sens in
+                                HStack {
+                                    Text(sens.time.formatted(date: .omitted, time: .shortened))
+                                    Spacer()
+                                    Text(sens.value.formatted(.number.precision(.fractionLength(1))))
+                                }
                             }
                         }
                     }
+                    .tag("ISF")
+
+                    List {
+                        Section(header: Text("basal")) {
+                            ForEach(profile.basal, id: \.timeAsSeconds) { basal in
+                                HStack {
+                                    Text(basal.time.formatted(date: .omitted, time: .shortened))
+                                    Spacer()
+                                    Text(basal.value.formatted(.number.precision(.fractionLength(2))))
+                                }
+                            }
+                        }
+                    }
+                    .tag("basal")
+
+                    List {
+                        Section(header: Text("correction target")) {
+                            ForEach(profile.targets, id: \.low.timeAsSeconds) { targets in
+                                HStack {
+                                    Text(targets.low.time.formatted(date: .omitted, time: .shortened))
+                                    Spacer()
+                                    Text(
+                                        targets.low.value.formatted(.number.precision(.fractionLength(1)))
+                                        + " - " +
+                                        targets.high.value.formatted(.number.precision(.fractionLength(1))))
+                                    
+                                }
+                            }
+                        }
+                    }
+                    .tag("target")
                 }
+                .tabViewStyle(.page)
+                .indexViewStyle(.page(backgroundDisplayMode: .always))
             }
         }
         .navigationBarTitle("Profile")
