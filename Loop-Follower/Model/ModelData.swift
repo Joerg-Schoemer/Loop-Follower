@@ -34,7 +34,7 @@ public class ModelData : ObservableObject {
     
     @Published var currentDate : Date?
     
-    private let hourOfHistory : Int = -6;
+    private let hourOfHistory : Int = -6
     
     private var tempBasal : [TempBasal] = []
 
@@ -132,7 +132,7 @@ public class ModelData : ObservableObject {
         
         let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction%20Bolus&find[timestamp][$gte]=\(startMillis)") {
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction Bolus&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -165,7 +165,7 @@ public class ModelData : ObservableObject {
         
         let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Carb%20Correction&find[timestamp][$gte]=\(startMillis)") {
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Carb Correction&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -198,7 +198,7 @@ public class ModelData : ObservableObject {
         
         let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp%20Basal&find[timestamp][$gte]=\(startMillis)") {
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp Basal&find[timestamp][$gte]=\(startMillis)") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -225,7 +225,7 @@ public class ModelData : ObservableObject {
         }
     }
     
-    func loadDeviceStatus(baseUrl:String, token: String, completionHandler: @escaping ([LoopData]) -> ()) {
+    func loadDeviceStatus(baseUrl:String, token: String, completionHandler: @escaping (LoopData?) -> ()) {
         if let url = URL(string: "\(baseUrl)/api/v1/devicestatus.json?token=\(token)&count=1") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
@@ -243,7 +243,7 @@ public class ModelData : ObservableObject {
                 if let data = data {
                     let loopData = try! JSONDecoder().decode([LoopData].self, from: data)
                     DispatchQueue.main.async {
-                        completionHandler(loopData)
+                        completionHandler(loopData.first)
                     }
                 } else {
                     print("no data")
@@ -391,8 +391,7 @@ public class ModelData : ObservableObject {
             baseUrl: baseUrl,
             token: token,
             completionHandler: { loopData in
-                let loopData: [LoopData] = loopData
-                self.currentLoopData = loopData.first
+                self.currentLoopData = loopData
             }
         )
         loadInsulin(
