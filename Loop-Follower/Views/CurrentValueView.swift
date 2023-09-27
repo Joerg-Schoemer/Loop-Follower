@@ -86,7 +86,7 @@ struct CurrentValueView: View {
                             progress = progressValue()
                         }
                     }
-                    .onChange(of: self.currentEntry!) { value in
+                    .onChange(of: self.currentEntry!) { oldValue, value in
                         progress = progressValue()
                     }
                     .frame(width: 150)

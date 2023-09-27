@@ -283,7 +283,7 @@ public class ModelData : ObservableObject {
     }
     
     func loadSiteChange(baseUrl:String, token : String, completionHandler: @escaping (Date?) -> ()) {
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Site%20Change&count=1") {
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Site Change&count=1&find[created_at][$gte]=0") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -320,7 +320,7 @@ public class ModelData : ObservableObject {
     }
 
     func loadSensorChange(baseUrl : String, token : String, completionHandler: @escaping (Date?) -> ()) {
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Sensor%20Change&count=1") {
+        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Sensor Change&count=1&find[created_at][$gte]=0") {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
