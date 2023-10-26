@@ -195,7 +195,7 @@ struct CurrentValueView_Previews: PreviewProvider {
             ForEach(0 ..< dirs.count, id: \.self) { i in
                 let dir = dirs[i]
                 let sgv = sgvs[i]
-                let date = Date() + Double.random(in: -300 ... -10)
+                let date = currentDate! + Double.random(in: -300 ... -10)
                 CurrentValueView(
                     currentDate: $currentDate,
                     currentEntry: .constant(Entry(

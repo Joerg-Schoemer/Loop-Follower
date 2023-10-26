@@ -90,6 +90,8 @@ public class ModelData : ObservableObject {
         self.scheduledBasal = calculateTempBasal(basals: (self.profile?.basal)!, startDate: (entries.last?.date)!, endDate: (lastEntry?.date)!)
         
         self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: (lastEntry?.date)!)
+        self.siteChanged = Calendar.current.date(byAdding: .hour, value: -26, to: Date.now)!
+        self.sensorChanged = Calendar.current.date(byAdding: .hour, value: -96, to: Date.now)!
     }
 
     func loadSgv(baseUrl : String, token : String, completionHandler: @escaping ([Entry]) -> ()) {
