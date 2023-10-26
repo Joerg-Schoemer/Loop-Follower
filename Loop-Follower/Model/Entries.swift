@@ -16,6 +16,7 @@ enum Direction : String, Codable, CaseIterable {
     case singleDown = "SingleDown"
     case doubleDown = "DoubleDown"
     case unknown = "NOT COMPUTABLE"
+    case none = "NONE"
 }
 
 struct Entry: Hashable, Decodable, Identifiable {

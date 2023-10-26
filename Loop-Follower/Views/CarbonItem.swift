@@ -18,7 +18,7 @@ struct CarbonItem: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             Label(
-                carb.foodType!,
+                carb.foodType ?? "",
                 systemImage: "fork.knife"
             )
             .font(.headline)
