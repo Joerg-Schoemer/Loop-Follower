@@ -21,7 +21,7 @@ class SettingsStore  : ObservableObject  {
     
     let objectWillChange = PassthroughSubject<Void, Never>()
     
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = UserDefaults(suiteName: "group.loop.follower")!) {
         self.defaults = defaults
         
         defaults.register(defaults: [

@@ -1,0 +1,25 @@
+{
+  "configurations" : [
+    {
+      "id" : "7B141EAA-CFC1-4B79-A657-44849EA15847",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Loop-Follower.xcodeproj",
+        "identifier" : "4BF86DDF287EF913003B9060",
+        "name" : "Loop-FollowerTests"
+      }
+    }
+  ],
+  "version" : 1
+}

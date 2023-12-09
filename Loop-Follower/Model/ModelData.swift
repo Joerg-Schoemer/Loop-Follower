@@ -41,7 +41,7 @@ public class ModelData : ObservableObject {
     init() {
         _ = load()
         Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { timer in
-            print("running timer event...")
+            print("running timer event \(Date.now)")
             if let nextRun = self.load() {
                 print("rescheduling timer at: \(nextRun)")
                 timer.fireDate = nextRun
@@ -97,7 +97,14 @@ public class ModelData : ObservableObject {
     func loadSgv(baseUrl : String, token : String, completionHandler: @escaping ([Entry]) -> ()) {
         let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date.now)!.timeIntervalSince1970 * 1000
 
-        if let url = URL(string: "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&find[date][$gte]=\(date)&count=1000") {
+        var requestString : String
+        if token.isEmpty {
+            requestString = "\(baseUrl)/api/v1/entries/sgv.json?find[date][$gte]=\(date)&count=1000"
+        } else {
+            requestString = "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&find[date][$gte]=\(date)&count=1000"
+        }
+        
+        if let url = URL(string: requestString) {
             URLSession.shared.dataTask(
                 with: url,
                 completionHandler: { data, response, error in
@@ -200,7 +207,14 @@ public class ModelData : ObservableObject {
         
         let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp Basal&find[timestamp][$gte]=\(startMillis)") {
+        var requestString : String
+        if token.isEmpty {
+            requestString = "\(baseUrl)/api/v1/treatments.json?find[eventType]=Temp Basal&find[timestamp][$gte]=\(startMillis)"
+        } else {
+            requestString = "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp Basal&find[timestamp][$gte]=\(startMillis)"
+        }
+
+        if let url = URL(string: requestString) {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -359,10 +373,11 @@ public class ModelData : ObservableObject {
     }
 
     @objc func load() -> Date? {
-        let baseUrl : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = UserDefaults.standard.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+        let store = UserDefaults(suiteName: "group.loop.follower")!
+        let baseUrl : String = store.object(forKey: SettingsStore.Keys.url) as? String ?? ""
+        let token : String = store.object(forKey: SettingsStore.Keys.token) as? String ?? ""
 
-        if baseUrl.isEmpty || token.isEmpty {
+        if baseUrl.isEmpty {
             // do nothing when not configured
             return nil
         }
@@ -740,13 +755,13 @@ struct AlertState {
 func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> AlertType {
     
     if let first = entries.first {
-        // on first we decide which threshold to check
+        // on the first entry we decide which threshold to check
         if first.sgv < alertSettings.veryLowThreshold {
             return .veryLow
         } else if first.sgv < alertSettings.lowThreshold {
             if let firstAboveThresholdIndex = entries.firstIndex(where: { $0.sgv >= alertSettings.lowThreshold }) {
                 let lastBelowThreshold = entries[firstAboveThresholdIndex - 1]
-                let diff = lastBelowThreshold.date.distance(to: first.date)
+                let diff = lastBelowThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
                 if let lowTime = alertSettings.lowTime {
                     if diff > lowTime {
                         return .low
@@ -762,7 +777,7 @@ func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> A
         } else if first.sgv > alertSettings.highThreshold {
             if let firstBelowThresholdIndex = entries.firstIndex(where: { $0.sgv <= alertSettings.highThreshold }) {
                 let lastAboveThreshold = entries[firstBelowThresholdIndex - 1]
-                let diff = lastAboveThreshold.date.distance(to: first.date)
+                let diff = lastAboveThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
                 print("diff=\(diff),\nlastAboveThreshold=\(lastAboveThreshold),\nfirst=\(first)")
                 if let highTime = alertSettings.highTime {
                     if diff > highTime {
@@ -780,4 +795,10 @@ func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> A
     }
 
     return .none
+}
+
+extension Date {
+    static func - (lhs: Date, rhs: Date) -> TimeInterval {
+        return lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
+    }
 }

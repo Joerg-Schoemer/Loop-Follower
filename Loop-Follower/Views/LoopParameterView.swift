@@ -98,12 +98,6 @@ struct LoopParameterView: View {
     }
 }
 
-extension Date {
-    static func - (lhs: Date, rhs: Date) -> TimeInterval {
-        return lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
-    }
-}
-
 func loopState(state: LoopState) -> String {
     switch (state) {
     case .looping:
