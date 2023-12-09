@@ -52,8 +52,8 @@ struct BasalChart: View {
                     RuleMark(
                         x: .value("now", self.currentDate!)
                     )
-                    .lineStyle(StrokeStyle(lineWidth: 3))
-                    .foregroundStyle(Color(.systemYellow))
+                    .lineStyle(StrokeStyle(lineWidth: 1))
+                    .foregroundStyle(Color(.systemCyan).opacity(0.75))
                 }
             }
         }

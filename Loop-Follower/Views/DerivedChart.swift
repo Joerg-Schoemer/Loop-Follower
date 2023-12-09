@@ -40,8 +40,8 @@ struct DerivedChart: View {
                     RuleMark(
                         x: .value("now", currentDate!)
                     )
-                    .lineStyle(StrokeStyle(lineWidth: 3))
-                    .foregroundStyle(Color(.systemYellow))
+                    .lineStyle(StrokeStyle(lineWidth: 1))
+                    .foregroundStyle(Color(.systemCyan).opacity(0.75))
                     RuleMark(
                         x: .value("future", Calendar.current.date(byAdding: .hour, value: 3, to: currentDate!)!)
                     )

@@ -27,7 +27,7 @@ struct BloodGlucoseChart: View {
     let rangeMax : Int
 
     let series: KeyValuePairs<String, Color> = [
-        "Blood Glucose": Color(.systemBlue),
+        "Blood Glucose": Color(.systemGray),
         "Prediction": Color(.systemPurple),
         "Insulin": Color(.systemOrange),
         "Carbs": Color(.systemGreen),
@@ -68,8 +68,8 @@ struct BloodGlucoseChart: View {
                     RuleMark(
                         x: .value("now", currentDate)
                     )
-                    .lineStyle(StrokeStyle(lineWidth: 3))
-                    .foregroundStyle(Color(.systemYellow).opacity(0.75))
+                    .lineStyle(StrokeStyle(lineWidth: 1))
+                    .foregroundStyle(Color(.systemCyan).opacity(0.75))
                 }
 
                 ForEach(insulin) { insulin in
@@ -134,7 +134,9 @@ struct BloodGlucoseChart: View {
                             .fill(estimateColorBySgv(entry.sgv))
                             .frame(width: 5)
                     }
+                    .foregroundStyle(Color(.systemGray))
                     .interpolationMethod(.monotone)
+                    .lineStyle(StrokeStyle(lineWidth: 1.0))
                 }
             }
             .chartForegroundStyleScale(series)
