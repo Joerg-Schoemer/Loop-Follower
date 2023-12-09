@@ -42,10 +42,7 @@ struct InsulinListView: View {
     }
 
     var sum : Measurement<UnitInsulin> {
-        var selectedItems = modelData.insulin
-        if editMode == .active {
-            selectedItems = modelData.insulin.filter { insulin in multiSelection.contains(insulin.id) }
-        }
+        let selectedItems = modelData.insulin.filter { insulin in multiSelection.contains(insulin.id) || editMode == .inactive }
 
         return Measurement<UnitInsulin>(value: selectedItems.map{ $0.insulin }.reduce(0, +), unit: .insulin)
     }
