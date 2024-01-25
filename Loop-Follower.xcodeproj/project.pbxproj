@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4B05BB492B6130BB00409D42 /* BloodGlucoseCursorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B05BB482B6130BB00409D42 /* BloodGlucoseCursorView.swift */; };
 		4B2124A2288593BA00453B69 /* NightScoutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */; };
 		4B2124A42885959400453B69 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2124A32885959400453B69 /* SettingsStore.swift */; };
 		4B2D70C32A9CFA4000BFBBE0 /* CarbonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D70C22A9CFA4000BFBBE0 /* CarbonItem.swift */; };
@@ -91,6 +92,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4B05BB482B6130BB00409D42 /* BloodGlucoseCursorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BloodGlucoseCursorView.swift; sourceTree = "<group>"; };
 		4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutSettingsView.swift; sourceTree = "<group>"; };
 		4B2124A32885959400453B69 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		4B21B3A52B0CF7A400887F71 /* Loop-Follower-WidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Loop-Follower-WidgetExtension.entitlements"; sourceTree = "<group>"; };
@@ -302,6 +304,7 @@
 				98D15236299B781500B53913 /* BasalChart.swift */,
 				98D15238299B789400B53913 /* DerivedChart.swift */,
 				98D1523A299B796000B53913 /* BloodGlucoseChart.swift */,
+				4B05BB482B6130BB00409D42 /* BloodGlucoseCursorView.swift */,
 				4B7DC5962A9CD7D800964F2E /* InsulinListView.swift */,
 				4BC951F62A9CEF6500684114 /* InsulinItem.swift */,
 				4B7DC5982A9CD94900964F2E /* CarbonListView.swift */,
@@ -515,6 +518,7 @@
 				4B7DC5992A9CD94900964F2E /* CarbonListView.swift in Sources */,
 				4B70525E28A2FFA200BFBF84 /* Profile.swift in Sources */,
 				4BF86DFE287EF97D003B9060 /* MonitorView.swift in Sources */,
+				4B05BB492B6130BB00409D42 /* BloodGlucoseCursorView.swift in Sources */,
 				4B7DC5972A9CD7D800964F2E /* InsulinListView.swift in Sources */,
 				4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */,
 			);

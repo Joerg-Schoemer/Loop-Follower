@@ -10,6 +10,28 @@ import Charts
 
 struct BloodGlucoseChart: View {
 
+    @State var rawSelectedDate: Date?
+
+    var selectedEntry: Entry? {
+        guard let rawSelectedDate else { return nil }
+        
+        let p = predictedValues(
+            startDate: prediction!.date,
+            values: prediction!.values
+        )
+
+        let allEntries = entries.reversed() + p
+        let f = allEntries.first(
+            where: { $0.date >= rawSelectedDate }
+        )
+        
+        if f != nil {
+            print("f=\(f!)")
+        }
+
+        return f
+    }
+
     let dashedLineStyle : [CGFloat] = [7, 3]
     let barWidth : Int = 3
     
@@ -126,19 +148,56 @@ struct BloodGlucoseChart: View {
                 ForEach(entries) { entry in
                     LineMark(
                         x: .value("timestamp", entry.date),
-                        y: .value("BG", entry.sgv),
+                        y: .value("BG", max(min(entry.sgv, 300), 40)),
                         series: .value("category", "Blood Glucose")
                     )
                     .symbol {
-                        Circle()
-                            .fill(estimateColorBySgv(entry.sgv))
-                            .frame(width: 5)
+                        if (entry.sgv >= 300){
+                            BasicChartSymbolShape
+                                .triangle
+                                .fill(estimateColorBySgv(entry.sgv))
+                                .frame(width: 5)
+                        } else if (entry.sgv <= 40) {
+                            BasicChartSymbolShape
+                                .triangle
+                                .fill(estimateColorBySgv(entry.sgv))
+                                .rotationEffect(.degrees(-180))
+                                .frame(width: 5)
+                        } else {
+                            BasicChartSymbolShape
+                                .circle
+                                .fill(estimateColorBySgv(entry.sgv))
+                                .frame(width: 5)
+                        }
                     }
                     .foregroundStyle(Color(.systemGray))
                     .interpolationMethod(.monotone)
                     .lineStyle(StrokeStyle(lineWidth: 1.0))
                 }
+
+                if let selectedEntry {
+                    RuleMark(
+                        x: .value("Selected", selectedEntry.date, unit: .minute)
+                    )
+                    .foregroundStyle(Color.gray.opacity(0.3))
+                    .offset(yStart: -10)
+                    .zIndex(-1)
+                    .annotation(
+                        position: .top,
+                        spacing: 0,
+                        overflowResolution: .init(
+                            x: .fit(to: .chart),
+                            y: .disabled
+                        )
+                    ) {
+                        BloodGlucoseCursorView(
+                            sgv: selectedEntry.sgv,
+                            date: selectedEntry.date
+                        )
+                    }
+                }
             }
+            .chartXSelection(value: $rawSelectedDate)
             .chartForegroundStyleScale(series)
             .chartLegend() {
                 HStack {
@@ -174,7 +233,7 @@ fileprivate let formatter = ISO8601DateFormatter(.withFractionalSeconds)
 func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
     var currentDate = startDate
     let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: startDate)!
-    
+
     let predictions : [Entry] = values.map {
         let entry = Entry(
             id: UUID().uuidString,
