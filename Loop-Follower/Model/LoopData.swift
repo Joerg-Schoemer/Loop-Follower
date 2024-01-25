@@ -151,6 +151,10 @@ struct LoopOverride : Codable {
             return "custom"
         }
         
+        if let multiplier = multiplier {
+            activeName += " (\(Int(multiplier * 100))%)"
+        }
+        
         return activeName.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
