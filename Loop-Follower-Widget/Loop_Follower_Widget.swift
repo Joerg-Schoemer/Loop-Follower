@@ -50,12 +50,15 @@ struct CurrentBGEntry: TimelineEntry {
     let timestamp: Date
     let delta: Int?
     
-    var deltaString : String {
-        if delta != nil {
-            return String(delta!)
+    fileprivate func formatDelta() -> String {
+        if let delta = self.delta {
+            if delta == 0 {
+                return String(format: "±%d mg/dl", delta)
+            }
+            return String(format: "%+d mg/dl", delta)
+        } else {
+            return "? mg/dl"
         }
-        
-        return "-"
     }
 }
 
@@ -69,19 +72,24 @@ func fetchCurrentBG() async throws -> CurrentBGEntry {
 
     // Fetch JSON data
     let (data, _) = try await URLSession.shared.data(from: url)
-    
+
     // Parse the JSON data
     let entries = try! JSONDecoder().decode([Entry].self, from: data)
-    let entry = entries.first!
-    print("entry = \(entry)")
+    if let entry = entries.first {
+        print("entry = \(entry)")
 
-    var delta : Int? = nil
-    if (entries.count > 1) {
-        delta = entries[1].sgv - entry.sgv
-        print("delta = \(delta!)")
+        var delta : Int? = nil
+        if (entries.count > 1) {
+            let prevEntry = entries[1]
+            print("prevEntry = \(prevEntry)")
+
+            delta = entry.sgv - prevEntry.sgv
+        }
+
+        return CurrentBGEntry(date: .now, sgv: entry.sgv, timestamp: entry.date, delta: delta)
     }
 
-    return CurrentBGEntry(date: .now, sgv: entry.sgv, timestamp: entry.date, delta: delta)
+    return CurrentBGEntry(date: .now, sgv: 0, timestamp: .now, delta: 0)
 }
 
 struct Loop_Follower_WidgetEntryView : View {
@@ -89,15 +97,11 @@ struct Loop_Follower_WidgetEntryView : View {
 
     var body: some View {
         VStack {
-            Text("\(entry.timestamp.formatted(date: .omitted , time: .shortened))")
+            Text("\(entry.timestamp.formatted(date: .omitted, time: .standard))")
                 .font(.subheadline)
-            HStack {
-                Text("\(entry.sgv)")
-                    .font(.title)
-                Text("mg/dl")
-                    .font(.callout)
-            }
-            Text("∆ \(entry.deltaString)")
+            Text("\(entry.sgv)")
+                .font(.title)
+            Text("\(entry.formatDelta())")
                 .font(.subheadline)
         }
     }
