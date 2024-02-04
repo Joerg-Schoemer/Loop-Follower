@@ -95,16 +95,20 @@ public class ModelData : ObservableObject {
     }
 
     func loadSgv(baseUrl : String, token : String, completionHandler: @escaping ([Entry]) -> ()) {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/entries/sgv.json")
+        else { return }
+        
         let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date.now)!.timeIntervalSince1970 * 1000
 
-        var requestString : String
-        if token.isEmpty {
-            requestString = "\(baseUrl)/api/v1/entries/sgv.json?find[date][$gte]=\(date)&count=1000"
-        } else {
-            requestString = "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&find[date][$gte]=\(date)&count=1000"
+        components.queryItems = []
+
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
+        components.queryItems?.append(URLQueryItem(name: "find[date][$gte]", value: date.description))
+        components.queryItems?.append(URLQueryItem(name: "count", value: "1000"))
         
-        if let url = URL(string: requestString) {
+        if let url = components.url {
             URLSession.shared.dataTask(
                 with: url,
                 completionHandler: { data, response, error in
@@ -136,12 +140,22 @@ public class ModelData : ObservableObject {
     }
     
     func loadInsulin(baseUrl : String, token: String, completionHandler: @escaping ([CorrectionBolus]) -> ()) {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
+        else { return }
+
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
-        
         let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Correction Bolus&find[timestamp][$gte]=\(startMillis)") {
+        components.queryItems = []
+
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        }
+        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Correction Bolus"))
+        components.queryItems?.append(URLQueryItem(name: "find[timestamp][$gte]", value: startMillis))
+        
+        if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -169,12 +183,23 @@ public class ModelData : ObservableObject {
     }
     
     func loadCarbs(baseUrl : String, token : String, completionHandler: @escaping ([CarbCorrection]) -> ()) {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
+        else { return }
+        
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
         let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Carb Correction&find[timestamp][$gte]=\(startMillis)") {
+        components.queryItems = []
+
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        }
+        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Carb Correction"))
+        components.queryItems?.append(URLQueryItem(name: "find[timestamp][$gte]", value: startMillis))
+        
+        if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -202,19 +227,23 @@ public class ModelData : ObservableObject {
     }
     
     func loadTempBasal(baseUrl : String, token : String, completionHandler: @escaping ([TempBasal]) -> ()) {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
+        else { return }
+        
         let format = ISO8601DateFormatter()
         format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
         
         let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
 
-        var requestString : String
-        if token.isEmpty {
-            requestString = "\(baseUrl)/api/v1/treatments.json?find[eventType]=Temp Basal&find[timestamp][$gte]=\(startMillis)"
-        } else {
-            requestString = "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Temp Basal&find[timestamp][$gte]=\(startMillis)"
-        }
+        components.queryItems = []
 
-        if let url = URL(string: requestString) {
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        }
+        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Temp Basal"))
+        components.queryItems?.append(URLQueryItem(name: "find[timestamp][$gte]", value: startMillis))
+        
+        if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -242,7 +271,17 @@ public class ModelData : ObservableObject {
     }
     
     func loadDeviceStatus(baseUrl:String, token: String, completionHandler: @escaping (LoopData?) -> ()) {
-        if let url = URL(string: "\(baseUrl)/api/v1/devicestatus.json?token=\(token)&count=1") {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/devicestatus.json")
+        else { return }
+        
+        components.queryItems = []
+
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        }
+        components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
+        
+        if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -270,7 +309,15 @@ public class ModelData : ObservableObject {
     }
     
     func loadProfile(baseUrl : String,token : String, completionHandler: @escaping (Profiles?) -> ()) {
-        if let url = URL(string: "\(baseUrl)/api/v1/profile.json?token=\(token)") {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/profile.json")
+        else { return }
+        
+        components.queryItems = []
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        }
+        
+        if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -299,7 +346,19 @@ public class ModelData : ObservableObject {
     }
     
     func loadSiteChange(baseUrl:String, token : String, completionHandler: @escaping (Date?) -> ()) {
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Site Change&count=1&find[created_at][$gte]=0") {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
+        else { return }
+        
+        components.queryItems = []
+
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        }
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: "0"))
+        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Site Change"))
+        components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
+        
+        if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
@@ -336,7 +395,19 @@ public class ModelData : ObservableObject {
     }
 
     func loadSensorChange(baseUrl : String, token : String, completionHandler: @escaping (Date?) -> ()) {
-        if let url = URL(string: "\(baseUrl)/api/v1/treatments.json?token=\(token)&find[eventType]=Sensor Change&count=1&find[created_at][$gte]=0") {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
+        else { return }
+        
+        components.queryItems = []
+
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        }
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: "0"))
+        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Sensor Change"))
+        components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
+        
+        if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
