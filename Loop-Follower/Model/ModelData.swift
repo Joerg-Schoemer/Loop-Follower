@@ -404,7 +404,7 @@ public class ModelData : ObservableObject {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
         components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: "0"))
-        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Sensor Change"))
+        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Sensor Start"))
         components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
         
         if let url = components.url {
