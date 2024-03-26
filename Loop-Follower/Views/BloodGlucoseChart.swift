@@ -148,27 +148,14 @@ struct BloodGlucoseChart: View {
                 ForEach(entries) { entry in
                     LineMark(
                         x: .value("timestamp", entry.date),
-                        y: .value("BG", max(min(entry.sgv, 300), 40)),
+                        y: .value("BG", max(entry.sgv, 40)),
                         series: .value("category", "Blood Glucose")
                     )
                     .symbol {
-                        if (entry.sgv >= 300){
-                            BasicChartSymbolShape
-                                .triangle
-                                .fill(estimateColorBySgv(entry.sgv))
-                                .frame(width: 5)
-                        } else if (entry.sgv <= 40) {
-                            BasicChartSymbolShape
-                                .triangle
-                                .fill(estimateColorBySgv(entry.sgv))
-                                .rotationEffect(.degrees(-180))
-                                .frame(width: 5)
-                        } else {
-                            BasicChartSymbolShape
-                                .circle
-                                .fill(estimateColorBySgv(entry.sgv))
-                                .frame(width: 5)
-                        }
+                        BasicChartSymbolShape
+                            .circle
+                            .fill(estimateColorBySgv(entry.sgv))
+                            .frame(width: 5)
                     }
                     .foregroundStyle(Color(.systemGray))
                     .interpolationMethod(.monotone)
@@ -252,7 +239,8 @@ func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
 }
 
 func truncateMinutes(date: Date) -> Date {
-    return Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date))!
+    let calendar: Calendar = Calendar.current
+    return calendar.date(from: calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date))!
 }
 
 struct BloodGlucoseChart_Previews: PreviewProvider {
