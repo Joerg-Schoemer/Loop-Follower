@@ -23,5 +23,6 @@ struct CarbonListView_Previews: PreviewProvider {
     static var previews: some View {
         CarbonListView()
             .environmentObject(ModelData(test: true))
+            .environmentObject(SettingsStore())
     }
 }

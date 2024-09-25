@@ -98,7 +98,8 @@ struct BloodGlucoseChart: View {
                     BarMark(
                         x: .value("timestamp", truncateMinutes(date: insulin.date)),
                         y: .value("insulin", 25),
-                        width: MarkDimension(integerLiteral: barWidth)
+                        width: MarkDimension(integerLiteral: barWidth),
+                        stacking: .normalized
                     )
                     .foregroundStyle(by: .value("category", "Insulin"))
                     .cornerRadius(0)
@@ -108,7 +109,8 @@ struct BloodGlucoseChart: View {
                     BarMark(
                         x: .value("timestamp", truncateMinutes(date: carb.date)),
                         y: .value("carbs", 25),
-                        width: MarkDimension(integerLiteral: barWidth)
+                        width: MarkDimension(integerLiteral: barWidth),
+                        stacking: .normalized
                     )
                     .foregroundStyle(by: .value("category", "Carbs"))
                     .cornerRadius(0)
@@ -133,7 +135,7 @@ struct BloodGlucoseChart: View {
                             y: .value("BG", entry.sgv),
                             series: .value("category", "Prediction")
                         )
-                        .foregroundStyle(Color(.systemPurple))
+                        .foregroundStyle(by: .value("category", "Prediction"))
                         .lineStyle(StrokeStyle(dash: dashedLineStyle))
                         .interpolationMethod(.monotone)
                         .symbol {
@@ -154,12 +156,12 @@ struct BloodGlucoseChart: View {
                     .symbol {
                         BasicChartSymbolShape
                             .circle
-                            .fill(estimateColorBySgv(entry.sgv))
+                            .stroke(estimateColorBySgv(entry.sgv), lineWidth: 1.5)
                             .frame(width: 5)
                     }
-                    .foregroundStyle(Color(.systemGray))
+                    .foregroundStyle(by: .value("category", "Blood Glucose"))
+                    .lineStyle(StrokeStyle(lineWidth: 3.0))
                     .interpolationMethod(.monotone)
-                    .lineStyle(StrokeStyle(lineWidth: 1.0))
                 }
 
                 if let selectedEntry {
@@ -184,6 +186,7 @@ struct BloodGlucoseChart: View {
                     }
                 }
             }
+            .chartYScale(domain: 0...300)
             .chartXSelection(value: $rawSelectedDate)
             .chartForegroundStyleScale(series)
             .chartLegend() {

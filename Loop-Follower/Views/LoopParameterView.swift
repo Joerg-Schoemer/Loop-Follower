@@ -101,15 +101,15 @@ struct LoopParameterView: View {
 func loopState(state: LoopState) -> String {
     switch (state) {
     case .looping:
-        return "↻"
+        return "🔄"
     case .error:
-        return "x"
+        return "❌"
     case .enacted:
-        return "⌁"
+        return "⚡️"
     case .warning:
-        return "⚠"
+        return "⚠️"
     case .recommendation:
-        return "⏀"
+        return "💉"
     }
 }
 

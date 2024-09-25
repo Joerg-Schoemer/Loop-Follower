@@ -85,7 +85,8 @@ struct CarbonItem_Previews: PreviewProvider {
                 foodType: "🌮",
                 absorptionTime: 210,
                 carbs: 12.0,
-                timestamp: "2023-08-28T12:00:00Z"
+                timestamp: "2023-08-28T12:00:00Z",
+                created_at: "2023-08-28T12:00:00.000Z"
             ),
             profile: Profile(
                 basal: [],

@@ -34,43 +34,43 @@ final class CarbCorrectionTests: XCTestCase {
     }
 
     func testCarbDescriptionWithoutFoodTypeHalfHour() throws {
-        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 30, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z")
+        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 30, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z", created_at: "2023-03-07T09:11:00.000Z")
         
         XCTAssertEqual(carbs.description, "🍭 3,5g 0,5h", "Carb description not correct")
     }
 
     func testCarbDescriptionWithoutFoodType1Hour() throws {
-        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 60, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z")
+        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 60, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z", created_at: "2023-03-07T09:11:00.000Z")
         
         XCTAssertEqual(carbs.description, "🍭 3,5g 1,0h", "Carb description not correct")
     }
 
     func testCarbDescriptionWithoutFoodType2Hours() throws {
-        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 120, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z")
+        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 120, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z", created_at: "2023-03-07T09:11:00.000Z")
         
         XCTAssertEqual(carbs.description, "🌮 3,5g 2,0h", "Carb description not correct")
     }
 
     func testCarbDescriptionWithoutFoodType3Hours() throws {
-        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 180, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z")
+        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 180, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z", created_at: "2023-03-07T09:11:00.000Z")
         
         XCTAssertEqual(carbs.description, "🌮 3,5g 3,0h", "Carb description not correct")
     }
     
     func testCarbDescriptionWithoutFoodType4Hours() throws {
-        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 240, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z")
+        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 240, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z", created_at: "2023-03-07T09:11:00.000Z")
         
         XCTAssertEqual(carbs.description, "🌮 3,5g 4,0h", "Carb description not correct")
     }
     
     func testCarbDescriptionWithoutFoodType5Hours() throws {
-        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 300, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z")
+        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 300, carbs: 3.54, timestamp: "2023-03-07T09:11:00Z", created_at: "2023-03-07T09:11:00.000Z")
         
         XCTAssertEqual(carbs.description, "🍕 3,5g 5,0h", "Carb description not correct")
     }
     
     func testCarbDescriptionWithoutFoodType6Hours() throws {
-        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 360, carbs: 90.06, timestamp: "2023-03-07T09:11:00Z")
+        let carbs = CarbCorrection(id: "", foodType: nil, absorptionTime: 360, carbs: 90.06, timestamp: "2023-03-07T09:11:00Z", created_at: "2023-03-07T09:11:00.000Z")
         
         XCTAssertEqual(carbs.description, "🥣 90,1g 6,0h", "Carb description not correct")
     }

@@ -28,7 +28,7 @@ struct Provider: TimelineProvider {
             }
             
             var nextUpdate = Calendar.current.date(
-                byAdding: DateComponents(minute: 5),
+                byAdding: DateComponents(minute: 1),
                 to: entry.timestamp
             )!
 
@@ -120,7 +120,7 @@ struct Loop_Follower_Widget: Widget {
         }
         .configurationDisplayName("Loop Follower Widget")
         .description("Loop Follower Widget showing current BG")
-        .supportedFamilies([.systemSmall])
+        .supportedFamilies([.systemSmall, .accessoryCircular])
     }
 }
 

@@ -34,6 +34,8 @@ public class ModelData : ObservableObject {
     
     @Published var currentDate : Date?
     
+    @Published var totalBasal : Double?
+    
     private let hourOfHistory : Int = -6
     
     private var tempBasal : [TempBasal] = []
@@ -97,17 +99,14 @@ public class ModelData : ObservableObject {
     func loadSgv(baseUrl : String, token : String, completionHandler: @escaping ([Entry]) -> ()) {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/entries/sgv.json")
         else { return }
-        
-        let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date.now)!.timeIntervalSince1970 * 1000
 
+        let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!.timeIntervalSince1970 * 1000
         components.queryItems = []
-
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
         components.queryItems?.append(URLQueryItem(name: "find[date][$gte]", value: date.description))
         components.queryItems?.append(URLQueryItem(name: "count", value: "1000"))
-        
         if let url = components.url {
             URLSession.shared.dataTask(
                 with: url,
@@ -138,23 +137,22 @@ public class ModelData : ObservableObject {
             completionHandler([])
         }
     }
-    
+
+    fileprivate func getStartTime() -> String {
+        return formatter.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!)
+    }
+
     func loadInsulin(baseUrl : String, token: String, completionHandler: @escaping ([CorrectionBolus]) -> ()) {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
         else { return }
 
-        let format = ISO8601DateFormatter()
-        format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
-
         components.queryItems = []
-
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
         components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Correction Bolus"))
-        components.queryItems?.append(URLQueryItem(name: "find[timestamp][$gte]", value: startMillis))
-        
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
+
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
@@ -185,19 +183,14 @@ public class ModelData : ObservableObject {
     func loadCarbs(baseUrl : String, token : String, completionHandler: @escaping ([CarbCorrection]) -> ()) {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
         else { return }
-        
-        let format = ISO8601DateFormatter()
-        format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
-        
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
-
+       
         components.queryItems = []
 
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
         components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Carb Correction"))
-        components.queryItems?.append(URLQueryItem(name: "find[timestamp][$gte]", value: startMillis))
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
         
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -230,19 +223,13 @@ public class ModelData : ObservableObject {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
         else { return }
         
-        let format = ISO8601DateFormatter()
-        format.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
-        
-        let startMillis = format.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: Date())!)
-
         components.queryItems = []
-
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
         components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Temp Basal"))
-        components.queryItems?.append(URLQueryItem(name: "find[timestamp][$gte]", value: startMillis))
-        
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
+
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
@@ -349,13 +336,14 @@ public class ModelData : ObservableObject {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
         else { return }
         
-        components.queryItems = []
+        let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: -5, to: Date())!
 
+        components.queryItems = []
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: "0"))
         components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Site Change"))
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)))
         components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
         
         if let url = components.url {
@@ -397,16 +385,17 @@ public class ModelData : ObservableObject {
     func loadSensorChange(baseUrl : String, token : String, completionHandler: @escaping (Date?) -> ()) {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
         else { return }
-        
-        components.queryItems = []
 
+        let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: -14, to: .now)!
+
+        components.queryItems = []
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: "0"))
         components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Sensor Start"))
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)))
         components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
-        
+
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
@@ -414,13 +403,13 @@ public class ModelData : ObservableObject {
                     print("Error fetching treatments: \(error)")
                     return
                 }
-                
+
                 guard let httpResponse = response as? HTTPURLResponse,
                       (200...299).contains(httpResponse.statusCode) else {
                     print("Error response, unexpected status code: \(String(describing: response))")
                     return
                 }
-                
+
                 if httpResponse.statusCode == 304 {
                     return
                 }
@@ -465,14 +454,13 @@ public class ModelData : ObservableObject {
                     alertSettings: AlertSettings(
                         veryLowThreshold: 55,
                         lowThreshold: 70,
-                        lowTime: 300.0,
+                        lowTime: 290.0,
                         highThreshold: 180,
-                        highTime: 3600.0,
+                        highTime: 3570.0,
                         veryHighThreshold: 260
                     )
                 )
-                
-                print(alert)
+                print("alert=\(alert)")
             }
         )
         loadDeviceStatus(
@@ -511,8 +499,9 @@ public class ModelData : ObservableObject {
                 let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: Date.now)!
 
                 self.profile = profiles!.store[profiles!.defaultProfile]!
+
                 self.loopSettings = profiles!.loopSettings
-                
+
                 self.scheduledBasal = calculateTempBasal(
                     basals: self.profile!.basal,
                     startDate: startDate,
@@ -549,12 +538,15 @@ public class ModelData : ObservableObject {
                 byAdding: .minute,
                 value: 5,
                 to: lastEntry.date
-            )!
+            )
             nextRun = Calendar.current.date(
                 byAdding: .second,
                 value: 10,
-                to: nextRun!)!
+                to: nextRun!)
             let oneMinuteInFuture = Calendar.current.date(byAdding: .minute, value: 1, to: currentDate!)!
+            while nextRun! < currentDate! {
+                nextRun = Calendar.current.date(byAdding: .minute, value: 5, to: nextRun!)
+            }
             while nextRun! > oneMinuteInFuture {
                 nextRun = Calendar.current.date(byAdding: .minute, value: -1, to: nextRun!)
             }
@@ -603,6 +595,15 @@ public class ModelData : ObservableObject {
         )
     }
 }
+
+fileprivate func iso8601() -> ISO8601DateFormatter {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
+    
+    return formatter
+}
+
+fileprivate let formatter : ISO8601DateFormatter = iso8601()
 
 func initLoad<T: Decodable>(_ filename: String) -> T {
     let data: Data
@@ -840,8 +841,15 @@ func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> A
                 } else {
                     return .none
                 }
-            } else {
-                return .low
+            } else if let lastBelowThreshold = entries.last {
+                let diff = lastBelowThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
+                if let lowTime = alertSettings.lowTime {
+                    if diff > lowTime {
+                        return .low
+                    }
+                } else {
+                    return .none
+                }
             }
         } else if first.sgv > alertSettings.veryHighThreshold {
             return .veryHigh
@@ -849,7 +857,6 @@ func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> A
             if let firstBelowThresholdIndex = entries.firstIndex(where: { $0.sgv <= alertSettings.highThreshold }) {
                 let lastAboveThreshold = entries[firstBelowThresholdIndex - 1]
                 let diff = lastAboveThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
-                print("diff=\(diff),\nlastAboveThreshold=\(lastAboveThreshold),\nfirst=\(first)")
                 if let highTime = alertSettings.highTime {
                     if diff > highTime {
                         return .high
@@ -857,8 +864,15 @@ func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> A
                 } else {
                     return .none
                 }
-            } else {
-                return .high
+            } else if let lastAboveThreshold = entries.last {
+                let diff = lastAboveThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
+                if let highTime = alertSettings.highTime {
+                    if diff > highTime {
+                        return .high
+                    }
+                } else {
+                    return .none
+                }
             }
         }
     } else {

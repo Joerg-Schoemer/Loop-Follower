@@ -32,15 +32,16 @@ struct TempBasal : Codable, Identifiable {
 struct CorrectionBolus : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id",
-             insulin, timestamp
+             insulin, timestamp, created_at
     }
 
     let id: String
     let insulin: Double
-    let timestamp: String
+    let timestamp: String?
+    let created_at: String
     
     var date : Date {
-        return formatter.date(from: timestamp)!
+        return formatter.date(from: created_at)!
     }
     
     var amount : Measurement<UnitInsulin> {
@@ -51,17 +52,18 @@ struct CorrectionBolus : Codable, Identifiable {
 struct CarbCorrection : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id",
-             carbs, timestamp, foodType, absorptionTime
+             carbs, timestamp, foodType, absorptionTime, created_at
     }
 
     let id: String
     let foodType: String?
     let absorptionTime: Int?
     let carbs: Double
-    let timestamp: String
+    let timestamp: String?
+    let created_at: String
     
     var date : Date {
-        return formatter.date(from: timestamp)!
+        return formatter.date(from: created_at)!
     }
     
     var mass : Measurement<UnitMass> {
@@ -143,7 +145,7 @@ struct CarbCorrection : Codable, Identifiable {
 struct Treatment : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id",
-             type, insulinType, insulin, eventType, duration, timestamp, rate
+             type, insulinType, insulin, eventType, duration, timestamp, rate, created_at
     }
 
     let id: String
@@ -154,10 +156,11 @@ struct Treatment : Codable, Identifiable {
     let eventType: String
     let duration: Double
     let rate : Double?
-    let timestamp: String
+    let timestamp: String?
+    let created_at: String
     
     var date : Date {
-        return formatter.date(from: timestamp)!
+        return formatter.date(from: created_at)!
     }
 }
 
@@ -172,8 +175,8 @@ struct ChangeEvent : Codable, Identifiable {
     let created_at: String
 
     var date : Date {
-        return ISO8601DateFormatter([.withInternetDateTime, .withFractionalSeconds]).date(from: created_at)!
+        return formatter.date(from: created_at)!
     }
 }
 
-fileprivate let formatter = ISO8601DateFormatter()
+fileprivate let formatter = ISO8601DateFormatter([.withInternetDateTime, .withFractionalSeconds])

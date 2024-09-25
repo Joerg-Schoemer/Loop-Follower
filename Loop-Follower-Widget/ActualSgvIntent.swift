@@ -12,10 +12,10 @@ struct ActualSgvIntent: WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Configuration"
 
     @Parameter(title: "blood glucose value")
-    var sgv: Int
+    var sgv: Int?
     
     @Parameter(title: "timestamp of sgv")
-    var timestamp: Date
+    var timestamp: Date?
     
     init(sgv: Int, timestamp: Date) {
         self.sgv = sgv

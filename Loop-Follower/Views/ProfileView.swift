@@ -40,7 +40,7 @@ struct ProfileView: View {
                         }
                     }
                     .tag("ISF")
-
+                    
                     List {
                         Section(header: Text("basal")) {
                             ForEach(profile.basal, id: \.timeAsSeconds) { basal in
@@ -51,7 +51,14 @@ struct ProfileView: View {
                                 }
                             }
                         }
-                    }
+                        Section(header: Text("totalBasal")) {
+                            Label(
+                                profile.totalBasal.formatted(.number.precision(.fractionLength(2))),
+                                systemImage: "sum"
+                            )
+                            .font(.headline)
+                        }
+                    }                  
                     .tag("basal")
 
                     List {

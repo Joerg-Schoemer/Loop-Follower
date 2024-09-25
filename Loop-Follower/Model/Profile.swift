@@ -34,6 +34,15 @@ struct Profile : Codable {
     var targets : [ (low: Target, high: Target) ] {
         return Array(zip(target_low, target_high))
     }
+    
+    var totalBasal : Double {
+        var b = basal.dropFirst()
+        b.append(Basal(value: Double(0), timeAsSeconds: 86400))
+        return zip(b, basal).map { (b1:Basal, b2:Basal) in
+            let diffComponents = Calendar.current.dateComponents([.hour], from: b2.time, to: b1.time)
+            return Double(diffComponents.hour!) * b2.value
+        }.reduce(0, +)
+    }
 }
 
 struct Basal : Codable {

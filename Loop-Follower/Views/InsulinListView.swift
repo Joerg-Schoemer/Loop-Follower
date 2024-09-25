@@ -52,5 +52,6 @@ struct InsulinList_Previews: PreviewProvider {
     static var previews: some View {
         InsulinListView()
             .environmentObject(ModelData(test: true))
+            .environmentObject(SettingsStore())
     }
 }

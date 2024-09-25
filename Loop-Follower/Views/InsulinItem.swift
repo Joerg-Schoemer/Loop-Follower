@@ -44,7 +44,8 @@ struct InsulinItem_Previews: PreviewProvider {
             insulin: CorrectionBolus(
                 id: "x",
                 insulin: 1.2,
-                timestamp: "2023-08-28T12:00:00Z"
+                timestamp: "2023-08-28T12:00:00Z",
+                created_at: "2023-08-28T12:00:00.000Z"
             )
         ).previewLayout(.fixed(width: 300, height: 70))
     }
