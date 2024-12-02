@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CurrentValueView: View {
     
-    @Binding var currentDate : Date?
+    @Binding var currentDate : Date
     @Binding var currentEntry : Entry?
 
     @State private var progress = 0.0
@@ -35,8 +35,8 @@ struct CurrentValueView: View {
     
     var body: some View {
         if let currentEntry = currentEntry {
-            let color = estimateBackgroundColorBySgv(currentEntry, currentDate!)
-            let textColor = estimateTextColorBySgv(currentEntry, currentDate!)
+            let color = estimateBackgroundColorBySgv(currentEntry, currentDate)
+            let textColor = estimateTextColorBySgv(currentEntry, currentDate)
             
             GeometryReader { geometry in
                 let arrow = Path { path in
@@ -170,7 +170,7 @@ struct CurrentValueView_Previews: PreviewProvider {
     static var modelData = ModelData()
     static let df = ISO8601DateFormatter([.withFractionalSeconds])
     static let date = Date() + -720
-    @State static var currentDate : Date? = Date.now
+    @State static var currentDate : Date = Date.now
     
     static var previews: some View {
         let sgvs = [ 50, 70, 101, 180, 250, 202, 303, 100 ]
@@ -180,9 +180,9 @@ struct CurrentValueView_Previews: PreviewProvider {
             CurrentValueView(
                 currentDate: $currentDate,
                 currentEntry: .constant(Entry(
-                    id: "wurscht",
                     sgv: 44,
                     direction: nil,
+                    id: "wurscht",
                     dateString: df.string(from: date)
                 )),
                 delta: nil,
@@ -195,13 +195,13 @@ struct CurrentValueView_Previews: PreviewProvider {
             ForEach(0 ..< dirs.count, id: \.self) { i in
                 let dir = dirs[i]
                 let sgv = sgvs[i]
-                let date = currentDate! + Double.random(in: -300 ... -10)
+                let date = currentDate + Double.random(in: -300 ... -10)
                 CurrentValueView(
                     currentDate: $currentDate,
                     currentEntry: .constant(Entry(
-                        id: "wurscht",
                         sgv: sgv,
                         direction: dir,
+                        id: "wurscht",
                         dateString: df.string(from: date)
                     )),
                     delta: Int.random(in: -10...10),

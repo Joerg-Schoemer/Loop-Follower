@@ -112,8 +112,8 @@ struct DerivedChart_Previews: PreviewProvider {
         for i in 0...72 {
             entries.append(
                 Entry(
-                    id: UUID().uuidString,
                     sgv: Int((sin(Double.pi * Double(-i) / 36.0) * 800.0 + 1500.0).nextUp.rounded()),
+                    id: UUID().uuidString,
                     dateString: formatter.string(from: date)
                 )
             )
@@ -128,8 +128,8 @@ struct DerivedChart_Previews: PreviewProvider {
 func derive(_ values: [Entry], _ name: String) -> [Entry] {
     return zip(values.dropFirst(), values).map {
         return Entry(
-            id: UUID().uuidString,
             sgv: $1.sgv - $0.sgv,
+            id: UUID().uuidString,
             dateString: $1.dateString
         )
     }

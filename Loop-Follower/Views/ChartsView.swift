@@ -36,6 +36,8 @@ struct ChartsView: View {
                         insulin: modelData.insulin,
                         carbs: modelData.carbs,
                         entries: modelData.entries,
+                        mbgs: modelData.mgbs,
+                        hourOfHistory: modelData.hourOfHistory,
                         criticalMin: criticalMin,
                         criticalMax: criticalMax,
                         rangeMin: rangeMin,

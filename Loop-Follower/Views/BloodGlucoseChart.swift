@@ -41,7 +41,9 @@ struct BloodGlucoseChart: View {
     let insulin : [CorrectionBolus]
     let carbs : [CarbCorrection]
     let entries : [Entry]
-    
+    let mbgs : [MbgEntry]
+    let hourOfHistory : Int
+
     let criticalMin : Int
     let criticalMax : Int
     
@@ -94,7 +96,12 @@ struct BloodGlucoseChart: View {
                     .foregroundStyle(Color(.systemCyan).opacity(0.75))
                 }
 
-                ForEach(insulin) { insulin in
+                ForEach(insulin.filter({ c in
+                    if let currentDate = currentDate {
+                        return c.date >= Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: currentDate)!
+                    }
+                    return false
+                })) { insulin in
                     BarMark(
                         x: .value("timestamp", truncateMinutes(date: insulin.date)),
                         y: .value("insulin", 25),
@@ -105,7 +112,12 @@ struct BloodGlucoseChart: View {
                     .cornerRadius(0)
                     .position(by: .value("category", "Insulin"))
                 }
-                ForEach(carbs) { carb in
+                ForEach(carbs.filter({ c in
+                    if let currentDate = currentDate {
+                        return c.date >= Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: currentDate)!
+                    }
+                    return false
+                })) { carb in
                     BarMark(
                         x: .value("timestamp", truncateMinutes(date: carb.date)),
                         y: .value("carbs", 25),
@@ -147,6 +159,15 @@ struct BloodGlucoseChart: View {
                         }
                     }
                 }
+
+                ForEach(mbgs) { mbg in
+                    PointMark(
+                        x: .value("timestamp", mbg.date),
+                        y: .value("BG", mbg.mbg)
+                    )
+                    .foregroundStyle(.red)
+                }
+
                 ForEach(entries) { entry in
                     LineMark(
                         x: .value("timestamp", entry.date),
@@ -226,8 +247,8 @@ func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
 
     let predictions : [Entry] = values.map {
         let entry = Entry(
-            id: UUID().uuidString,
             sgv: max(Int($0), 0),
+            id: UUID().uuidString,
             dateString: formatter.string(from: currentDate)
         )
         currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: currentDate)!
@@ -255,6 +276,8 @@ struct BloodGlucoseChart_Previews: PreviewProvider {
             insulin: data.insulin,
             carbs: data.carbs,
             entries: data.entries,
+            mbgs: data.mgbs,
+            hourOfHistory: -6,
             criticalMin: 55,
             criticalMax: 260,
             rangeMin: 70,

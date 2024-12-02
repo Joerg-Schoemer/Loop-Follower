@@ -12,6 +12,8 @@ public class ModelData : ObservableObject {
 
     @Published var entries : [Entry] = []
     
+    @Published var mgbs : [MbgEntry] = []
+    
     @Published var lastEntry : Entry?
     
     @Published var currentLoopData : LoopData?
@@ -32,11 +34,11 @@ public class ModelData : ObservableObject {
 
     @Published var sensorChanged : Date?
     
-    @Published var currentDate : Date?
+    @Published var currentDate : Date = Date.now
     
     @Published var totalBasal : Double?
     
-    private let hourOfHistory : Int = -6
+    let hourOfHistory : Int = -6
     
     private var tempBasal : [TempBasal] = []
 
@@ -91,7 +93,7 @@ public class ModelData : ObservableObject {
         )
         self.scheduledBasal = calculateTempBasal(basals: (self.profile?.basal)!, startDate: (entries.last?.date)!, endDate: (lastEntry?.date)!)
         
-        self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: (lastEntry?.date)!)
+        self.currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: (lastEntry?.date)!)!
         self.siteChanged = Calendar.current.date(byAdding: .hour, value: -26, to: Date.now)!
         self.sensorChanged = Calendar.current.date(byAdding: .hour, value: -96, to: Date.now)!
     }
@@ -138,10 +140,56 @@ public class ModelData : ObservableObject {
         }
     }
 
+    func loadMbg(baseUrl : String, token : String, completionHandler: @escaping ([MbgEntry]) -> ()) {
+        guard var components = URLComponents(string: "\(baseUrl)/api/v1/entries/mbg.json")
+        else { return }
+
+        let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!.timeIntervalSince1970 * 1000
+        components.queryItems = []
+        if !token.isEmpty {
+            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        }
+        components.queryItems?.append(URLQueryItem(name: "find[date][$gte]", value: date.description))
+        components.queryItems?.append(URLQueryItem(name: "count", value: "1000"))
+        if let url = components.url {
+            URLSession.shared.dataTask(
+                with: url,
+                completionHandler: { data, response, error in
+                    if let error = error {
+                        print("Error with fetching sgv: \(error)")
+                        return
+                    }
+                    
+                    guard let httpResponse = response as? HTTPURLResponse,
+                          (200...299).contains(httpResponse.statusCode) else {
+                        print("Error with the response, unexpected status code: \(String(describing: response))")
+                        return
+                    }
+                    
+                    if let data = data {
+                        let entries = try! JSONDecoder().decode([MbgEntry].self, from: data)
+                        DispatchQueue.main.async {
+                            completionHandler(entries)
+                        }
+                    } else {
+                        print("no data")
+                        return
+                    }
+                }
+            ).resume()
+        } else {
+            completionHandler([])
+        }
+    }
+
     fileprivate func getStartTime() -> String {
         return formatter.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!)
     }
 
+    fileprivate func getYesterday() -> String {
+        return formatter.string(from: Calendar.current.date(byAdding: .hour, value: -48, to: .now)!)
+    }
+    
     func loadInsulin(baseUrl : String, token: String, completionHandler: @escaping ([CorrectionBolus]) -> ()) {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
         else { return }
@@ -151,7 +199,7 @@ public class ModelData : ObservableObject {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
         components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Correction Bolus"))
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getYesterday()))
 
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -189,8 +237,9 @@ public class ModelData : ObservableObject {
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
+        
         components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Carb Correction"))
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getYesterday()))
         
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
@@ -463,6 +512,9 @@ public class ModelData : ObservableObject {
                 print("alert=\(alert)")
             }
         )
+        loadMbg(baseUrl: baseUrl, token: token, completionHandler: { entries in
+            self.mgbs = entries
+        })
         loadDeviceStatus(
             baseUrl: baseUrl,
             token: token,
@@ -530,37 +582,51 @@ public class ModelData : ObservableObject {
                 self.sensorChanged = date
             }
         )
+
         currentDate = Date.now
         
-        var nextRun : Date? = nil
         if let lastEntry = self.lastEntry {
-            nextRun = Calendar.current.date(
+            
+            let calendar = Calendar.current
+            let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: lastEntry.date)
+            let nowComponents = calendar.dateComponents([.hour, .minute, .second], from: currentDate)
+            let difference = calendar.dateComponents([.second], from: timeComponents, to: nowComponents).second!
+
+            if difference > 300 {
+                return Calendar.current.date(
+                    byAdding: .second,
+                    value: 10,
+                    to: currentDate
+                )!
+            }
+            
+            var nextRun = Calendar.current.date(
                 byAdding: .minute,
-                value: 5,
+                value: 1,
                 to: lastEntry.date
-            )
-            nextRun = Calendar.current.date(
-                byAdding: .second,
-                value: 10,
-                to: nextRun!)
-            let oneMinuteInFuture = Calendar.current.date(byAdding: .minute, value: 1, to: currentDate!)!
-            while nextRun! < currentDate! {
-                nextRun = Calendar.current.date(byAdding: .minute, value: 5, to: nextRun!)
-            }
-            while nextRun! > oneMinuteInFuture {
-                nextRun = Calendar.current.date(byAdding: .minute, value: -1, to: nextRun!)
-            }
-        }
-
-        if nextRun == nil || nextRun! < currentDate! {
-            nextRun = Calendar.current.date(
-                byAdding: .second,
-                value: 10,
-                to: currentDate!
             )!
+            
+            
+            
+            while nextRun < currentDate {
+                nextRun = Calendar.current.date(
+                    byAdding: .minute,
+                    value: 1,
+                    to: nextRun
+                )!
+            }
+
+            return Calendar.current.date(
+                byAdding: .second,
+                value: 10,
+                to: nextRun)!
         }
 
-        return nextRun
+        return Calendar.current.date(
+            byAdding: .second,
+            value: 10,
+            to: currentDate
+        )!
     }
     
     var cn : Measurement<UnitMass> {

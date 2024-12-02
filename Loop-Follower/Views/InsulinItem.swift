@@ -18,22 +18,21 @@ struct InsulinItem: View {
     )
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 3) {
+        HStack(spacing: 3) {
+            Label(
+                insulin.date.formatted(
+                    date: .abbreviated,
+                    time: .shortened
+                ),
+                systemImage: "clock"
+            )
+            .font(.subheadline)
+            Spacer()
             Label(
                 insulin.amount.formatted(insulinFormatStyle),
                 systemImage: "syringe"
             )
             .font(.headline)
-            HStack(spacing: 3) {
-                Label(
-                    insulin.date.formatted(
-                        date: .abbreviated,
-                        time: .shortened
-                    ),
-                    systemImage: "clock"
-                )
-                .font(.subheadline)
-            }
         }
     }
 }

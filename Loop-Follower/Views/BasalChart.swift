@@ -10,7 +10,7 @@ import Charts
 
 struct BasalChart: View {
 
-    @Binding var currentDate: Date?
+    @Binding var currentDate: Date
     let scheduledBasal : [TempBasal]
     let resultingBasal : [TempBasal]
     
@@ -48,13 +48,11 @@ struct BasalChart: View {
                     )
                 }
 
-                if currentDate != nil {
-                    RuleMark(
-                        x: .value("now", self.currentDate!)
-                    )
-                    .lineStyle(StrokeStyle(lineWidth: 1))
-                    .foregroundStyle(Color(.systemCyan).opacity(0.75))
-                }
+                RuleMark(
+                    x: .value("now", self.currentDate)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 1))
+                .foregroundStyle(Color(.systemCyan).opacity(0.75))
             }
         }
         .padding([.top, .bottom])
@@ -79,7 +77,9 @@ struct BasalChart_Previews: PreviewProvider {
         ]
 
         BasalChart(
-            currentDate: .constant(ISO8601DateFormatter().date(from: "2023-02-15T05:15:00Z")),
+            currentDate: .constant(
+                ISO8601DateFormatter()
+                    .date(from: "2023-02-15T05:15:00Z")!),
             scheduledBasal: sb,
             resultingBasal: rb
         )

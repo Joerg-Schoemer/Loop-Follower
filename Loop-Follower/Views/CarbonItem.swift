@@ -50,8 +50,10 @@ struct CarbonItem: View {
                 if let ratio = findCarbRatio(profile: profile, carb: carb) {
                     Spacer()
                     Label(
-                        Measurement<UnitInsulin>(value: calculateInsulinNeeds(carbs: carb.mass.value, factor: ratio.value, pumpResolution: settings.pumpRes), unit: .insulin)
-                            .formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
+                        Measurement<UnitInsulin>(
+                            value: calculateInsulinNeeds(carbs: carb.mass.value, factor: ratio.value, pumpResolution: settings.pumpRes),
+                            unit: .insulin
+                        ).formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
                         systemImage: "syringe"
                     )
                 }

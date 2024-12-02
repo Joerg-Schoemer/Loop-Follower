@@ -19,12 +19,25 @@ enum Direction : String, Codable, CaseIterable {
     case none = "NONE"
 }
 
+struct MbgEntry: Hashable, Decodable, Identifiable {
+    enum CodingKeys: String, CodingKey {
+        case id = "_id", mbg, dateString
+    }
+    
+    var mbg : Int
+    
+    var id : String
+    var dateString : String
+    var date : Date {
+        return  formatter.date(from: dateString)!
+    }
+}
+
 struct Entry: Hashable, Decodable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id", sgv, direction, dateString
     }
-
-    var id : String
+    
     var sgv : Int
     var direction : Direction?
     var delta : Int?
@@ -62,8 +75,8 @@ struct Entry: Hashable, Decodable, Identifiable {
         return nil
     }
     
+    var id : String
     var dateString : String
-
     var date : Date {
         return  formatter.date(from: dateString)!
     }
