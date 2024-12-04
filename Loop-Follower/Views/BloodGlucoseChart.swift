@@ -102,15 +102,16 @@ struct BloodGlucoseChart: View {
                     }
                     return false
                 })) { insulin in
-                    BarMark(
-                        x: .value("timestamp", truncateMinutes(date: insulin.date)),
-                        y: .value("insulin", 25),
-                        width: MarkDimension(integerLiteral: barWidth),
-                        stacking: .normalized
+                    PointMark(
+                        x: .value("timestamp", insulin.date),
+                        y: .value("insulin", 10)
                     )
                     .foregroundStyle(by: .value("category", "Insulin"))
-                    .cornerRadius(0)
-                    .position(by: .value("category", "Insulin"))
+                    .symbol {
+                        Image(systemName: "syringe")
+                            .foregroundColor(.orange)
+                            .font(.system(size: 10))
+                    }
                 }
                 ForEach(carbs.filter({ c in
                     if let currentDate = currentDate {
@@ -118,15 +119,16 @@ struct BloodGlucoseChart: View {
                     }
                     return false
                 })) { carb in
-                    BarMark(
-                        x: .value("timestamp", truncateMinutes(date: carb.date)),
-                        y: .value("carbs", 25),
-                        width: MarkDimension(integerLiteral: barWidth),
-                        stacking: .normalized
+                    PointMark(
+                        x: .value("timestamp", carb.date),
+                        y: .value("carbs", 30)
                     )
                     .foregroundStyle(by: .value("category", "Carbs"))
-                    .cornerRadius(0)
-                    .position(by: .value("category", "Carbs"))
+                    .symbol {
+                        Image(systemName: "fork.knife")
+                            .foregroundColor(.green)
+                            .font(.system(size: 10))
+                    }
                 }
 
                 if let prediction = prediction {
