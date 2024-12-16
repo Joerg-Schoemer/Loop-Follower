@@ -13,6 +13,7 @@ struct LoopParameterView: View {
     let cn : Measurement<UnitMass>
     let siteChanged : Date?
     let sensorChanged : Date?
+    let timeInRange : Int?
     
     let insulinFormatStyle = Measurement<UnitInsulin>.FormatStyle(
         width: .abbreviated,
@@ -67,6 +68,11 @@ struct LoopParameterView: View {
                     label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
                     data: predictedMinMax(loopData.loop.predicted?.values))
                 Divider()
+                if let timeInRange = timeInRange {
+                    LoopParameterValue(
+                        label: NSLocalizedString("TIR last 24h", comment: "Time In Range"),
+                        data: (Double(timeInRange) / 1000).formatted(.percent.precision(.fractionLength(1...1))))
+                }
                 LoopParameterBatteryView(
                     label: NSLocalizedString("Battery", comment: "Battery"),
                     percentage: loopData.uploader.battery)
@@ -162,7 +168,8 @@ struct LoopParameterView_Previews: PreviewProvider {
             ),
             cn: Measurement<UnitMass>(value: 2.5, unit: UnitMass.grams),
             siteChanged: (Date.now - 86400.0),
-            sensorChanged: (Date.now - 86400.0/2.0)
+            sensorChanged: (Date.now - 86400.0/2.0),
+            timeInRange: 1000
         )
         .previewLayout(.sizeThatFits)
     }

@@ -123,9 +123,14 @@ struct CarbCorrection : Codable, Identifiable {
         if !descriptionString.isEmpty {
             descriptionString.append(" ")
         }
-        descriptionString.append(numberFormatter.string(from: NSNumber.init(value: self.carbs))! + "g")
+        descriptionString.append(numberFormatter.string(from: NSNumber.init(value: self.carbs))! + "g ")
         if !timeInHours.isEmpty {
-            descriptionString.append(self.absorption.formatted())
+            descriptionString.append(self.absorption.formatted(
+                .measurement(
+                    width: .narrow,
+                    numberFormatStyle: .number.precision(.fractionLength(1...1)))
+                )
+            )
         }
 
         return descriptionString
@@ -139,6 +144,14 @@ struct CarbCorrection : Codable, Identifiable {
         }
 
         return timeInHours.converted(to: .hours)
+    }
+    
+    var endOfAbsorption : Date {
+        return Calendar.current.date(byAdding: .minute, value: self.absorptionTime ?? 180, to: self.date)!
+    }
+    
+    var endOfHalfAbsorption : Date {
+        return Calendar.current.date(byAdding: .minute, value: (self.absorptionTime ?? 180) / 2, to: self.date)!
     }
 }
 

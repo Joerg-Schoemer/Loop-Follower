@@ -10,6 +10,7 @@
 		4B05BB492B6130BB00409D42 /* BloodGlucoseCursorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B05BB482B6130BB00409D42 /* BloodGlucoseCursorView.swift */; };
 		4B2124A2288593BA00453B69 /* NightScoutSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2124A1288593BA00453B69 /* NightScoutSettingsView.swift */; };
 		4B2124A42885959400453B69 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2124A32885959400453B69 /* SettingsStore.swift */; };
+		4B2549222D0B7E2700C1AAE5 /* CarbonDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2549212D0B7E2700C1AAE5 /* CarbonDetails.swift */; };
 		4B2D70C32A9CFA4000BFBBE0 /* CarbonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B2D70C22A9CFA4000BFBBE0 /* CarbonItem.swift */; };
 		4B4C120D2B06187C008DF17F /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B4C120C2B06187C008DF17F /* WidgetKit.framework */; };
 		4B4C120F2B06187C008DF17F /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B4C120E2B06187C008DF17F /* SwiftUI.framework */; };
@@ -31,6 +32,7 @@
 		4BB8D29B28875B0F006AAEE5 /* CorrectionBolus.json in Resources */ = {isa = PBXBuildFile; fileRef = 4B961B5728868B1800E51DC0 /* CorrectionBolus.json */; };
 		4BC951F72A9CEF6500684114 /* InsulinItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BC951F62A9CEF6500684114 /* InsulinItem.swift */; };
 		4BCD62B02885F6DD007D0B6A /* Treatment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BCD62AF2885F6DD007D0B6A /* Treatment.swift */; };
+		4BD7B8EB2D0F7C060008AFA2 /* TimeInRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD7B8EA2D0F7C060008AFA2 /* TimeInRange.swift */; };
 		4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */; };
 		4BE2604F2A9D373700D51927 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE2604E2A9D373700D51927 /* ProfileView.swift */; };
 		4BF86DD4287EF911003B9060 /* Loop_FollowerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF86DD3287EF911003B9060 /* Loop_FollowerApp.swift */; };
@@ -97,6 +99,7 @@
 		4B2124A32885959400453B69 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
 		4B21B3A52B0CF7A400887F71 /* Loop-Follower-WidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Loop-Follower-WidgetExtension.entitlements"; sourceTree = "<group>"; };
 		4B21B3A62B0CF7D300887F71 /* Loop-Follower.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Loop-Follower.entitlements"; sourceTree = "<group>"; };
+		4B2549212D0B7E2700C1AAE5 /* CarbonDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarbonDetails.swift; sourceTree = "<group>"; };
 		4B2D70C22A9CFA4000BFBBE0 /* CarbonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarbonItem.swift; sourceTree = "<group>"; };
 		4B4C120A2B06187C008DF17F /* Loop-Follower-WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Loop-Follower-WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4B4C120C2B06187C008DF17F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -116,6 +119,7 @@
 		4BC1874E2B168342003590A7 /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		4BC951F62A9CEF6500684114 /* InsulinItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinItem.swift; sourceTree = "<group>"; };
 		4BCD62AF2885F6DD007D0B6A /* Treatment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Treatment.swift; sourceTree = "<group>"; };
+		4BD7B8EA2D0F7C060008AFA2 /* TimeInRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInRange.swift; sourceTree = "<group>"; };
 		4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterBatteryView.swift; sourceTree = "<group>"; };
 		4BE2604E2A9D373700D51927 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		4BEB46902885D72D000773C1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -246,6 +250,7 @@
 				4BF86DE4287EF913003B9060 /* Loop_FollowerTests.swift */,
 				98573D4A29B7347D00101FAD /* CarbCorrectionTests.swift */,
 				4BC1874E2B168342003590A7 /* TestPlan.xctestplan */,
+				4BD7B8EA2D0F7C060008AFA2 /* TimeInRange.swift */,
 			);
 			path = "Loop-FollowerTests";
 			sourceTree = "<group>";
@@ -302,6 +307,7 @@
 				4B7DC5982A9CD94900964F2E /* CarbonListView.swift */,
 				4B2D70C22A9CFA4000BFBBE0 /* CarbonItem.swift */,
 				4BE2604E2A9D373700D51927 /* ProfileView.swift */,
+				4B2549212D0B7E2700C1AAE5 /* CarbonDetails.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -505,6 +511,7 @@
 				4BF86E0B287F1653003B9060 /* Entries.swift in Sources */,
 				4B2124A42885959400453B69 /* SettingsStore.swift in Sources */,
 				4BF86E14287F4E51003B9060 /* LoopData.swift in Sources */,
+				4B2549222D0B7E2700C1AAE5 /* CarbonDetails.swift in Sources */,
 				4B2D70C32A9CFA4000BFBBE0 /* CarbonItem.swift in Sources */,
 				98D1523B299B796000B53913 /* BloodGlucoseChart.swift in Sources */,
 				4B7DC5992A9CD94900964F2E /* CarbonListView.swift in Sources */,
@@ -522,6 +529,7 @@
 			files = (
 				4BF86DE5287EF913003B9060 /* Loop_FollowerTests.swift in Sources */,
 				98573D4B29B7347D00101FAD /* CarbCorrectionTests.swift in Sources */,
+				4BD7B8EB2D0F7C060008AFA2 /* TimeInRange.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

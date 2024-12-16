@@ -170,7 +170,12 @@ struct BloodGlucoseChart: View {
                     .foregroundStyle(.red)
                 }
 
-                ForEach(entries) { entry in
+                ForEach(entries.filter({ c in
+                    if let currentDate = currentDate {
+                        return c.date >= Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: currentDate)!
+                    }
+                    return false
+                })) { entry in
                     LineMark(
                         x: .value("timestamp", entry.date),
                         y: .value("BG", max(entry.sgv, 40)),
@@ -209,7 +214,6 @@ struct BloodGlucoseChart: View {
                     }
                 }
             }
-            .chartYScale(domain: 0...300)
             .chartXSelection(value: $rawSelectedDate)
             .chartForegroundStyleScale(series)
             .chartLegend() {

@@ -14,29 +14,55 @@ struct CarbonListView: View {
 
     var body: some View {
 
-        VStack{
-            
-            List(modelData.carbs, id: \.id) { carb in
-                CarbonItem(carb: carb, profile: modelData.profile!)
-            }
-            
-            Spacer()
-
-            ForEach(sumByDay.sorted(by: >), id: \.key) { key, value in
-                HStack {
-                    Label(
-                        key.formatted(date: .numeric, time: .omitted),
-                        systemImage: "calendar"
-                    )
-                    Spacer()
-                    Label(
-                        value.formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
-                        systemImage: "sum"
-                    )
+        NavigationSplitView() {
+            VStack() {
+                List(carbs) { carb in
+                    NavigationLink() {
+                        CarbonDetails(carb: carb)
+                    } label: {
+                        CarbonItem(carb: carb.item, profile: modelData.profile!)
+                    }
+                }
+                
+                Spacer()
+                
+                ForEach(sumByDay.sorted(by: >), id: \.key) { key, value in
+                    HStack(spacing: 5) {
+                        Label(
+                            key.formatted(date: .numeric, time: .omitted),
+                            systemImage: "calendar"
+                        )
+                        Spacer()
+                        Label(
+                            value.formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
+                            systemImage: "sum"
+                        )
+                    }
                 }
             }
+            .navigationBarTitle("Carbs")
+        } detail: {
+            Text("Select a carb correction")
         }
-        .navigationBarTitle("Carbs")
+    }
+    
+    var carbs : [Node<CarbCorrection>] {
+        var nodes : [Node<CarbCorrection>] = []
+        let carbs = Array(modelData.carbs)
+
+        if carbs.count > 0 {
+            var prevNode = Node<CarbCorrection>(item: carbs.first!, next: nil)
+            nodes.append(prevNode)
+
+            var idx : Int = 0
+            while idx < carbs.count - 1 {
+                idx += 1
+                prevNode = Node<CarbCorrection>(item: carbs[idx], next: prevNode)
+                nodes.append(prevNode)
+            }
+        }
+        
+        return nodes
     }
     
     var sumByDay : Dictionary<Date,Measurement<UnitInsulin>> {
@@ -68,5 +94,17 @@ struct CarbonListView_Previews: PreviewProvider {
         CarbonListView()
             .environmentObject(ModelData(test: true))
             .environmentObject(SettingsStore())
+    }
+}
+
+class Node<T> : Identifiable {
+    
+    public var item : T
+    public var next : Node<T>?
+
+    
+    public init(item : T, next : Node<T>?) {
+        self.item = item
+        self.next = next
     }
 }

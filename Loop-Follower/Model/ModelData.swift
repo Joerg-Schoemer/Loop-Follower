@@ -38,6 +38,8 @@ public class ModelData : ObservableObject {
     
     @Published var totalBasal : Double?
     
+    @Published var timeInRange : Int?
+    
     let hourOfHistory : Int = -6
     
     private var tempBasal : [TempBasal] = []
@@ -102,13 +104,13 @@ public class ModelData : ObservableObject {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/entries/sgv.json")
         else { return }
 
-        let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!.timeIntervalSince1970 * 1000
+        let date = Calendar.current.date(byAdding: .hour, value: -48, to: .now)!.timeIntervalSince1970 * 1000
         components.queryItems = []
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
         components.queryItems?.append(URLQueryItem(name: "find[date][$gte]", value: date.description))
-        components.queryItems?.append(URLQueryItem(name: "count", value: "1000"))
+        components.queryItems?.append(URLQueryItem(name: "count", value: "2000"))
         if let url = components.url {
             URLSession.shared.dataTask(
                 with: url,
@@ -497,7 +499,9 @@ public class ModelData : ObservableObject {
             completionHandler: { entries in
                 self.entries = entries
                 self.lastEntry = entries.first
-                
+
+                let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
+                self.timeInRange = calcTimeInRange(entries.filter { $0.date > startOfTir }, min: 70, max: 180)
                 let alert = processSgvForAlerts(
                     entries,
                     alertSettings: AlertSettings(
@@ -946,6 +950,78 @@ func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> A
     }
 
     return .none
+}
+
+///
+/// calculates the timeInRange in promill
+///
+func calcTimeInRange(_ entries: [Entry], min: Int, max: Int) -> Int {
+    let orderedByDate = entries.sorted { $0.date < $1.date }
+    
+    // find all indices out of range
+    let aboveOrBelowIndexes = orderedByDate.filter { e in
+        e.sgv > max || e.sgv < min
+    }.map {
+        (index: orderedByDate.firstIndex(of:$0)!, isMax: $0.sgv > max)
+    }
+    
+    // if none is out of range time in range 1000 promill
+    if aboveOrBelowIndexes.isEmpty {
+        return 1000
+    }
+    
+    // filter out all directly consecutive values
+    var inAndOuts = zip(aboveOrBelowIndexes, aboveOrBelowIndexes.dropFirst()).filter {
+        ($1.index - $0.index) >= 2 || $1.isMax != $0.isMax
+    }.flatMap {
+        [$0.0, $0.1]
+    }
+    if !inAndOuts.contains(where: { $0 == aboveOrBelowIndexes.first! }) {
+        // the first has no previous one to compare it with => insert it if missing
+        inAndOuts.insert(aboveOrBelowIndexes.first!, at: 0)
+    }
+    if !inAndOuts.contains( where: { $0 == aboveOrBelowIndexes.last! }) {
+        // the last has no next one to compare it with => append it if missing
+        inAndOuts.append(aboveOrBelowIndexes.last!)
+    }
+    
+    var interval : [(start: Entry, end: Entry?)] = []
+    // resolve entry
+    for x in stride(from: 0, to: inAndOuts.count, by: 2) {
+        let start : Entry = orderedByDate[inAndOuts[x].index]
+        // no more inAndOuts
+        let end : Entry? = if x + 1 < inAndOuts.count {
+            // when the last inAndOut is also the last value
+            if inAndOuts[x + 1].index + 1 < orderedByDate.count {
+                orderedByDate[inAndOuts[x + 1].index + 1]
+            } else {
+                nil
+            }
+        } else {
+            // try to use the start also as end
+            if inAndOuts[x].index + 1 < orderedByDate.count {
+                orderedByDate[inAndOuts[x].index + 1]
+            } else {
+                nil
+            }
+        }
+
+        interval.append((start: start, end: end))
+    }
+
+    // five minutes later to get the full day
+    let endDate = Calendar.current.date(byAdding: .minute, value: 5, to: orderedByDate.last!.date)!
+
+    let totalTime : Double  = endDate - orderedByDate.first!.date
+    let outOfRange  : Double = interval.map { (start: Entry, end: Entry?) in
+        if let end = end {
+            end.date - start.date
+        } else {
+            endDate - start.date
+        }
+    }.reduce(0, +)
+    
+    return Int((totalTime - outOfRange) * 1000 / totalTime)
 }
 
 extension Date {

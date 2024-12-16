@@ -67,6 +67,9 @@
 /* No comment provided by engineer. */
 "Profile" = "Profil";
 
+/* No comment provided by engineer. */
+"Pump Settings" = "Pumpeneinstellungen";
+
 /* Pump reservoir volume */
 "Pump Volume" = "Pumpentank";
 
@@ -79,11 +82,17 @@
 /* abbreviated recommended carbs */
 "Rec. Carbs" = "Empf. KH";
 
+/* No comment provided by engineer. */
+"Resolution" = "Auflösung";
+
 /* Canula age */
 "SAGE" = "SAGE";
 
 /* No comment provided by engineer. */
 "Settings" = "Einstellungen";
+
+/* Time In Range */
+"TIR last 24h" = "TIR der letzten 24h";
 
 /* No comment provided by engineer. */
 "Token" = "Token";
@@ -100,12 +109,3 @@
 /* No comment provided by engineer. */
 "your Nightscout URL" = "Deine Nightscout URL";
 
-"Prediction" = "Vorhersage";
-
-"acceleration" = "Beschleunigung";
-
-"velocity" = "Geschwindigkeit";
-
-"Pump Settings" = "Pumpeneinstellungen";
-
-"Resolution" = "Auflösung";

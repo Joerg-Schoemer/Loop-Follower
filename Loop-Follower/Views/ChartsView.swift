@@ -26,6 +26,7 @@ struct ChartsView: View {
                 Group {
                     DerivedChart(
                         currentDate: modelData.currentDate,
+                        hourOfHistory: modelData.hourOfHistory,
                         entries: $modelData.entries
                     )
                     .tag("derived")

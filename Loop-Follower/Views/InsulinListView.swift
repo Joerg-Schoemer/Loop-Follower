@@ -38,20 +38,6 @@ struct InsulinListView: View {
                     systemImage: "sum"
                 )
                 .font(.headline)
-            } else {
-                ForEach(sumByDay.sorted(by: >), id: \.key) { key, value in
-                    HStack {
-                        Label(
-                            key.formatted(date: .numeric, time: .omitted),
-                            systemImage: "calendar"
-                        )
-                        Spacer()
-                        Label(
-                            value.formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
-                            systemImage: "sum"
-                        )
-                    }
-                }
             }
         }
         .navigationBarTitle("Insulin")
@@ -61,20 +47,6 @@ struct InsulinListView: View {
         let selectedItems = modelData.insulin.filter { insulin in multiSelection.contains(insulin.id) || editMode == .inactive }
         
         return Measurement<UnitInsulin>(value: selectedItems.map{ $0.insulin }.reduce(0, +), unit: .insulin)
-    }
-    
-    var sumByDay : Dictionary<Date,Measurement<UnitInsulin>> {
-        
-        let groupedByDay = Dictionary(grouping: modelData.insulin) {
-            Calendar.current.startOfDay(for: $0.date)
-        }
-        
-        var x = Dictionary<Date,Measurement<UnitInsulin>>()
-        for (day, insulin) in groupedByDay {
-            x[day] = Measurement<UnitInsulin>(value: insulin.map{ $0.insulin }.reduce(0, +), unit: .insulin)
-        }
-
-        return x
     }
 }
 

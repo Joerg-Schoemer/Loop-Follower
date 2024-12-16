@@ -13,7 +13,7 @@ struct MonitorView: View {
     @State var orientation = UIDevice.current.orientation
     @State var prevOrientation = UIDevice.current.orientation
     @State var tabSelection : String = "BG"
-    
+
     let criticalMax : Int = 260
     let criticalMin : Int = 55
     
@@ -42,21 +42,20 @@ struct MonitorView: View {
                                 loopData: loopData,
                                 cn: modelData.cn,
                                 siteChanged: modelData.siteChanged,
-                                sensorChanged: modelData.sensorChanged
+                                sensorChanged: modelData.sensorChanged,
+                                timeInRange: modelData.timeInRange
                             )
                         }
-                        if modelData.lastEntry != nil {
-                            CurrentValueView(
-                                currentDate: $modelData.currentDate,
-                                currentEntry: $modelData.lastEntry,
-                                delta: calcDelta(modelData.entries),
-                                criticalMin: criticalMin,
-                                criticalMax: criticalMax,
-                                rangeMin: rangeMin,
-                                rangeMax: rangeMax
-                            )
-                            .scaleEffect(0.707)
-                        }
+                        CurrentValueView(
+                            currentDate: $modelData.currentDate,
+                            currentEntry: $modelData.lastEntry,
+                            delta: calcDelta(modelData.entries),
+                            criticalMin: criticalMin,
+                            criticalMax: criticalMax,
+                            rangeMin: rangeMin,
+                            rangeMax: rangeMax
+                        )
+                        .scaleEffect(0.707)
                     }
 
                     ChartsView(

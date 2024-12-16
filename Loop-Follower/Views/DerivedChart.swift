@@ -11,6 +11,8 @@ import Charts
 struct DerivedChart: View {
     
     var currentDate : Date?
+    var hourOfHistory: Int
+    
     @Binding var entries : [Entry]
 
     @State var orientation = UIDevice.current.orientation
@@ -28,7 +30,12 @@ struct DerivedChart: View {
 
     var body: some View {
 
-        let velocity = derive(entries, "veloc")
+        let velocity = derive(entries.filter({ c in
+            if let currentDate = currentDate {
+                return c.date >= Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: currentDate)!
+            }
+            return false
+        }), "veloc")
         let acceleration = derive(velocity, "accel")
 
         VStack {
@@ -99,6 +106,7 @@ struct DerivedChart_Previews: PreviewProvider {
     static var previews: some View {
         DerivedChart(
             currentDate: currentDate,
+            hourOfHistory: -6,
             entries: .constant(entries)
         )
     }

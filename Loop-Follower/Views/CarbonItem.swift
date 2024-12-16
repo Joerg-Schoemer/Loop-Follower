@@ -11,16 +11,35 @@ struct CarbonItem: View {
 
     @EnvironmentObject var settings: SettingsStore
 
-    var carb : CarbCorrection
+    var carb: CarbCorrection
     
-    var profile : Profile
+    var profile: Profile
+    
+    var bgEntry: Entry?
+    
+    let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        formatter.minimumFractionDigits = 0
+        return formatter
+    }()
     
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Label(
-                carb.foodType ?? "",
-                systemImage: "fork.knife"
-            )
+            HStack(spacing: 3) {
+                Label(
+                    carb.foodType ?? "",
+                    systemImage: "fork.knife"
+                )
+                if let bgEntry = bgEntry {
+                    Spacer()
+                    Label(
+                        bgEntry.sgv.formatted(.number),
+                        systemImage: "drop"
+                    )
+                }
+            }
             .font(.headline)
             HStack(spacing: 3) {
                 Label(
