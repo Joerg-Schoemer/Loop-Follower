@@ -157,6 +157,11 @@ struct LoopOverride : Codable {
         
         return activeName.trimmingCharacters(in: .whitespacesAndNewlines)
     }
+    
+    var date : Date {
+        return formatter.date(from: timestamp)!
+    }
+    
 }
 
 struct CorrectionRange : Codable {
@@ -164,7 +169,7 @@ struct CorrectionRange : Codable {
     let maxValue : Double
 }
 
-class UnitInsulin : Dimension {
+class UnitInsulin : Dimension, @unchecked Sendable {
     override class func baseUnit() -> Self {
         return self.insulin as! Self
     }
