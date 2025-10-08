@@ -22,7 +22,6 @@ struct ContentView: View {
                                 Image(systemName: "syringe")
                             }
                         )
-                        Spacer()
                         NavigationLink(
                             destination: {
                                 CarbonListView()
@@ -31,7 +30,6 @@ struct ContentView: View {
                                 Image(systemName: "fork.knife")
                             }
                         )
-                        Spacer()
                         NavigationLink(
                             destination: {
                                 ProfileView()
