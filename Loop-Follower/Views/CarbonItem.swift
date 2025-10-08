@@ -32,15 +32,16 @@ struct CarbonItem: View {
                     carb.foodType ?? "",
                     systemImage: "fork.knife"
                 )
+                .font(.headline)
                 if let bgEntry = bgEntry {
                     Spacer()
                     Label(
                         bgEntry.sgv.formatted(.number),
                         systemImage: "drop"
                     )
+                    .font(.subheadline)
                 }
             }
-            .font(.headline)
             HStack(spacing: 3) {
                 Label(
                     carb.mass.formatted(),
@@ -49,11 +50,10 @@ struct CarbonItem: View {
                 .font(.headline)
                 Spacer()
                 Label(
-                    carb.absorption.formatted(
-                        .measurement(
-                            width: .narrow,
-                            numberFormatStyle: .number.precision(.fractionLength(1)))
-                    ),
+                    carb.absorption.formatted(.measurement(
+                        width: .narrow,
+                        numberFormatStyle: .number.precision(.fractionLength(1))
+                    )),
                     systemImage: "stopwatch"
                 )
                 .font(.subheadline)
@@ -66,13 +66,20 @@ struct CarbonItem: View {
                     ),
                     systemImage: "clock"
                 )
-                if let ratio = findCarbRatio(profile: profile, carb: carb) {
+                if let ratio = findCarbRatio(profile: profile, carb: carb)?.value {
                     Spacer()
                     Label(
                         Measurement<UnitInsulin>(
-                            value: calculateInsulinNeeds(carbs: carb.mass.value, factor: ratio.value, pumpResolution: settings.pumpRes),
+                            value: calculateInsulinNeeds(
+                                carbs: carb.carbs,
+                                factor: ratio,
+                                pumpResolution: settings.pumpRes
+                            ),
                             unit: .insulin
-                        ).formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
+                        ).formatted(.measurement(
+                            width: .abbreviated,
+                            numberFormatStyle: .number.precision(.fractionLength(2))
+                        )),
                         systemImage: "syringe"
                     )
                 }

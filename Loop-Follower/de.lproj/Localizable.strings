@@ -89,6 +89,9 @@
 "SAGE" = "SAGE";
 
 /* No comment provided by engineer. */
+"Selected" = "Ausgewählt";
+
+/* No comment provided by engineer. */
 "Settings" = "Einstellungen";
 
 /* Time In Range */
@@ -96,6 +99,9 @@
 
 /* No comment provided by engineer. */
 "Token" = "Token";
+
+/* No comment provided by engineer. */
+"totalBasal" = "Gesamtbasal";
 
 /* Unit of Insulin */
 "U" = "IE";

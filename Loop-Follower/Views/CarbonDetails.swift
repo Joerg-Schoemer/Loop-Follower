@@ -10,6 +10,8 @@ import SwiftUI
 struct CarbonDetails: View {
     
     @EnvironmentObject var modelData : ModelData
+    @EnvironmentObject var settings: SettingsStore
+    
     var carb : Node<CarbCorrection>
     let insulinFormatStyle = Measurement<UnitInsulin>.FormatStyle(
         width: .abbreviated,
@@ -23,14 +25,67 @@ struct CarbonDetails: View {
                 CarbonItem(carb: carb.item, profile: modelData.profile!, bgEntry: findBgEntry(carb.item))
             }
             Spacer()
+            HStack {
+                Label(
+                    Measurement<UnitMass>(value: carbs.map{ $0.item.carbs }.reduce(0, +), unit: .grams).formatted(),
+                    systemImage: "scalemass"
+                )
+                Spacer()
+                Label(
+                    Measurement<UnitInsulin>(
+                        value: carbs.map {
+                            calculateInsulinNeeds(
+                                carbs: $0.item.carbs,
+                                factor: findCarbRatio(profile: modelData.profile!, carb: $0.item)!.value,
+                                pumpResolution: settings.pumpRes
+                            )
+                        }.reduce(0, +),
+                        unit: .insulin
+                    ).formatted(insulinFormatStyle),
+                    systemImage: "syringe"
+                )
+            }
+            .padding(.horizontal, 20)
+            .font(.subheadline)
+            if let override = modelData.currentLoopData?.override {
+                if override.active {
+                    Spacer()
+                    HStack {
+                        Label(override.activeName, systemImage: "suit.heart")
+                        Spacer()
+                        Label(
+                            Measurement<UnitInsulin>(
+                                value: carbs.map {
+                                    calculateInsulinNeeds(
+                                        carbs: $0.item.carbs,
+                                        factor: findCarbRatio(profile: modelData.profile!, carb: $0.item)!.value / (override.multiplier ?? 1.0),
+                                        pumpResolution: settings.pumpRes
+                                    )
+                                }.reduce(0, +),
+                                unit: .insulin
+                            ).formatted(insulinFormatStyle),
+                            systemImage: "syringe"
+                        )
+                    }
+                    .padding(.horizontal, 20)
+                    .font(.subheadline)
+                }
+            }
+
+            Spacer()
             List(insulin) { insulin in
                 InsulinItem(insulin: insulin)
             }
             Spacer()
-            Label(
-                Measurement(value: insulin.map{ $0.insulin }.reduce(0, +), unit: .insulin).formatted(insulinFormatStyle),
-                systemImage: "syringe"
-            )
+            HStack() {
+                Spacer()
+                Label(
+                    Measurement(value: insulin.map{ $0.insulin }.reduce(0, +), unit: .insulin).formatted(insulinFormatStyle),
+                    systemImage: "syringe"
+                )
+            }
+            .padding(.horizontal, 20)
+            .font(.subheadline)
         }
     }
     
@@ -106,5 +161,5 @@ struct CarbonDetails: View {
             ))
     )
     .environmentObject(ModelData(test: true))
-
+    .environmentObject(SettingsStore())
 }

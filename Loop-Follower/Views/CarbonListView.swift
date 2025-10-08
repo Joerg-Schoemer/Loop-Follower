@@ -14,36 +14,32 @@ struct CarbonListView: View {
 
     var body: some View {
 
-        NavigationSplitView() {
-            VStack() {
-                List(carbs) { carb in
-                    NavigationLink() {
-                        CarbonDetails(carb: carb)
-                    } label: {
-                        CarbonItem(carb: carb.item, profile: modelData.profile!)
-                    }
-                }
-                
-                Spacer()
-                
-                ForEach(sumByDay.sorted(by: >), id: \.key) { key, value in
-                    HStack(spacing: 5) {
-                        Label(
-                            key.formatted(date: .numeric, time: .omitted),
-                            systemImage: "calendar"
-                        )
-                        Spacer()
-                        Label(
-                            value.formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
-                            systemImage: "sum"
-                        )
-                    }
+        VStack() {
+            List(carbs) { carb in
+                NavigationLink() {
+                    CarbonDetails(carb: carb)
+                } label: {
+                    CarbonItem(carb: carb.item, profile: modelData.profile!)
                 }
             }
-            .navigationBarTitle("Carbs")
-        } detail: {
-            Text("Select a carb correction")
+            
+            Spacer()
+            
+            ForEach(sumByDay.sorted(by: >), id: \.key) { key, value in
+                HStack(spacing: 5) {
+                    Label(
+                        key.formatted(date: .numeric, time: .omitted),
+                        systemImage: "calendar"
+                    )
+                    Spacer()
+                    Label(
+                        value.formatted(.measurement(width: .abbreviated, numberFormatStyle: .number.precision(.fractionLength(2)))),
+                        systemImage: "sum"
+                    )
+                }.padding(.horizontal, 20)
+            }
         }
+        .navigationBarTitle("Carbs")
     }
     
     var carbs : [Node<CarbCorrection>] {
