@@ -92,7 +92,7 @@ struct CurrentValueView: View {
                     .frame(width: 150)
                     Text(formatDelta())
                 }
-                .font(.headline)
+                .font(.title2)
                 .foregroundColor(textColor)
                 .shadow(radius: 2, x: 5, y:5)
             }
