@@ -487,6 +487,7 @@ public class ModelData : ObservableObject {
         let store = UserDefaults(suiteName: "group.loop.follower")!
         let baseUrl : String = store.object(forKey: SettingsStore.Keys.url) as? String ?? ""
         let token : String = store.object(forKey: SettingsStore.Keys.token) as? String ?? ""
+        currentDate = Date.now
 
         if baseUrl.isEmpty {
             // do nothing when not configured
@@ -587,8 +588,6 @@ public class ModelData : ObservableObject {
             }
         )
 
-        currentDate = Date.now
-        
         if let lastEntry = self.lastEntry {
             
             let calendar = Calendar.current
@@ -956,72 +955,12 @@ func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> A
 /// calculates the timeInRange in promill
 ///
 func calcTimeInRange(_ entries: [Entry], min: Int, max: Int) -> Int {
-    let orderedByDate = entries.sorted { $0.date < $1.date }
-    
-    // find all indices out of range
-    let aboveOrBelowIndexes = orderedByDate.filter { e in
+
+    let aboveOrBelowCount = entries.filter { e in
         e.sgv > max || e.sgv < min
-    }.map {
-        (index: orderedByDate.firstIndex(of:$0)!, isMax: $0.sgv > max)
-    }
-    
-    // if none is out of range time in range 1000 promill
-    if aboveOrBelowIndexes.isEmpty {
-        return 1000
-    }
-    
-    // filter out all directly consecutive values
-    var inAndOuts = zip(aboveOrBelowIndexes, aboveOrBelowIndexes.dropFirst()).filter {
-        ($1.index - $0.index) >= 2 || $1.isMax != $0.isMax
-    }.flatMap {
-        [$0.0, $0.1]
-    }
-    if !inAndOuts.contains(where: { $0 == aboveOrBelowIndexes.first! }) {
-        // the first has no previous one to compare it with => insert it if missing
-        inAndOuts.insert(aboveOrBelowIndexes.first!, at: 0)
-    }
-    if !inAndOuts.contains( where: { $0 == aboveOrBelowIndexes.last! }) {
-        // the last has no next one to compare it with => append it if missing
-        inAndOuts.append(aboveOrBelowIndexes.last!)
-    }
-    
-    var interval : [(start: Entry, end: Entry?)] = []
-    // resolve entry
-    for x in stride(from: 0, to: inAndOuts.count, by: 2) {
-        let start : Entry = orderedByDate[inAndOuts[x].index]
-        // no more inAndOuts
-        let end : Entry? = if x + 1 < inAndOuts.count {
-            // when the last inAndOut is also the last value
-            if inAndOuts[x + 1].index + 1 < orderedByDate.count {
-                orderedByDate[inAndOuts[x + 1].index + 1]
-            } else {
-                nil
-            }
-        } else {
-            // try to use the start also as end
-            if inAndOuts[x].index + 1 < orderedByDate.count {
-                orderedByDate[inAndOuts[x].index + 1]
-            } else {
-                nil
-            }
-        }
+    }.count
 
-        interval.append((start: start, end: end))
-    }
-
-    // five minutes later to get the full day
-    let endDate = Calendar.current.date(byAdding: .minute, value: 5, to: orderedByDate.last!.date)!
-
-    let totalTime : Double  = endDate - orderedByDate.first!.date
-    let outOfRange  : Double = interval.map { (start: Entry, end: Entry?) in
-        if let end = end {
-            end.date - start.date
-        } else {
-            endDate - start.date
-        }
-    }.reduce(0, +)
-    
-    return Int((totalTime - outOfRange) * 1000 / totalTime)
+    return (entries.count - aboveOrBelowCount) * 1000 / entries.count
 }
 
 extension Date {

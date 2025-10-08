@@ -131,10 +131,10 @@ struct TimeInRange {
         dateComponents.timeZone = TimeZone(abbreviation: "CET")
         dateComponents.hour = 0
         dateComponents.minute = 0
-
+        
         // Create date from components
         let startDate = Calendar.current.date(from: dateComponents)!
-
+        
         let entries = generateData(
             startDate,
             by: { (i: Int) -> Int in if i == 0 { 181 } else if i == 5 { 69 } else { 100 } }
@@ -142,6 +142,48 @@ struct TimeInRange {
         
         let tir = calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 993)
+    }
+    
+    @Test func realData20241225T1738Z() async throws {
+        
+        let filename = "sgv-2024-12-26T1738Z"
+        let entries : [Entry]
+        
+        guard let path = Bundle(for: Loop_FollowerTests.self).url(forResource: filename, withExtension: "json") else {
+            fatalError("\(filename) not found")
+        }
+        
+        do {
+            let ressourceData = try Data(contentsOf: path)
+            let decoder = JSONDecoder()
+            entries = try decoder.decode([Entry].self, from: ressourceData)
+        } catch {
+            fatalError("Couldn't parse \(filename) as \([Entry].self):\n\(error)")
+        }
+        
+        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        #expect(tir == 822)
+    }
+    
+    @Test func realData20241225T1903Z() async throws {
+
+        let filename = "sgv-2024-12-25T1903Z"
+        let entries : [Entry]
+        
+        guard let path = Bundle(for: Loop_FollowerTests.self).url(forResource: filename, withExtension: "json") else {
+            fatalError("\(filename) not found")
+        }
+        
+        do {
+            let ressourceData = try Data(contentsOf: path)
+            let decoder = JSONDecoder()
+            entries = try decoder.decode([Entry].self, from: ressourceData)
+        } catch {
+            fatalError("Couldn't parse \(filename) as \([Entry].self):\n\(error)")
+        }
+
+        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        #expect(tir == 802)
     }
 }
 
