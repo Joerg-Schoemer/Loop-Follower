@@ -111,18 +111,19 @@ public class ModelData : ObservableObject {
         }
         components.queryItems?.append(URLQueryItem(name: "find[date][$gte]", value: date.description))
         components.queryItems?.append(URLQueryItem(name: "count", value: "2000"))
+
         if let url = components.url {
             URLSession.shared.dataTask(
                 with: url,
                 completionHandler: { data, response, error in
                     if let error = error {
-                        print("Error with fetching sgv: \(error)")
+                        print("loadSgv: Error with fetching sgv: \(error)")
                         return
                     }
                     
                     guard let httpResponse = response as? HTTPURLResponse,
                           (200...299).contains(httpResponse.statusCode) else {
-                        print("Error with the response, unexpected status code: \(String(describing: response))")
+                        print("loadSgv: Error with the response, unexpected status code: \(String(describing: response))")
                         return
                     }
                     
@@ -131,10 +132,9 @@ public class ModelData : ObservableObject {
                         DispatchQueue.main.async {
                             completionHandler(entries)
                         }
-                    } else {
-                        print("no data")
                         return
                     }
+                    print("loadSgv: no data")
                 }
             ).resume()
         } else {
@@ -262,10 +262,9 @@ public class ModelData : ObservableObject {
                     DispatchQueue.main.async {
                         completionHandler(treatmentData)
                     }
-                } else {
-                    print("no data")
                     return
                 }
+                print("loadCarbs no data")
             }).resume()
         }
     }
@@ -300,10 +299,9 @@ public class ModelData : ObservableObject {
                     DispatchQueue.main.async {
                         completionHandler(treatmentData)
                     }
-                } else {
-                    print("no data")
                     return
                 }
+                print("loadTempBasal no data")
             }).resume()
         }
     }
@@ -317,31 +315,32 @@ public class ModelData : ObservableObject {
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
         components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
-        
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
-                    print("Error with fetching devicestatus: \(error)")
+                    print("loadDeviceStatus: Error with fetching devicestatus: \(error)")
                     return
                 }
                 
                 guard let httpResponse = response as? HTTPURLResponse,
                       (200...299).contains(httpResponse.statusCode) else {
-                    print("Error with the response, unexpected status code: \(String(describing: response))")
+                    print("loadDeviceStatus: Error with the response, unexpected status code: \(String(describing: response))")
                     return
                 }
 
                 if let data = data {
                     let loopData = try! JSONDecoder().decode([LoopData].self, from: data)
-                    DispatchQueue.main.async {
-                        completionHandler(loopData.first)
+                    if let loopDataFirst = loopData.first {
+                        DispatchQueue.main.async {
+                            completionHandler(loopDataFirst)
+                        }
+                        return
                     }
-                } else {
-                    print("no data")
-                    return
                 }
+                print("loadDeviceStatus: no data")
             }).resume()
         }
     }
@@ -354,96 +353,53 @@ public class ModelData : ObservableObject {
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
-        
+
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
-                    print("Error with fetching devicestatus: \(error)")
+                    print("loadProfile: Error with fetching devicestatus: \(error)")
                     return
                 }
                 
                 guard let httpResponse = response as? HTTPURLResponse,
                       (200...299).contains(httpResponse.statusCode) else {
-                    print("Error with the response, unexpected status code: \(String(describing: response))")
+                    print("loadProfile: Error with the response, unexpected status code: \(String(describing: response))")
                     return
                 }
 
                 if let data = data {
                     let profiles = try! JSONDecoder().decode([Profiles].self, from: data)
-                    let activeProfile = profiles.first!
-                    DispatchQueue.main.async {
-                        completionHandler(activeProfile)
-                    }
-                } else {
-                    print("no data")
-                    return
-                }
-            }).resume()
-        }
-    }
-    
-    func loadSiteChange(baseUrl:String, token : String, completionHandler: @escaping (Date?) -> ()) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
-        else { return }
-        
-        let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: -5, to: Date())!
-
-        components.queryItems = []
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
-        }
-        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Site Change"))
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)))
-        components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
-        
-        if let url = components.url {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-
-                if let error = error {
-                    print("Error fetching treatments: \(error)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("Error response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-                
-                if httpResponse.statusCode == 304 {
-                    return
-                }
-
-                if let data = data {
-                    let treatmentData = (try! JSONDecoder().decode([ChangeEvent].self, from: data)).first
-                    
-                    if treatmentData == nil {
+                    if let activeProfile = profiles.first {
+                        DispatchQueue.main.async {
+                            completionHandler(activeProfile)
+                        }
                         return
                     }
-
-                    DispatchQueue.main.async {
-                        completionHandler(treatmentData!.date)
-                    }
-                } else {
-                    print("no data")
-                    completionHandler(nil)
                 }
+
+                print("loadProfile: no data")
             }).resume()
         }
     }
 
-    func loadSensorChange(baseUrl : String, token : String, completionHandler: @escaping (Date?) -> ()) {
+    func loadEventType(
+        baseUrl : String,
+        token : String,
+        eventType : String,
+        days: Int,
+        completionHandler: @escaping (Date?) -> ()
+    ) {
         guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
         else { return }
 
-        let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: -14, to: .now)!
+        let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: days, to: .now)!
 
         components.queryItems = []
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
-        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Sensor Start"))
+        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: eventType))
         components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)))
         components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
 
@@ -451,32 +407,34 @@ public class ModelData : ObservableObject {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
                 if let error = error {
-                    print("Error fetching treatments: \(error)")
+                    print("loadEventType: Error fetching treatments: \(String(describing: error))")
+                    DispatchQueue.main.async {
+                        completionHandler(nil)
+                    }
                     return
                 }
 
                 guard let httpResponse = response as? HTTPURLResponse,
                       (200...299).contains(httpResponse.statusCode) else {
-                    print("Error response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-
-                if httpResponse.statusCode == 304 {
+                    print("loadEventType: Error response, unexpected status code: \(String(describing: response))")
+                    DispatchQueue.main.async {
+                        completionHandler(nil)
+                    }
                     return
                 }
 
                 if let data = data {
-                    let treatmentData = (try! JSONDecoder().decode([ChangeEvent].self, from: data)).first
-                    
-                    if treatmentData == nil {
+                    if let treatmentData = (try! JSONDecoder().decode([ChangeEvent].self, from: data)).first {
+                        print("loadEventType: treatment of type \"\(eventType)\" found with \(treatmentData.date)")
+                        DispatchQueue.main.async {
+                            completionHandler(treatmentData.date)
+                        }
+
                         return
                     }
-                    
-                    DispatchQueue.main.async {
-                        completionHandler(treatmentData!.date)
-                    }
-                } else {
-                    print("no data")
+                }
+                print("loadEventType: no treatment of type \"\(eventType)\" found")
+                DispatchQueue.main.async {
                     completionHandler(nil)
                 }
             }).resume()
@@ -500,26 +458,17 @@ public class ModelData : ObservableObject {
             completionHandler: { entries in
                 self.entries = entries
                 self.lastEntry = entries.first
-
                 let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
                 self.timeInRange = calcTimeInRange(entries.filter { $0.date > startOfTir }, min: 70, max: 180)
-                let alert = processSgvForAlerts(
-                    entries,
-                    alertSettings: AlertSettings(
-                        veryLowThreshold: 55,
-                        lowThreshold: 70,
-                        lowTime: 290.0,
-                        highThreshold: 180,
-                        highTime: 3570.0,
-                        veryHighThreshold: 260
-                    )
-                )
-                print("alert=\(alert)")
             }
         )
-        loadMbg(baseUrl: baseUrl, token: token, completionHandler: { entries in
-            self.mgbs = entries
-        })
+        loadMbg(
+            baseUrl: baseUrl,
+            token: token,
+            completionHandler: { entries in
+                self.mgbs = entries
+            }
+        )
         loadDeviceStatus(
             baseUrl: baseUrl,
             token: token,
@@ -573,18 +522,36 @@ public class ModelData : ObservableObject {
                 ).sorted(by: {$0.startDate < $1.startDate})
             }
         )
-        loadSiteChange(
+        loadEventType(
             baseUrl: baseUrl,
             token: token,
+            eventType: "Site Change",
+            days: -5,
             completionHandler: { date in
                 self.siteChanged = date
             }
         )
-        loadSensorChange(
+        loadEventType(
             baseUrl: baseUrl,
             token: token,
+            eventType: "Sensor Start",
+            days: -14,
             completionHandler: { date in
-                self.sensorChanged = date
+                if date != nil {
+                    self.sensorChanged = date
+                    return
+                }
+
+                // try to load eventType "Sensor Start" when eventType "Sensor Change" couldn't be loaded
+                self.loadEventType(
+                    baseUrl: baseUrl,
+                    token: token,
+                    eventType: "Sensor Change",
+                    days: -14,
+                    completionHandler: { date in
+                        self.sensorChanged = date
+                    }
+                )
             }
         )
 
@@ -608,9 +575,7 @@ public class ModelData : ObservableObject {
                 value: 1,
                 to: lastEntry.date
             )!
-            
-            
-            
+
             while nextRun < currentDate {
                 nextRun = Calendar.current.date(
                     byAdding: .minute,
