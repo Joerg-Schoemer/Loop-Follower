@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LoopParameterView: View {
     
-    let loopData : LoopData
+    let loopData : LoopData?
     let cn : Measurement<UnitMass>
     let siteChanged : Date?
     let sensorChanged : Date?
@@ -41,45 +41,52 @@ struct LoopParameterView: View {
                         label: NSLocalizedString("SAGE", comment: "Canula age"),
                         data: hoursBetween(start: sensorChanged, end: Date.now))
                 }
-                Divider()
-                LoopParameterValue(
-                    label: NSLocalizedString("COB", comment: "Carbs on board"),
-                    data: loopData.cob.formatted(gramFormatStyle))
-                LoopParameterValue(
-                    label: NSLocalizedString("Rec. Carbs", comment: "abbreviated recommended carbs"),
-                    data: cn.formatted(gramFormatStyle))
-                Divider()
+                if let loopData = self.loopData {
+                    Divider()
+                    LoopParameterValue(
+                        label: NSLocalizedString("COB", comment: "Carbs on board"),
+                        data: loopData.cob.formatted(gramFormatStyle))
+                    LoopParameterValue(
+                        label: NSLocalizedString("Rec. Carbs", comment: "abbreviated recommended carbs"),
+                        data: cn.formatted(gramFormatStyle))
+                    Divider()
+                }
             }
             Group {
-                LoopParameterValue(
-                    label: NSLocalizedString("IOB", comment: "Insulin on board"),
-                    data: loopData.iob.formatted(insulinFormatStyle))
-                LoopParameterValue(
-                    label: NSLocalizedString("Rec. Bolus", comment: "abbreviated recommended bolus"),
-                    data: recommendedBolus(self.loopData.recommendedBolus))
-                LoopParameterValue(
-                    label: NSLocalizedString("Pump Volume", comment: "Pump reservoir volume"),
-                    data: pumpVolume(loopData.pumpVolume))
-                Divider()
-                LoopParameterValue(
-                    label: NSLocalizedString("Loop state", comment: "loop state label"),
-                    data: loopState(state: loopData.loop.state))
-                LoopParameterValue(
-                    label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
-                    data: predictedMinMax(loopData.loop.predicted?.values))
-                Divider()
+                if let loopData = self.loopData {
+                    LoopParameterValue(
+                        label: NSLocalizedString("IOB", comment: "Insulin on board"),
+                        data: loopData.iob.formatted(insulinFormatStyle))
+                    LoopParameterValue(
+                        label: NSLocalizedString("Rec. Bolus", comment: "abbreviated recommended bolus"),
+                        data: recommendedBolus(self.loopData!.recommendedBolus))
+                    LoopParameterValue(
+                        label: NSLocalizedString("Pump Volume", comment: "Pump reservoir volume"),
+                        data: pumpVolume(loopData.pumpVolume))
+                    Divider()
+                    LoopParameterValue(
+                        label: NSLocalizedString("Loop state", comment: "loop state label"),
+                        data: loopState(state: loopData.loop.state))
+                    LoopParameterValue(
+                        label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
+                        data: predictedMinMax(loopData.loop.predicted?.values))
+                }
+                if let loopData = self.loopData {
+                    LoopParameterBatteryView(
+                        label: NSLocalizedString("Battery", comment: "Battery"),
+                        percentage: loopData.uploader.battery)
+                    if loopData.override.active {
+                        LoopParameterValue(
+                            label: NSLocalizedString("Override", comment: "Override Name"),
+                            data: loopData.override.activeName)
+                    }
+                }
                 if let timeInRange = timeInRange {
+                    Spacer()
+                    Divider()
                     LoopParameterValue(
                         label: NSLocalizedString("TIR last 24h", comment: "Time In Range"),
                         data: (Double(timeInRange) / 1000).formatted(.percent.precision(.fractionLength(1...1))))
-                }
-                LoopParameterBatteryView(
-                    label: NSLocalizedString("Battery", comment: "Battery"),
-                    percentage: loopData.uploader.battery)
-                if loopData.override.active {
-                    LoopParameterValue(
-                        label: NSLocalizedString("Override", comment: "Override Name"),
-                        data: loopData.override.activeName)
                 }
             }
                 

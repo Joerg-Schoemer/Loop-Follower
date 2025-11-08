@@ -14,20 +14,21 @@ struct BloodGlucoseChart: View {
 
     var selectedEntry: Entry? {
         guard let rawSelectedDate else { return nil }
-        
-        let p = predictedValues(
-            startDate: prediction!.date,
-            values: prediction!.values
-        )
 
-        let allEntries = entries.reversed() + p
+        var allEntries : [Entry];
+        if prediction != nil {
+            let p = predictedValues(
+                startDate: prediction!.date,
+                values: prediction!.values
+            )
+
+            allEntries = entries.reversed() + p
+        } else {
+            allEntries = entries.reversed()
+        }
         let f = allEntries.first(
             where: { $0.date >= rawSelectedDate }
         )
-        
-        if f != nil {
-            print("f=\(f!)")
-        }
 
         return f
     }

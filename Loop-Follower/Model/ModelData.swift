@@ -318,7 +318,8 @@ public class ModelData : ObservableObject {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
         components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
-        
+        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
+
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
@@ -354,7 +355,7 @@ public class ModelData : ObservableObject {
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
-        
+
         if let url = components.url {
             URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
 
@@ -370,6 +371,7 @@ public class ModelData : ObservableObject {
                 }
 
                 if let data = data {
+                    print("data: ")
                     let profiles = try! JSONDecoder().decode([Profiles].self, from: data)
                     let activeProfile = profiles.first!
                     DispatchQueue.main.async {
@@ -608,9 +610,7 @@ public class ModelData : ObservableObject {
                 value: 1,
                 to: lastEntry.date
             )!
-            
-            
-            
+
             while nextRun < currentDate {
                 nextRun = Calendar.current.date(
                     byAdding: .minute,
