@@ -501,8 +501,15 @@ public class ModelData : ObservableObject {
             baseUrl: baseUrl,
             token: token,
             completionHandler: { profiles in
-                let startDate = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: Date.now)!
-                let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: Date.now)!
+                let currentDate = Date.now
+                let startDate = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: currentDate)!
+                
+                let endDate: Date
+                if self.currentLoopData != nil {
+                    endDate = Calendar.current.date(byAdding: .hour, value: 3, to: currentDate)!
+                } else {
+                    endDate = currentDate
+                }
 
                 self.profile = profiles!.store[profiles!.defaultProfile]!
 
@@ -663,8 +670,7 @@ func initLoad<T: Decodable>(_ filename: String) -> T {
 
 func convertBasalToTempBasal(
     _ basals: [Basal],
-    _ startOfDay: Date,
-    _ offset: Double
+    _ startOfDay: Date
 ) -> [TempBasal] {
     var tempBasal : [TempBasal] = []
     for i in 0..<(basals.count - 1) {
@@ -675,7 +681,7 @@ func convertBasalToTempBasal(
                 id: UUID().uuidString,
                 duration: (nextBasal.timeAsSeconds - currentBasal.timeAsSeconds) / 60,
                 rate: currentBasal.value,
-                timestamp: ISO8601DateFormatter().string(from: startOfDay + currentBasal.timeAsSeconds + offset),
+                timestamp: ISO8601DateFormatter().string(from: startOfDay + currentBasal.timeAsSeconds),
                 type: "scheduled"
             )
         )
@@ -686,7 +692,7 @@ func convertBasalToTempBasal(
             id: UUID().uuidString,
             duration: (86400 - lastBasal.timeAsSeconds) / 60,
             rate: lastBasal.value,
-            timestamp: ISO8601DateFormatter().string(from: startOfDay + lastBasal.timeAsSeconds + offset),
+            timestamp: ISO8601DateFormatter().string(from: startOfDay + lastBasal.timeAsSeconds),
             type: "scheduled"
         )
     )
@@ -700,13 +706,15 @@ func calculateTempBasal(
     endDate: Date
 ) -> [TempBasal] {
 
-    let startOfDay = Calendar.current.startOfDay(for: startDate)
     var tempBasal : [TempBasal] = []
 
     // first day
-    tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDay, 0))
+    let startOfDayOne = Calendar.current.startOfDay(for: startDate)
+    tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDayOne))
+
     // second day
-    tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDay, 86400))
+    let startOfDayTwo = Calendar.current.date(byAdding: .day, value: 1, to: startOfDayOne)!
+    tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDayTwo))
 
     tempBasal = tempBasal.filter({ $0.endDate > startDate && $0.startDate < endDate })
 

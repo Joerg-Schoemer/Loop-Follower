@@ -30,7 +30,6 @@ struct ContentView: View {
                                 Image(systemName: "fork.knife")
                             }
                         )
-                        /*
                         NavigationLink(
                             destination: {
                                 ProfileView()
@@ -39,7 +38,6 @@ struct ContentView: View {
                                 Image(systemName: "slider.horizontal.3")
                             }
                         )
-                        */
                         Spacer()
                         NavigationLink(
                             destination: {

@@ -49,10 +49,12 @@ struct DerivedChart: View {
                     )
                     .lineStyle(StrokeStyle(lineWidth: 1))
                     .foregroundStyle(Color(.systemCyan).opacity(0.75))
+                    /*
                     RuleMark(
                         x: .value("future", Calendar.current.date(byAdding: .hour, value: 3, to: currentDate!)!)
                     )
                     .foregroundStyle(Color(.systemFill))
+                    */
                 }
                 ForEach(velocity) { velocity in
                     BarMark(
