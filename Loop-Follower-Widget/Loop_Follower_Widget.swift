@@ -67,14 +67,14 @@ func fetchCurrentBG() async throws -> CurrentBGEntry {
     let baseUrl = store.url
     let token = store.token
 
-    let requestString = "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&count=2"
+    let requestString = "\(baseUrl)/api/v1/entries/sgv.json?token=\(token)&count=4"
     let url = URL(string: requestString)!
 
     // Fetch JSON data
     let (data, _) = try await URLSession.shared.data(from: url)
 
     // Parse the JSON data
-    let entries = try! JSONDecoder().decode([Entry].self, from: data)
+    let entries = filterEntries(try! JSONDecoder().decode([Entry].self, from: data))
     if let entry = entries.first {
         print("entry = \(entry)")
 
@@ -121,6 +121,29 @@ struct Loop_Follower_Widget: Widget {
         .configurationDisplayName("Loop Follower Widget")
         .description("Loop Follower Widget showing current BG")
         .supportedFamilies([.systemSmall, .accessoryCircular])
+    }
+}
+
+func filterEntries(_ entries : [Entry]) -> [Entry] {
+    let interval : TimeInterval = 100
+    var clearedEntries = zip(entries, entries.dropFirst()).filter { (e1, e2) in
+        return abs(e1.date - e2.date) > interval
+    }.map { (e1, e2) in
+        return e1
+    }
+    
+    let last = entries.last!
+    let clearedLast = clearedEntries.last!
+    if (clearedLast.id != last.id && abs(clearedLast.date - last.date) > interval) {
+        clearedEntries.append(last)
+    }
+    
+    return clearedEntries
+}
+
+extension Date {
+    static func - (lhs: Date, rhs: Date) -> TimeInterval {
+        return lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
     }
 }
 

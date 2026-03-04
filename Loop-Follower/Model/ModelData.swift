@@ -456,10 +456,10 @@ public class ModelData : ObservableObject {
             baseUrl: baseUrl,
             token: token,
             completionHandler: { entries in
-                self.entries = entries
-                self.lastEntry = entries.first
+                self.entries = filterEntries(entries)
+                self.lastEntry = self.entries.first
                 let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
-                self.timeInRange = calcTimeInRange(entries.filter { $0.date > startOfTir }, min: 70, max: 180)
+                self.timeInRange = calcTimeInRange(self.entries.filter { $0.date > startOfTir }, min: 70, max: 180)
             }
         )
         loadMbg(
@@ -837,6 +837,23 @@ func calculateResultingBasal(
     }
     
     return tempBasalPoints.filter({ $0.startDate < endDate && $0.endDate > startDate })
+}
+
+func filterEntries(_ entries : [Entry]) -> [Entry] {
+    let interval : TimeInterval = 100
+    var clearedEntries = zip(entries, entries.dropFirst()).filter { (e1, e2) in
+        return abs(e1.date - e2.date) > interval
+    }.map { (e1, e2) in
+        return e1
+    }
+    
+    let last = entries.last!
+    let clearedLast = clearedEntries.last!
+    if (clearedLast.id != last.id && abs(clearedLast.date - last.date) > interval) {
+        clearedEntries.append(last)
+    }
+    
+    return clearedEntries
 }
 
 enum AlertType {

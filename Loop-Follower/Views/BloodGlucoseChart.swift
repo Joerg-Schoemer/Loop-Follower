@@ -185,7 +185,7 @@ struct BloodGlucoseChart: View {
                     .symbol {
                         BasicChartSymbolShape
                             .circle
-                            .stroke(estimateColorBySgv(entry.sgv), lineWidth: 1.5)
+                            .stroke(estimateColorBySgv(entry.sgv), lineWidth: 1.0)
                             .frame(width: 5)
                     }
                     .foregroundStyle(by: .value("category", "Blood Glucose"))
