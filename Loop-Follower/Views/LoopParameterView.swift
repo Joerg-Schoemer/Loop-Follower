@@ -64,21 +64,23 @@ struct LoopParameterView: View {
                         label: NSLocalizedString("Pump Volume", comment: "Pump reservoir volume"),
                         data: pumpVolume(loopData.pumpVolume))
                     Divider()
-                    LoopParameterValue(
-                        label: NSLocalizedString("Loop state", comment: "loop state label"),
-                        data: loopState(state: loopData.loop.state))
-                    LoopParameterValue(
-                        label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
-                        data: predictedMinMax(loopData.loop.predicted?.values))
-                }
-                if let loopData = self.loopData {
+                    if let loop = loopData.loop {
+                        LoopParameterValue(
+                            label: NSLocalizedString("Loop state", comment: "loop state label"),
+                            data: loopState(state: loop.state))
+                        LoopParameterValue(
+                            label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
+                            data: predictedMinMax(loop.predicted?.values))
+                    }
                     LoopParameterBatteryView(
                         label: NSLocalizedString("Battery", comment: "Battery"),
                         percentage: loopData.uploader.battery)
-                    if loopData.override.active {
-                        LoopParameterValue(
-                            label: NSLocalizedString("Override", comment: "Override Name"),
-                            data: loopData.override.activeName)
+                    if let override = loopData.override {
+                        if override.active {
+                            LoopParameterValue(
+                                label: NSLocalizedString("Override", comment: "Override Name"),
+                                data: override.activeName)
+                        }
                     }
                 }
                 if let timeInRange = timeInRange {
@@ -111,19 +113,23 @@ struct LoopParameterView: View {
     }
 }
 
-func loopState(state: LoopState) -> String {
-    switch (state) {
-    case .looping:
-        return "🔄"
-    case .error:
-        return "❌"
-    case .enacted:
-        return "⚡️"
-    case .warning:
-        return "⚠️"
-    case .recommendation:
-        return "💉"
+func loopState(state: LoopState?) -> String {
+    if let state = state {
+        switch (state) {
+        case .looping:
+            return "🔄"
+        case .error:
+            return "❌"
+        case .enacted:
+            return "⚡️"
+        case .warning:
+            return "⚠️"
+        case .recommendation:
+            return "💉"
+        }
     }
+
+    return ""
 }
 
 func predictedMinMax(_ values : [Double]?) -> String {
@@ -161,7 +167,8 @@ struct LoopParameterView_Previews: PreviewProvider {
                     enacted: nil,
                     failureReason: nil
                 ),
-                uploader: Uploader(battery: 75),
+                openaps: nil,
+                uploader: Uploader(battery: 75, isCharging: false),
                 pump: Pump(reservoir: nil),
                 override: LoopOverride(
                     currentCorrectionRange: nil,

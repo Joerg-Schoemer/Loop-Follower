@@ -62,26 +62,27 @@ struct BasalChart: View {
 struct BasalChart_Previews: PreviewProvider {
     static var previews: some View {
         let sb = [
-            TempBasal(id: "", duration: 60, rate: 0.05, timestamp: "2023-02-14T23:00:00Z"),
-            TempBasal(id: "", duration: 120, rate: 0.10, timestamp: "2023-02-15T00:00:00Z"),
-            TempBasal(id: "", duration: 360, rate: 0.05, timestamp: "2023-02-15T02:00:00Z")
+            TempBasal(id: "", duration:  60, rate: 0.05, created_at: "2023-02-14T23:00:00.000Z"),
+            TempBasal(id: "", duration: 120, rate: 0.10, created_at: "2023-02-15T00:00:00.000Z"),
+            TempBasal(id: "", duration: 360, rate: 0.05, created_at: "2023-02-15T02:00:00Z")
         ]
         let rb = [
-            TempBasal(id: "", duration: 30, rate: 0.05, timestamp: "2023-02-14T23:00:00Z", type: "scheduled"),
-            TempBasal(id: "", duration: 30, rate: 0.00, timestamp: "2023-02-14T23:30:00Z", type: "temporary"),
-            TempBasal(id: "", duration: 100, rate: 0.10, timestamp: "2023-02-15T00:00:00Z", type: "scheduled"),
-            TempBasal(id: "", duration: 30,  rate: 0.15, timestamp: "2023-02-15T01:40:00Z", type: "temporary"),
-            TempBasal(id: "", duration: 50, rate: 0.00, timestamp:  "2023-02-15T02:10:00Z"),
-            TempBasal(id: "", duration: 100, rate: 0.05, timestamp: "2023-02-15T03:00:00Z"),
-            TempBasal(id: "", duration: 200, rate: 0.05, timestamp: "2023-02-15T04:40:00Z")
+            TempBasal(id: "", duration:  30, rate: 0.05, created_at: "2023-02-14T23:00:00Z", type: "scheduled"),
+            TempBasal(id: "", duration:  30, rate: 0.00, created_at: "2023-02-14T23:30:00Z", type: "temporary"),
+            TempBasal(id: "", duration: 100, rate: 0.10, created_at: "2023-02-15T00:00:00Z", type: "scheduled"),
+            TempBasal(id: "", duration:  30, rate: 0.15, created_at: "2023-02-15T01:40:00Z", type: "temporary"),
+            TempBasal(id: "", duration:  50, rate: 0.00, created_at: "2023-02-15T02:10:00Z"),
+            TempBasal(id: "", duration: 100, rate: 0.05, created_at: "2023-02-15T03:00:00Z"),
+            TempBasal(id: "", duration: 200, rate: 0.05, created_at: "2023-02-15T04:40:00Z")
         ]
 
         BasalChart(
-            currentDate: .constant(
-                ISO8601DateFormatter()
-                    .date(from: "2023-02-15T05:15:00Z")!),
+            currentDate: .constant(formatter.date(from: "2023-02-15T05:15:00Z")!),
             scheduledBasal: sb,
             resultingBasal: rb
         )
     }
 }
+
+
+fileprivate var formatter = ISO8601DateFormatter()

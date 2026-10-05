@@ -18,21 +18,33 @@ struct InsulinItem: View {
     )
 
     var body: some View {
-        HStack(spacing: 3) {
-            Label(
-                insulin.date.formatted(
-                    date: .abbreviated,
-                    time: .shortened
-                ),
-                systemImage: "clock"
-            )
-            .font(.subheadline)
+        let sysImageName = switch insulin.type {
+        case "Automatic Bolus", "SMB": "arrowtriangle.down.fill"
+        case "Bolus": "circle.fill"
+        default: "gear"
+        }
+        VStack() {
+            Label (
+                insulin.type,
+                systemImage: sysImageName
+            ).frame(maxWidth: .infinity, alignment: .leading)
             Spacer()
-            Label(
-                insulin.amount.formatted(insulinFormatStyle),
-                systemImage: "syringe"
-            )
-            .font(.headline)
+            HStack(spacing: 3) {
+                Label(
+                    insulin.date.formatted(
+                        date: .abbreviated,
+                        time: .shortened
+                    ),
+                    systemImage: "clock"
+                )
+                .font(.subheadline)
+                Spacer()
+                Label(
+                    insulin.amount.formatted(insulinFormatStyle),
+                    systemImage: "syringe"
+                )
+                .font(.headline)
+            }
         }
     }
 }
@@ -43,8 +55,10 @@ struct InsulinItem_Previews: PreviewProvider {
             insulin: CorrectionBolus(
                 id: "x",
                 insulin: 1.2,
+                duration: 1,
                 timestamp: "2023-08-28T12:00:00Z",
-                created_at: "2023-08-28T12:00:00.000Z"
+                created_at: "2023-08-28T12:00:00.000Z",
+                eventType: "Bolus"
             )
         ).previewLayout(.fixed(width: 300, height: 70))
     }

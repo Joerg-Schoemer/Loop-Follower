@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import WidgetKit
 
 public class ModelData : ObservableObject {
 
@@ -200,7 +201,7 @@ public class ModelData : ObservableObject {
         if !token.isEmpty {
             components.queryItems?.append(URLQueryItem(name: "token", value: token))
         }
-        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Correction Bolus"))
+        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "/Bolus|SMB|Correction%20Bolus/"))
         components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getYesterday()))
 
         if let url = components.url {
@@ -295,6 +296,8 @@ public class ModelData : ObservableObject {
                 }
 
                 if let data = data {
+                    let decode = JSONDecoder()
+                    decode.dateDecodingStrategy = .iso8601WithFractionalSeconds
                     let treatmentData = try! JSONDecoder().decode([TempBasal].self, from: data)
                     DispatchQueue.main.async {
                         completionHandler(treatmentData)
@@ -456,8 +459,15 @@ public class ModelData : ObservableObject {
             baseUrl: baseUrl,
             token: token,
             completionHandler: { entries in
+                let previousLastEntry = self.lastEntry
                 self.entries = filterEntries(entries)
                 self.lastEntry = self.entries.first
+
+                // only reload the widget when a new CGM value arrived, to save the widget's reload budget
+                if let lastEntry = self.lastEntry, lastEntry.id != previousLastEntry?.id || (.now - lastEntry.date) > 300  {
+                    print("reload Widget")
+                    WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
+                }
                 let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
                 self.timeInRange = calcTimeInRange(self.entries.filter { $0.date > startOfTir }, min: 70, max: 180)
             }
@@ -541,24 +551,13 @@ public class ModelData : ObservableObject {
         loadEventType(
             baseUrl: baseUrl,
             token: token,
-            eventType: "Sensor Start",
+            eventType: "/Sensor Start|Sensor Change/",
             days: -14,
             completionHandler: { date in
                 if date != nil {
                     self.sensorChanged = date
                     return
                 }
-
-                // try to load eventType "Sensor Start" when eventType "Sensor Change" couldn't be loaded
-                self.loadEventType(
-                    baseUrl: baseUrl,
-                    token: token,
-                    eventType: "Sensor Change",
-                    days: -14,
-                    completionHandler: { date in
-                        self.sensorChanged = date
-                    }
-                )
             }
         )
 
@@ -618,12 +617,14 @@ public class ModelData : ObservableObject {
         var currentTarget = profile!.target_low.last(where: {(start + $0.timeAsSeconds) < now})!
         
         var factor = 1.0;
-        if (loopData.override.active) {
-            if let multiplier = loopData.override.multiplier {
-                factor = multiplier
-            }
-            if let targetRange = loopData.override.currentCorrectionRange {
-                currentTarget = Target(value: targetRange.minValue, timeAsSeconds: 0)
+        if let override = loopData.override {
+            if (override.active) {
+                if let multiplier = override.multiplier {
+                    factor = multiplier
+                }
+                if let targetRange = override.currentCorrectionRange {
+                    currentTarget = Target(value: targetRange.minValue, timeAsSeconds: 0)
+                }
             }
         }
         
@@ -639,7 +640,7 @@ public class ModelData : ObservableObject {
 
 fileprivate func iso8601() -> ISO8601DateFormatter {
     let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withFullDate, .withFullTime, .withTimeZone]
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
     
     return formatter
 }
@@ -676,24 +677,28 @@ func convertBasalToTempBasal(
     for i in 0..<(basals.count - 1) {
         let currentBasal = basals[i]
         let nextBasal = basals[i + 1]
+        let startDate = startOfDay + currentBasal.timeAsSeconds
         tempBasal.append(
             TempBasal(
                 id: UUID().uuidString,
                 duration: (nextBasal.timeAsSeconds - currentBasal.timeAsSeconds) / 60,
                 rate: currentBasal.value,
-                timestamp: ISO8601DateFormatter().string(from: startOfDay + currentBasal.timeAsSeconds),
-                type: "scheduled"
+                created_at: formatter.string(from: startDate),
+                type: "scheduled",
+                endDate: startDate + (nextBasal.timeAsSeconds - currentBasal.timeAsSeconds)
             )
         )
     }
     let lastBasal = basals.last!
+    let startDate = startOfDay + lastBasal.timeAsSeconds
     tempBasal.append(
         TempBasal(
             id: UUID().uuidString,
             duration: (86400 - lastBasal.timeAsSeconds) / 60,
             rate: lastBasal.value,
-            timestamp: ISO8601DateFormatter().string(from: startOfDay + lastBasal.timeAsSeconds),
-            type: "scheduled"
+            created_at: formatter.string(from: startDate),
+            type: "scheduled",
+            endDate: startDate + (86400 - lastBasal.timeAsSeconds)
         )
     )
     
@@ -723,10 +728,11 @@ func calculateTempBasal(
             // replace with start of chart
             let newFirst = TempBasal(
                 id: UUID().uuidString,
-                duration: Double(Calendar.current.dateComponents([.second], from: startDate, to: first.endDate).second!) / 60,
+                duration: 0,
                 rate: first.rate,
-                timestamp: ISO8601DateFormatter().string(from: startDate),
-                type: "scheduled"
+                created_at: formatter.string(from: startDate),
+                type: "scheduled",
+                endDate: first.endDate
             )
             tempBasal.remove(at: 0)
             tempBasal.insert(newFirst, at: 0)
@@ -738,10 +744,11 @@ func calculateTempBasal(
             // replace with end of chart
             let newLast = TempBasal(
                 id: UUID().uuidString,
-                duration: Double(Calendar.current.dateComponents([.second], from: last.startDate, to: endDate).second!) / 60,
+                duration: 0,
                 rate: last.rate,
-                timestamp: last.timestamp,
-                type: "scheduled"
+                created_at: formatter.string(from: last.startDate),
+                type: "scheduled",
+                endDate: endDate
             )
             tempBasal.remove(at: tempBasal.count - 1)
             tempBasal.append(newLast)
@@ -758,12 +765,32 @@ func calculateResultingBasal(
     endDate: Date
 ) -> [TempBasal] {
     
-    let formatter = ISO8601DateFormatter()
-    
+    var tempBaselWithEndDate = zip(tempBasal.dropFirst(), tempBasal).map { (a: TempBasal, b: TempBasal) in
+        return TempBasal(
+            id: a.id,
+            duration: a.duration,
+            rate: a.rate,
+            created_at: a.created_at,
+            endDate: min(a.startDate + a.duration * 60, b.startDate)
+        )
+        
+    }
+    let first = tempBasal.first!
+    tempBaselWithEndDate.insert(
+        TempBasal(
+            id: first.id,
+            duration: first.duration,
+            rate: first.rate,
+            created_at: first.created_at,
+            endDate: first.startDate + first.duration * 60
+        ),
+        at: 0
+    )
+
     var tempBasalPoints : [TempBasal] = []
     for sb in scheduledBasal {
         
-        let tempWithinCurrentSchedule = tempBasal.filter({
+        let tempWithinCurrentSchedule = tempBaselWithEndDate.filter({
             (sb.startDate ... sb.endDate).contains($0.endDate)
             || (sb.startDate ..< sb.endDate).contains($0.startDate)
         }).sorted(by: {$0.startDate < $1.startDate})
@@ -782,9 +809,10 @@ func calculateResultingBasal(
                 tempBasalPoints.append(
                     TempBasal(
                         id: UUID().uuidString,
-                        duration: Double(Calendar.current.dateComponents([.second], from: sb.startDate, to: tb.endDate).second!) / 60,
+                        duration: 0,
                         rate: tb.rate,
-                        timestamp: formatter.string(from: sb.startDate)
+                        created_at: formatter.string(from: sb.startDate),
+                        endDate: tb.endDate
                     )
                 )
                 lastTempEndDate = tb.endDate
@@ -796,10 +824,11 @@ func calculateResultingBasal(
                 tempBasalPoints.append(
                     TempBasal(
                         id: UUID().uuidString,
-                        duration: (tb.startDate - lastTempEndDate) / 60.0,
+                        duration: 0,
                         rate: sb.rate,
-                        timestamp: formatter.string(from: lastTempEndDate),
-                        type: "scheduled"
+                        created_at: formatter.string(from: lastTempEndDate),
+                        type: "scheduled",
+                        endDate: tb.startDate
                     )
                 )
             }
@@ -814,9 +843,10 @@ func calculateResultingBasal(
                 tempBasalPoints.append(
                     TempBasal(
                         id: UUID().uuidString,
-                        duration: Double(Calendar.current.dateComponents([.second], from: tb.startDate, to: sb.endDate).second!) / 60,
+                        duration: 0,
                         rate: tb.rate,
-                        timestamp: formatter.string(from: tb.startDate)
+                        created_at: formatter.string(from: tb.startDate),
+                        endDate: sb.endDate
                     )
                 )
                 lastTempEndDate = sb.endDate
@@ -827,10 +857,11 @@ func calculateResultingBasal(
             tempBasalPoints.append(
                 TempBasal(
                     id: UUID().uuidString,
-                    duration: Double(Calendar.current.dateComponents([.second], from: lastTempEndDate, to: sb.endDate).second!) / 60,
+                    duration: 0,
                     rate: sb.rate,
-                    timestamp: formatter.string(from: lastTempEndDate),
-                    type: "scheduled"
+                    created_at: formatter.string(from: lastTempEndDate),
+                    type: "scheduled",
+                    endDate: sb.endDate
                 )
             )
         }
@@ -957,4 +988,25 @@ extension Date {
     static func - (lhs: Date, rhs: Date) -> TimeInterval {
         return lhs.timeIntervalSinceReferenceDate - rhs.timeIntervalSinceReferenceDate
     }
+}
+
+extension Formatter {
+   static var customISO8601DateFormatter: ISO8601DateFormatter = {
+      let formatter = ISO8601DateFormatter()
+      formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+      return formatter
+   }()
+}
+
+extension JSONDecoder.DateDecodingStrategy {
+   static var iso8601WithFractionalSeconds = custom { decoder in
+      let dateStr = try decoder.singleValueContainer().decode(String.self)
+      let customIsoFormatter = Formatter.customISO8601DateFormatter
+      if let date = customIsoFormatter.date(from: dateStr) {
+         return date
+      }
+      throw DecodingError.dataCorrupted(
+               DecodingError.Context(codingPath: decoder.codingPath,
+                                     debugDescription: "Invalid date"))
+   }
 }

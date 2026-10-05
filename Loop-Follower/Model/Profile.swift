@@ -17,7 +17,7 @@ struct Profiles : Codable, Identifiable {
     let startDate : String
     let store : [String : Profile]
     let defaultProfile : String
-    let loopSettings : LoopSettings
+    let loopSettings : LoopSettings?
     
     var date : Date {
         return formatter.date(from: startDate)!

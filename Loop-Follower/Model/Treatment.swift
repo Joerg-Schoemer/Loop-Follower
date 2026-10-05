@@ -10,35 +10,41 @@ import Foundation
 struct TempBasal : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id",
-             duration, timestamp, rate
+             duration,
+             created_at,
+             rate
     }
 
     let id : String
 
     let duration : Double
     let rate : Double
-    let timestamp : String
+    let created_at : String
+
     var type : String = "temporary"
+    var endDate : Date = Date()
         
     var startDate : Date {
-        return ISO8601DateFormatter().date(from: timestamp)!
-    }
-
-    var endDate : Date {
-        return startDate + (duration * 60)
+        return formatter.date(from: created_at)!
     }
 }
 
 struct CorrectionBolus : Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case id = "_id",
-             insulin, timestamp, created_at
+             insulin,
+             duration,
+             eventType,
+             timestamp,
+             created_at
     }
 
     let id: String
     let insulin: Double
+    let duration : Double?
     let timestamp: String?
     let created_at: String
+    let eventType: String
     
     var date : Date {
         return formatter.date(from: created_at)!
@@ -46,6 +52,18 @@ struct CorrectionBolus : Codable, Identifiable {
     
     var amount : Measurement<UnitInsulin> {
         return Measurement<UnitInsulin>(value: insulin, unit: .insulin)
+    }
+    
+    var type : String {
+        if let duration = self.duration {
+            return switch Int(duration) {
+            case 0: "Automatic Bolus"
+            case 1: "Bolus"
+            default: eventType
+            }
+        }
+        
+        return eventType
     }
 }
 

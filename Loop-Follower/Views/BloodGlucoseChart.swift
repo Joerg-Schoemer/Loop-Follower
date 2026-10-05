@@ -16,13 +16,9 @@ struct BloodGlucoseChart: View {
         guard let rawSelectedDate else { return nil }
 
         var allEntries : [Entry];
-        if prediction != nil {
-            let p = predictedValues(
-                startDate: prediction!.date,
-                values: prediction!.values
-            )
-
-            allEntries = entries.reversed() + p
+        if let prediction = self.prediction {
+            
+            allEntries = entries.reversed() + prediction
         } else {
             allEntries = entries.reversed()
         }
@@ -38,7 +34,7 @@ struct BloodGlucoseChart: View {
     
     let currentDate : Date?
     
-    let prediction: Predicted?
+    let prediction: [Entry]?
     let insulin : [CorrectionBolus]
     let carbs : [CarbCorrection]
     let entries : [Entry]
@@ -134,16 +130,13 @@ struct BloodGlucoseChart: View {
 
                 if let prediction = prediction {
                     RuleMark(
-                        x: .value("prediction-start", prediction.date)
+                        x: .value("prediction-start", prediction.first!.date)
                     )
                     .lineStyle(StrokeStyle(dash: dashedLineStyle, dashPhase: 3))
                     .foregroundStyle(Color(.systemPurple))
                     
                     ForEach(
-                        predictedValues(
-                            startDate: prediction.date,
-                            values: prediction.values
-                        )
+                        prediction
                     ) { entry in
                         LineMark(
                             x: .value("timestamp", entry.date),
@@ -162,7 +155,7 @@ struct BloodGlucoseChart: View {
                         }
                     }
                 }
-
+                
                 ForEach(mbgs) { mbg in
                     PointMark(
                         x: .value("timestamp", mbg.date),
@@ -248,26 +241,6 @@ struct BloodGlucoseChart: View {
 
 fileprivate let formatter = ISO8601DateFormatter(.withFractionalSeconds)
 
-func predictedValues(startDate: Date, values: [Double]) -> [Entry] {
-    var currentDate = startDate
-    let endDate = Calendar.current.date(byAdding: .hour, value: 3, to: startDate)!
-
-    let predictions : [Entry] = values.map {
-        let entry = Entry(
-            sgv: max(Int($0), 0),
-            id: UUID().uuidString,
-            dateString: formatter.string(from: currentDate)
-        )
-        currentDate = Calendar.current.date(byAdding: .minute, value: 5, to: currentDate)!
-        return entry
-    }
-
-    return Array(
-        predictions.prefix(
-            while: { $0.date <= endDate}
-        )
-    )
-}
 
 func truncateMinutes(date: Date) -> Date {
     let calendar: Calendar = Calendar.current
@@ -279,7 +252,7 @@ struct BloodGlucoseChart_Previews: PreviewProvider {
         let data = ModelData(test: true)
         BloodGlucoseChart(
             currentDate: data.currentDate,
-            prediction: data.currentLoopData?.loop.predicted,
+            prediction: data.currentLoopData?.predicted,
             insulin: data.insulin,
             carbs: data.carbs,
             entries: data.entries,

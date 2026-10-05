@@ -33,7 +33,7 @@ struct ChartsView: View {
 
                     BloodGlucoseChart(
                         currentDate: modelData.currentDate,
-                        prediction: modelData.currentLoopData?.loop.predicted,
+                        prediction: modelData.currentLoopData?.predicted,
                         insulin: modelData.insulin,
                         carbs: modelData.carbs,
                         entries: modelData.entries,
