@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CurrentValueView: View {
     
-    @Binding var currentDate : Date
-    @Binding var currentEntry : Entry?
+    let currentDate : Date
+    let currentEntry : Entry?
 
     @State private var progress = 0.0
 
@@ -178,13 +178,13 @@ struct CurrentValueView_Previews: PreviewProvider {
 
         ScrollView {
             CurrentValueView(
-                currentDate: $currentDate,
-                currentEntry: .constant(Entry(
+                currentDate: currentDate,
+                currentEntry: Entry(
                     sgv: 44,
                     direction: nil,
                     id: "wurscht",
                     dateString: df.string(from: date)
-                )),
+                ),
                 delta: nil,
                 criticalMin: 55,
                 criticalMax: 260,
@@ -197,13 +197,13 @@ struct CurrentValueView_Previews: PreviewProvider {
                 let sgv = sgvs[i]
                 let date = currentDate + Double.random(in: -300 ... -10)
                 CurrentValueView(
-                    currentDate: $currentDate,
-                    currentEntry: .constant(Entry(
+                    currentDate: currentDate,
+                    currentEntry: Entry(
                         sgv: sgv,
                         direction: dir,
                         id: "wurscht",
                         dateString: df.string(from: date)
-                    )),
+                    ),
                     delta: Int.random(in: -10...10),
                     criticalMin: 55,
                     criticalMax: 260,

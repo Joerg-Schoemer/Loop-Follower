@@ -45,8 +45,8 @@ struct MonitorView: View {
                             timeInRange: modelData.timeInRange
                         )
                         CurrentValueView(
-                            currentDate: $modelData.currentDate,
-                            currentEntry: $modelData.lastEntry,
+                            currentDate: modelData.currentDate,
+                            currentEntry: modelData.lastEntry,
                             delta: calcDelta(modelData.entries),
                             criticalMin: criticalMin,
                             criticalMax: criticalMax,

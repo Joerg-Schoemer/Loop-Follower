@@ -10,7 +10,7 @@ import Charts
 
 struct BasalChart: View {
 
-    @Binding var currentDate: Date
+    let currentDate: Date
     let scheduledBasal : [TempBasal]
     let resultingBasal : [TempBasal]
     
@@ -77,7 +77,7 @@ struct BasalChart_Previews: PreviewProvider {
         ]
 
         BasalChart(
-            currentDate: .constant(formatter.date(from: "2023-02-15T05:15:00Z")!),
+            currentDate: formatter.date(from: "2023-02-15T05:15:00Z")!,
             scheduledBasal: sb,
             resultingBasal: rb
         )

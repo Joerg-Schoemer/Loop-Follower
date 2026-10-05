@@ -13,7 +13,7 @@ struct DerivedChart: View {
     var currentDate : Date?
     var hourOfHistory: Int
     
-    @Binding var entries : [Entry]
+    let entries : [Entry]
 
     @State var orientation = UIDevice.current.orientation
     @State var prevOrientation = UIDevice.current.orientation
@@ -109,7 +109,7 @@ struct DerivedChart_Previews: PreviewProvider {
         DerivedChart(
             currentDate: currentDate,
             hourOfHistory: -6,
-            entries: .constant(entries)
+            entries: entries
         )
     }
     

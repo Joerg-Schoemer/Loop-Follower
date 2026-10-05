@@ -9,6 +9,7 @@ import Foundation
 import Combine
 import WidgetKit
 
+@MainActor
 public class ModelData : ObservableObject {
 
     @Published var entries : [Entry] = []
@@ -46,15 +47,22 @@ public class ModelData : ObservableObject {
     private var tempBasal : [TempBasal] = []
 
     init() {
-        _ = load()
+        // Start the first load asynchronously and yield first, so no @Published
+        // change happens while the @StateObject is being created during a view update.
+        Task { @MainActor in
+            await Task.yield()
+            _ = self.load()
+        }
         Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { timer in
-            print("running timer event \(Date.now)")
-            if let nextRun = self.load() {
-                print("rescheduling timer at: \(nextRun)")
-                timer.fireDate = nextRun
-            } else {
-                print("invalidating timer")
-                timer.invalidate()
+            Task { @MainActor in
+                print("running timer event \(Date.now)")
+                if let nextRun = self.load() {
+                    print("rescheduling timer at: \(nextRun)")
+                    timer.fireDate = nextRun
+                } else {
+                    print("invalidating timer")
+                    timer.invalidate()
+                }
             }
         }
     }
@@ -101,87 +109,39 @@ public class ModelData : ObservableObject {
         self.sensorChanged = Calendar.current.date(byAdding: .hour, value: -96, to: Date.now)!
     }
 
-    func loadSgv(baseUrl : String, token : String, completionHandler: @escaping ([Entry]) -> ()) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/entries/sgv.json")
-        else { return }
-
+    func loadSgv() async -> [Entry] {
         let date = Calendar.current.date(byAdding: .hour, value: -48, to: .now)!.timeIntervalSince1970 * 1000
-        components.queryItems = []
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
-        }
-        components.queryItems?.append(URLQueryItem(name: "find[date][$gte]", value: date.description))
-        components.queryItems?.append(URLQueryItem(name: "count", value: "2000"))
+        let queryItems = [
+            URLQueryItem(name: "find[date][$gte]", value: date.description),
+            URLQueryItem(name: "count", value: "2000")
+        ]
 
-        if let url = components.url {
-            URLSession.shared.dataTask(
-                with: url,
-                completionHandler: { data, response, error in
-                    if let error = error {
-                        print("loadSgv: Error with fetching sgv: \(error)")
-                        return
-                    }
-                    
-                    guard let httpResponse = response as? HTTPURLResponse,
-                          (200...299).contains(httpResponse.statusCode) else {
-                        print("loadSgv: Error with the response, unexpected status code: \(String(describing: response))")
-                        return
-                    }
-                    
-                    if let data = data {
-                        let entries = try! JSONDecoder().decode([Entry].self, from: data)
-                        DispatchQueue.main.async {
-                            completionHandler(entries)
-                        }
-                        return
-                    }
-                    print("loadSgv: no data")
-                }
-            ).resume()
-        } else {
-            completionHandler([])
+        do {
+            return try await NightScoutAPI.get(
+                path: "/api/v1/entries/sgv.json",
+                queryItems: queryItems
+            )
+        } catch {
+            print("loadSgv: Error with fetching sgv: \(error)")
+            return []
         }
     }
 
-    func loadMbg(baseUrl : String, token : String, completionHandler: @escaping ([MbgEntry]) -> ()) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/entries/mbg.json")
-        else { return }
-
+    func loadMbg() async -> [MbgEntry] {
         let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!.timeIntervalSince1970 * 1000
-        components.queryItems = []
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
-        }
-        components.queryItems?.append(URLQueryItem(name: "find[date][$gte]", value: date.description))
-        components.queryItems?.append(URLQueryItem(name: "count", value: "1000"))
-        if let url = components.url {
-            URLSession.shared.dataTask(
-                with: url,
-                completionHandler: { data, response, error in
-                    if let error = error {
-                        print("Error with fetching sgv: \(error)")
-                        return
-                    }
-                    
-                    guard let httpResponse = response as? HTTPURLResponse,
-                          (200...299).contains(httpResponse.statusCode) else {
-                        print("Error with the response, unexpected status code: \(String(describing: response))")
-                        return
-                    }
-                    
-                    if let data = data {
-                        let entries = try! JSONDecoder().decode([MbgEntry].self, from: data)
-                        DispatchQueue.main.async {
-                            completionHandler(entries)
-                        }
-                    } else {
-                        print("no data")
-                        return
-                    }
-                }
-            ).resume()
-        } else {
-            completionHandler([])
+        let queryItems = [
+            URLQueryItem(name: "find[date][$gte]", value: date.description),
+            URLQueryItem(name: "count", value: "1000")
+        ]
+
+        do {
+            return try await NightScoutAPI.get(
+                path: "/api/v1/entries/mbg.json",
+                queryItems: queryItems
+            )
+        } catch {
+            print("loadMbg: Error with fetching mbg: \(error)")
+            return []
         }
     }
 
@@ -193,327 +153,149 @@ public class ModelData : ObservableObject {
         return formatter.string(from: Calendar.current.date(byAdding: .hour, value: -48, to: .now)!)
     }
     
-    func loadInsulin(baseUrl : String, token: String, completionHandler: @escaping ([CorrectionBolus]) -> ()) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
-        else { return }
+    func loadInsulin() async -> [CorrectionBolus] {
 
-        components.queryItems = []
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
-        }
-        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "/Bolus|SMB|Correction%20Bolus/"))
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getYesterday()))
-
-        if let url = components.url {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-
-                if let error = error {
-                    print("Error fetching treatments: \(error)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("Error response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-
-                if let data = data {
-                    let treatmentData = try! JSONDecoder().decode([CorrectionBolus].self, from: data)
-                    DispatchQueue.main.async {
-                        completionHandler(treatmentData)
-                    }
-                } else {
-                    print("no data")
-                    return
-                }
-            }).resume()
+        do {
+            return try await NightScoutAPI.get(
+                path: "/api/v1/treatments.json",
+                queryItems: [
+                    URLQueryItem(name: "find[eventType]", value: "/Bolus|SMB|Correction%20Bolus/"),
+                    URLQueryItem(name: "find[created_at][$gte]", value: getYesterday())
+                ]
+            )
+        } catch {
+            print("loadInsulin: Error fetching treatments: \(error)")
+            return []
         }
     }
     
-    func loadCarbs(baseUrl : String, token : String, completionHandler: @escaping ([CarbCorrection]) -> ()) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
-        else { return }
-       
-        components.queryItems = []
-
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
-        }
-        
-        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Carb Correction"))
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getYesterday()))
-        
-        if let url = components.url {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-
-                if let error = error {
-                    print("Error fetching treatments: \(error)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("Error response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-
-                if let data = data {
-                    let treatmentData = try! JSONDecoder().decode([CarbCorrection].self, from: data)
-                    DispatchQueue.main.async {
-                        completionHandler(treatmentData)
-                    }
-                    return
-                }
-                print("loadCarbs no data")
-            }).resume()
+    func loadCarbs() async -> [CarbCorrection] {
+        do {
+            return try await NightScoutAPI.get(
+                path: "/api/v1/treatments.json",
+                queryItems: [
+                    URLQueryItem(name: "find[eventType]", value: "Carb Correction"),
+                    URLQueryItem(name: "find[created_at][$gte]", value: getYesterday())
+                ]
+            )
+        } catch {
+            print("loadCarbs: Error fetching treatments: \(error)")
+            return []
         }
     }
     
-    func loadTempBasal(baseUrl : String, token : String, completionHandler: @escaping ([TempBasal]) -> ()) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
-        else { return }
-        
-        components.queryItems = []
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
-        }
-        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: "Temp Basal"))
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
-
-        if let url = components.url {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-
-                if let error = error {
-                    print("Error fetching treatments: \(error)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("Error response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-
-                if let data = data {
-                    let decode = JSONDecoder()
-                    decode.dateDecodingStrategy = .iso8601WithFractionalSeconds
-                    let treatmentData = try! JSONDecoder().decode([TempBasal].self, from: data)
-                    DispatchQueue.main.async {
-                        completionHandler(treatmentData)
-                    }
-                    return
-                }
-                print("loadTempBasal no data")
-            }).resume()
+    func loadTempBasal() async -> [TempBasal] {
+        do {
+            return try await NightScoutAPI.get(
+                path: "/api/v1/treatments.json",
+                queryItems: [
+                    URLQueryItem(name: "find[eventType]", value: "Temp Basal"),
+                    URLQueryItem(name: "find[created_at][$gte]", value: getStartTime())
+                ]
+            )
+        } catch {
+            print("loadTempBasal: Error fetching treatments: \(error)")
+            return []
         }
     }
     
-    func loadDeviceStatus(baseUrl:String, token: String, completionHandler: @escaping (LoopData?) -> ()) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/devicestatus.json")
-        else { return }
-        
-        components.queryItems = []
-
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
-        }
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()))
-        components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
-        if let url = components.url {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-
-                if let error = error {
-                    print("loadDeviceStatus: Error with fetching devicestatus: \(error)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("loadDeviceStatus: Error with the response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-
-                if let data = data {
-                    let loopData = try! JSONDecoder().decode([LoopData].self, from: data)
-                    if let loopDataFirst = loopData.first {
-                        DispatchQueue.main.async {
-                            completionHandler(loopDataFirst)
-                        }
-                        return
-                    }
-                }
-                print("loadDeviceStatus: no data")
-            }).resume()
+    func loadDeviceStatus() async -> LoopData? {
+        do {
+            let loopData: [LoopData] = try await NightScoutAPI.get(
+                path: "/api/v1/devicestatus.json",
+                queryItems: [
+                    URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()),
+                    URLQueryItem(name: "count", value: "1")
+                ]
+            )
+            return loopData.first
+        } catch {
+            print("loadDeviceStatus: Error with fetching devicestatus: \(error)")
+            return nil
         }
     }
     
-    func loadProfile(baseUrl : String,token : String, completionHandler: @escaping (Profiles?) -> ()) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/profile.json")
-        else { return }
-        
-        components.queryItems = []
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
-        }
-
-        if let url = components.url {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-
-                if let error = error {
-                    print("loadProfile: Error with fetching devicestatus: \(error)")
-                    return
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("loadProfile: Error with the response, unexpected status code: \(String(describing: response))")
-                    return
-                }
-
-                if let data = data {
-                    let profiles = try! JSONDecoder().decode([Profiles].self, from: data)
-                    if let activeProfile = profiles.first {
-                        DispatchQueue.main.async {
-                            completionHandler(activeProfile)
-                        }
-                        return
-                    }
-                }
-
-                print("loadProfile: no data")
-            }).resume()
+    func loadProfile() async -> Profiles? {
+        do {
+            let profiles: [Profiles] = try await NightScoutAPI.get(
+                path: "/api/v1/profile.json",
+                queryItems: []
+            )
+            return profiles.first
+        } catch {
+            print("loadProfile: Error with fetching profile: \(error)")
+            return nil
         }
     }
 
-    func loadEventType(
-        baseUrl : String,
-        token : String,
-        eventType : String,
-        days: Int,
-        completionHandler: @escaping (Date?) -> ()
-    ) {
-        guard var components = URLComponents(string: "\(baseUrl)/api/v1/treatments.json")
-        else { return }
-
+    func loadEventType(eventType : String, days: Int) async -> Date? {
         let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: days, to: .now)!
 
-        components.queryItems = []
-        if !token.isEmpty {
-            components.queryItems?.append(URLQueryItem(name: "token", value: token))
+        let queryItems = [
+            URLQueryItem(name: "find[eventType]", value: eventType),
+            URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)),
+            URLQueryItem(name: "count", value: "1")
+        ]
+
+        do {
+            let treatments: [ChangeEvent] = try await NightScoutAPI.get(
+                path: "/api/v1/treatments.json",
+                queryItems: queryItems
+            )
+            if let first = treatments.first {
+                print("loadEventType: treatment of type \"\(eventType)\" found with \(first.date)")
+                return first.date
+            }
+        } catch {
+            print("loadEventType: Error fetching treatments: \(String(describing: error))")
         }
-        components.queryItems?.append(URLQueryItem(name: "find[eventType]", value: eventType))
-        components.queryItems?.append(URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)))
-        components.queryItems?.append(URLQueryItem(name: "count", value: "1"))
-
-        if let url = components.url {
-            URLSession.shared.dataTask(with: url, completionHandler: { data, response, error in
-
-                if let error = error {
-                    print("loadEventType: Error fetching treatments: \(String(describing: error))")
-                    DispatchQueue.main.async {
-                        completionHandler(nil)
-                    }
-                    return
-                }
-
-                guard let httpResponse = response as? HTTPURLResponse,
-                      (200...299).contains(httpResponse.statusCode) else {
-                    print("loadEventType: Error response, unexpected status code: \(String(describing: response))")
-                    DispatchQueue.main.async {
-                        completionHandler(nil)
-                    }
-                    return
-                }
-
-                if let data = data {
-                    if let treatmentData = (try! JSONDecoder().decode([ChangeEvent].self, from: data)).first {
-                        print("loadEventType: treatment of type \"\(eventType)\" found with \(treatmentData.date)")
-                        DispatchQueue.main.async {
-                            completionHandler(treatmentData.date)
-                        }
-
-                        return
-                    }
-                }
-                print("loadEventType: no treatment of type \"\(eventType)\" found")
-                DispatchQueue.main.async {
-                    completionHandler(nil)
-                }
-            }).resume()
-        }
+        print("loadEventType: no treatment of type \"\(eventType)\" found")
+        return nil
     }
 
     @objc func load() -> Date? {
-        let store = UserDefaults(suiteName: "group.loop.follower")!
-        let baseUrl : String = store.object(forKey: SettingsStore.Keys.url) as? String ?? ""
-        let token : String = store.object(forKey: SettingsStore.Keys.token) as? String ?? ""
         currentDate = Date.now
 
-        if baseUrl.isEmpty {
+        if NightScoutAPI.baseUrl.isEmpty {
             // do nothing when not configured
             return nil
         }
-        
-        loadSgv(
-            baseUrl: baseUrl,
-            token: token,
-            completionHandler: { entries in
-                let previousLastEntry = self.lastEntry
-                self.entries = filterEntries(entries)
-                self.lastEntry = self.entries.first
 
-                // only reload the widget when a new CGM value arrived, to save the widget's reload budget
-                if let lastEntry = self.lastEntry, lastEntry.id != previousLastEntry?.id || (.now - lastEntry.date) > 300  {
-                    print("reload Widget")
-                    WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
-                }
-                let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
-                self.timeInRange = calcTimeInRange(self.entries.filter { $0.date > startOfTir }, min: 70, max: 180)
+        Task { @MainActor in
+            let previousLastEntry = self.lastEntry
+            let entries = await self.loadSgv()
+            self.entries = filterEntries(entries)
+            self.lastEntry = self.entries.first
+
+            // only reload the widget when a new CGM value arrived, to save the widget's reload budget
+            if let lastEntry = self.lastEntry, lastEntry.id != previousLastEntry?.id {
+                print("reload Widget")
+                WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
             }
-        )
-        loadMbg(
-            baseUrl: baseUrl,
-            token: token,
-            completionHandler: { entries in
-                self.mgbs = entries
-            }
-        )
-        loadDeviceStatus(
-            baseUrl: baseUrl,
-            token: token,
-            completionHandler: { loopData in
-                self.currentLoopData = loopData
-            }
-        )
-        loadInsulin(
-            baseUrl: baseUrl,
-            token: token,
-            completionHandler: { correctionBolus in
-                self.insulin = correctionBolus
-            }
-        )
-        loadCarbs(
-            baseUrl: baseUrl,
-            token: token,
-            completionHandler:  { carbCorrections in
-                self.carbs = carbCorrections
-            }
-        )
-        loadTempBasal(
-            baseUrl: baseUrl,
-            token: token,
-            completionHandler:  { tempBasal in
-                self.tempBasal = tempBasal
-            }
-        )
-        loadProfile(
-            baseUrl: baseUrl,
-            token: token,
-            completionHandler: { profiles in
+            let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
+            self.timeInRange = calcTimeInRange(self.entries.filter { $0.date > startOfTir }, min: 70, max: 180)
+        }
+        Task { @MainActor in
+            self.mgbs = await self.loadMbg()
+            self.currentLoopData = await self.loadDeviceStatus()
+
+            async let insulin = self.loadInsulin()
+            async let carbs = self.loadCarbs()
+            async let tempBasal = self.loadTempBasal()
+            async let siteChanged = self.loadEventType(eventType: "Site Change", days: -5)
+            async let sensorChanged = self.loadEventType(eventType: "/Sensor Start|Sensor Change/", days: -14)
+
+            self.insulin = await insulin
+            self.carbs = await carbs
+            self.tempBasal = await tempBasal
+            self.siteChanged = await siteChanged
+            self.sensorChanged = await sensorChanged
+
+            let profile = await self.loadProfile()
+            if let profile = profile {
                 let currentDate = Date.now
                 let startDate = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: currentDate)!
-                
+
                 let endDate: Date
                 if self.currentLoopData != nil {
                     endDate = Calendar.current.date(byAdding: .hour, value: 3, to: currentDate)!
@@ -521,9 +303,9 @@ public class ModelData : ObservableObject {
                     endDate = currentDate
                 }
 
-                self.profile = profiles!.store[profiles!.defaultProfile]!
+                self.profile = profile.store[profile.defaultProfile]!
 
-                self.loopSettings = profiles!.loopSettings
+                self.loopSettings = profile.loopSettings
 
                 self.scheduledBasal = calculateTempBasal(
                     basals: self.profile!.basal,
@@ -538,28 +320,7 @@ public class ModelData : ObservableObject {
                     endDate: endDate
                 ).sorted(by: {$0.startDate < $1.startDate})
             }
-        )
-        loadEventType(
-            baseUrl: baseUrl,
-            token: token,
-            eventType: "Site Change",
-            days: -5,
-            completionHandler: { date in
-                self.siteChanged = date
-            }
-        )
-        loadEventType(
-            baseUrl: baseUrl,
-            token: token,
-            eventType: "/Sensor Start|Sensor Change/",
-            days: -14,
-            completionHandler: { date in
-                if date != nil {
-                    self.sensorChanged = date
-                    return
-                }
-            }
-        )
+        }
 
         if let lastEntry = self.lastEntry {
             
