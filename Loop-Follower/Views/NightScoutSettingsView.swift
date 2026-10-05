@@ -47,7 +47,7 @@ struct NightScoutSettingsView: View {
                 }
             }
             
-        }.navigationBarTitle("Settings")
+        }.navigationTitle("Settings")
     }
 }
 

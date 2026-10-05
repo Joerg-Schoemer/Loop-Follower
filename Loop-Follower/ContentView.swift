@@ -10,47 +10,51 @@ import SwiftUI
 struct ContentView: View {
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             MonitorView()
                 .toolbar {
-                    ToolbarItemGroup(placement: .bottomBar) {
-                        NavigationLink(
-                            destination: {
-                                InsulinListView()
-                            },
-                            label: {
-                                Image(systemName: "syringe")
-                            }
-                        )
-                        NavigationLink(
-                            destination: {
-                                CarbonListView()
-                            },
-                            label: {
-                                Image(systemName: "fork.knife")
-                            }
-                        )
-                        NavigationLink(
-                            destination: {
-                                ProfileView()
-                            },
-                            label: {
-                                Image(systemName: "slider.horizontal.3")
-                            }
-                        )
-                        Spacer()
-                        NavigationLink(
-                            destination: {
-                                NightScoutSettingsView()
-                            },
-                            label: {
-                                Image(systemName: "gear")
-                            }
-                        )
-                    }
+                    bottomToolbar
                 }
-                .navigationBarHidden(true)
-                .navigationTitle("Overview")
+        }
+        .navigationBarHidden(true)
+        .navigationTitle("Overview")
+    }
+
+    var bottomToolbar: some ToolbarContent {
+        ToolbarItemGroup(placement: .bottomBar) {
+            NavigationLink(
+                destination: {
+                    InsulinListView()
+                },
+                label: {
+                    Image(systemName: "syringe")
+                }
+            )
+            NavigationLink(
+                destination: {
+                    CarbonListView()
+                },
+                label: {
+                    Image(systemName: "fork.knife")
+                }
+            )
+            NavigationLink(
+                destination: {
+                    ProfileView()
+                },
+                label: {
+                    Image(systemName: "slider.horizontal.3")
+                }
+            )
+            Spacer()
+            NavigationLink(
+                destination: {
+                    NightScoutSettingsView()
+                },
+                label: {
+                    Image(systemName: "gear")
+                }
+            )
         }
     }
 }

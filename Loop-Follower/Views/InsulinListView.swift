@@ -40,7 +40,7 @@ struct InsulinListView: View {
                 .font(.headline)
             }
         }
-        .navigationBarTitle("Insulin")
+        .navigationTitle("Insulin")
     }
     
     var sum : Measurement<UnitInsulin> {

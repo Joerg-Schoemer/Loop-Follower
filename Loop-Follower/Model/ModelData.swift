@@ -45,15 +45,11 @@ public class ModelData : ObservableObject {
     let hourOfHistory : Int = -6
     
     private var tempBasal : [TempBasal] = []
+    
+    private var isReloading = false
 
     init() {
-        // Start the first load asynchronously and yield first, so no @Published
-        // change happens while the @StateObject is being created during a view update.
-        Task { @MainActor in
-            await Task.yield()
-            _ = self.load()
-        }
-        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { timer in
+        Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { timer in
             Task { @MainActor in
                 print("running timer event \(Date.now)")
                 if let nextRun = self.load() {
@@ -243,7 +239,6 @@ public class ModelData : ObservableObject {
                 queryItems: queryItems
             )
             if let first = treatments.first {
-                print("loadEventType: treatment of type \"\(eventType)\" found with \(first.date)")
                 return first.date
             }
         } catch {
@@ -253,87 +248,107 @@ public class ModelData : ObservableObject {
         return nil
     }
 
-    @objc func load() -> Date? {
-        currentDate = Date.now
+    @MainActor
+    func reloadData() async {
+        guard !isReloading else { return }
+        isReloading = true
+        defer { isReloading = false }
 
+        let previousLastEntry = self.lastEntry
+        let entries = await self.loadSgv()
+        self.currentDate = Date.now
+        self.entries = filterEntries(entries)
+        self.lastEntry = self.entries.first
+
+        // only reload the widget when a new CGM value arrived, to save the widget's reload budget
+        if let lastEntry = self.lastEntry, lastEntry.id != previousLastEntry?.id {
+            print("reload Widget")
+            WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
+        }
+        let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
+        self.timeInRange = calcTimeInRange(self.entries.filter { $0.date > startOfTir }, min: 70, max: 180)
+
+        self.mgbs = await self.loadMbg()
+        self.currentLoopData = await self.loadDeviceStatus()
+
+        async let insulin = self.loadInsulin()
+        async let carbs = self.loadCarbs()
+        async let tempBasal = self.loadTempBasal()
+        async let siteChanged = self.loadEventType(eventType: "Site Change", days: -5)
+        async let sensorChanged = self.loadEventType(eventType: "/Sensor Start|Sensor Change/", days: -14)
+
+        self.insulin = await insulin
+        self.carbs = await carbs
+        self.tempBasal = await tempBasal
+        self.siteChanged = await siteChanged
+        self.sensorChanged = await sensorChanged
+
+        let profile = await self.loadProfile()
+        if let profile = profile {
+            let startDate = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: self.currentDate)!
+
+            let endDate: Date
+            if self.currentLoopData != nil {
+                endDate = Calendar.current.date(byAdding: .hour, value: 3, to: self.currentDate)!
+            } else {
+                endDate = self.currentDate
+            }
+
+            self.profile = profile.store[profile.defaultProfile]!
+
+            self.loopSettings = profile.loopSettings
+
+            self.scheduledBasal = calculateTempBasal(
+                basals: self.profile!.basal,
+                startDate: startDate,
+                endDate: endDate
+            )
+
+            self.resultingBasal = calculateResultingBasal(
+                tempBasal: self.tempBasal,
+                scheduledBasal: self.scheduledBasal,
+                startDate: startDate,
+                endDate: endDate
+            ).sorted(by: {$0.startDate < $1.startDate})
+        }
+    }
+
+    func refresh() async {
+        // Run the load in an unstructured @MainActor task so that cancellation
+        // of the calling (refreshable) task does not cancel the underlying
+        // network requests (which would surface as NSURLErrorCancelled / -999).
+        await withUnsafeContinuation { (continuation: UnsafeContinuation<Void, Never>) in
+            Task { @MainActor in
+                await reloadData()
+                continuation.resume()
+            }
+        }
+    }
+
+    @objc func load() -> Date? {
         if NightScoutAPI.baseUrl.isEmpty {
             // do nothing when not configured
             return nil
         }
 
         Task { @MainActor in
-            let previousLastEntry = self.lastEntry
-            let entries = await self.loadSgv()
-            self.entries = filterEntries(entries)
-            self.lastEntry = self.entries.first
-
-            // only reload the widget when a new CGM value arrived, to save the widget's reload budget
-            if let lastEntry = self.lastEntry, lastEntry.id != previousLastEntry?.id {
-                print("reload Widget")
-                WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
-            }
-            let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
-            self.timeInRange = calcTimeInRange(self.entries.filter { $0.date > startOfTir }, min: 70, max: 180)
+            await reloadData()
         }
-        Task { @MainActor in
-            self.mgbs = await self.loadMbg()
-            self.currentLoopData = await self.loadDeviceStatus()
 
-            async let insulin = self.loadInsulin()
-            async let carbs = self.loadCarbs()
-            async let tempBasal = self.loadTempBasal()
-            async let siteChanged = self.loadEventType(eventType: "Site Change", days: -5)
-            async let sensorChanged = self.loadEventType(eventType: "/Sensor Start|Sensor Change/", days: -14)
-
-            self.insulin = await insulin
-            self.carbs = await carbs
-            self.tempBasal = await tempBasal
-            self.siteChanged = await siteChanged
-            self.sensorChanged = await sensorChanged
-
-            let profile = await self.loadProfile()
-            if let profile = profile {
-                let currentDate = Date.now
-                let startDate = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: currentDate)!
-
-                let endDate: Date
-                if self.currentLoopData != nil {
-                    endDate = Calendar.current.date(byAdding: .hour, value: 3, to: currentDate)!
-                } else {
-                    endDate = currentDate
-                }
-
-                self.profile = profile.store[profile.defaultProfile]!
-
-                self.loopSettings = profile.loopSettings
-
-                self.scheduledBasal = calculateTempBasal(
-                    basals: self.profile!.basal,
-                    startDate: startDate,
-                    endDate: endDate
-                )
-
-                self.resultingBasal = calculateResultingBasal(
-                    tempBasal: self.tempBasal,
-                    scheduledBasal: self.scheduledBasal,
-                    startDate: startDate,
-                    endDate: endDate
-                ).sorted(by: {$0.startDate < $1.startDate})
-            }
-        }
+        let now = Date.now
 
         if let lastEntry = self.lastEntry {
             
             let calendar = Calendar.current
             let timeComponents = calendar.dateComponents([.hour, .minute, .second], from: lastEntry.date)
-            let nowComponents = calendar.dateComponents([.hour, .minute, .second], from: currentDate)
+            let nowComponents = calendar.dateComponents([.hour, .minute, .second], from: now)
             let difference = calendar.dateComponents([.second], from: timeComponents, to: nowComponents).second!
 
             if difference > 300 {
                 return Calendar.current.date(
                     byAdding: .second,
                     value: 10,
-                    to: currentDate
+                    to: now
                 )!
             }
             
@@ -343,7 +358,7 @@ public class ModelData : ObservableObject {
                 to: lastEntry.date
             )!
 
-            while nextRun < currentDate {
+            while nextRun < now {
                 nextRun = Calendar.current.date(
                     byAdding: .minute,
                     value: 1,
@@ -360,7 +375,7 @@ public class ModelData : ObservableObject {
         return Calendar.current.date(
             byAdding: .second,
             value: 10,
-            to: currentDate
+            to: now
         )!
     }
     
@@ -525,6 +540,12 @@ func calculateResultingBasal(
     startDate: Date,
     endDate: Date
 ) -> [TempBasal] {
+    
+    // Without any temp basals there is nothing to combine, the result is
+    // simply the scheduled basal. Avoid force-unwrapping on empty arrays.
+    guard !tempBasal.isEmpty else {
+        return scheduledBasal
+    }
     
     var tempBaselWithEndDate = zip(tempBasal.dropFirst(), tempBasal).map { (a: TempBasal, b: TempBasal) in
         return TempBasal(

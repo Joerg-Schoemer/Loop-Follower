@@ -21,52 +21,39 @@ struct ChartsView: View {
     @EnvironmentObject var modelData : ModelData
     
     var body: some View {
-        GeometryReader { proxy in
-            TabView(selection: $selection) {
-                Group {
-                    DerivedChart(
-                        currentDate: modelData.currentDate,
-                        hourOfHistory: modelData.hourOfHistory,
-                        entries: modelData.entries
-                    )
-                    .tag("derived")
-
-                    BloodGlucoseChart(
-                        currentDate: modelData.currentDate,
-                        prediction: modelData.currentLoopData?.predicted,
-                        insulin: modelData.insulin,
-                        carbs: modelData.carbs,
-                        entries: modelData.entries,
-                        mbgs: modelData.mgbs,
-                        hourOfHistory: modelData.hourOfHistory,
-                        criticalMin: criticalMin,
-                        criticalMax: criticalMax,
-                        rangeMin: rangeMin,
-                        rangeMax: rangeMax
-                    )
-                    .tag("BG")
-                    
-                    BasalChart(
-                        currentDate: modelData.currentDate,
-                        scheduledBasal: modelData.scheduledBasal,
-                        resultingBasal: modelData.resultingBasal
-                    )
-                    .tag("basal")
-                }
-                .rotationEffect(.degrees(-90))
-                .frame(
-                    width: proxy.size.width,
-                    height: proxy.size.height
+        TabView(selection: $selection) {
+            Group {
+                DerivedChart(
+                    currentDate: modelData.currentDate,
+                    hourOfHistory: modelData.hourOfHistory,
+                    entries: modelData.entries
                 )
+                .tag("derived")
+
+                BloodGlucoseChart(
+                    currentDate: modelData.currentDate,
+                    prediction: modelData.currentLoopData?.predicted,
+                    insulin: modelData.insulin,
+                    carbs: modelData.carbs,
+                    entries: modelData.entries,
+                    mbgs: modelData.mgbs,
+                    hourOfHistory: modelData.hourOfHistory,
+                    criticalMin: criticalMin,
+                    criticalMax: criticalMax,
+                    rangeMin: rangeMin,
+                    rangeMax: rangeMax
+                )
+                .tag("BG")
+                
+                BasalChart(
+                    currentDate: modelData.currentDate,
+                    scheduledBasal: modelData.scheduledBasal,
+                    resultingBasal: modelData.resultingBasal
+                )
+                .tag("basal")
             }
-            .frame(
-                width: proxy.size.height, // Height & width swap
-                height: proxy.size.width
-            )
-            .rotationEffect(.degrees(90), anchor: .topLeading)
-            .offset(x: proxy.size.width) // Offset back into screens bounds
-            .tabViewStyle(.page(indexDisplayMode: .never))
         }
+        .tabViewStyle(.page(indexDisplayMode: .never))
     }
 }
 

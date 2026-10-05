@@ -21,7 +21,9 @@ struct CurrentValueView: View {
 
     let rangeMin : Int
     let rangeMax : Int
-    
+
+    @State private var progressTimer : Timer?
+
     fileprivate func formatDelta() -> String {
         if let delta = self.delta {
             if delta == 0 {
@@ -82,9 +84,15 @@ struct CurrentValueView: View {
                     .font(.system(size: 72, weight: .bold, design: .default))
                     .onAppear {
                         progress = progressValue()
-                        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
+                        let timer = Timer(timeInterval: 5, repeats: true) { _ in
                             progress = progressValue()
                         }
+                        RunLoop.main.add(timer, forMode: .common)
+                        progressTimer = timer
+                    }
+                    .onDisappear {
+                        progressTimer?.invalidate()
+                        progressTimer = nil
                     }
                     .onChange(of: self.currentEntry!) { oldValue, value in
                         progress = progressValue()
@@ -124,8 +132,7 @@ struct CurrentValueView: View {
     }
     
     private func progressValue() -> Double {
-        let diff = min(Date.now - currentEntry!.date, 300)
-        return diff
+        return min(Date.now - currentEntry!.date, 300)
     }
 }
 

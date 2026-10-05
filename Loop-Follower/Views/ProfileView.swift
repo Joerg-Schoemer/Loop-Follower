@@ -82,7 +82,7 @@ struct ProfileView: View {
                 .indexViewStyle(.page(backgroundDisplayMode: .always))
             }
         }
-        .navigationBarTitle("Profile")
+        .navigationTitle("Profile")
     }
 }
 

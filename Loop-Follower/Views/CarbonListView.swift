@@ -39,7 +39,7 @@ struct CarbonListView: View {
                 }.padding(.horizontal, 20)
             }
         }
-        .navigationBarTitle("Carbs")
+        .navigationTitle("Carbs")
     }
     
     var carbs : [Node<CarbCorrection>] {

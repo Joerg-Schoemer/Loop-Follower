@@ -10,8 +10,7 @@ import SwiftUI
 struct MonitorView: View {
     
     @EnvironmentObject var modelData : ModelData
-    @State var orientation = UIDevice.current.orientation
-    @State var prevOrientation = UIDevice.current.orientation
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @State var tabSelection : String = "BG"
 
     let criticalMax : Int = 260
@@ -20,42 +19,10 @@ struct MonitorView: View {
     let rangeMin : Int = 70
     let rangeMax : Int = 180
 
-    let orientationChanged = NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)
-        .makeConnectable()
-        .autoconnect()
-    
     var body: some View {
-        Group {
-            if orientation.isLandscape || prevOrientation.isLandscape && orientation.isFlat {
-                ChartsView(
-                    criticalMin: criticalMin,
-                    criticalMax: criticalMax,
-                    rangeMin: rangeMin,
-                    rangeMax: rangeMax,
-                    selection: $tabSelection
-                )
-            } else {
-                VStack(spacing: 0) {
-                    ZStack {
-                        LoopParameterView(
-                            loopData: modelData.currentLoopData,
-                            cn: modelData.cn,
-                            siteChanged: modelData.siteChanged,
-                            sensorChanged: modelData.sensorChanged,
-                            timeInRange: modelData.timeInRange
-                        )
-                        CurrentValueView(
-                            currentDate: modelData.currentDate,
-                            currentEntry: modelData.lastEntry,
-                            delta: calcDelta(modelData.entries),
-                            criticalMin: criticalMin,
-                            criticalMax: criticalMax,
-                            rangeMin: rangeMin,
-                            rangeMax: rangeMax
-                        )
-                        .scaleEffect(0.707)
-                    }
-
+        ScrollView {
+            Group {
+                if verticalSizeClass == .compact {
                     ChartsView(
                         criticalMin: criticalMin,
                         criticalMax: criticalMax,
@@ -63,13 +30,44 @@ struct MonitorView: View {
                         rangeMax: rangeMax,
                         selection: $tabSelection
                     )
+                } else {
+                    VStack(spacing: 0) {
+                        ZStack {
+                            LoopParameterView(
+                                loopData: modelData.currentLoopData,
+                                cn: modelData.cn,
+                                siteChanged: modelData.siteChanged,
+                                sensorChanged: modelData.sensorChanged,
+                                timeInRange: modelData.timeInRange
+                            )
+                            CurrentValueView(
+                                currentDate: modelData.currentDate,
+                                currentEntry: modelData.lastEntry,
+                                delta: calcDelta(modelData.entries),
+                                criticalMin: criticalMin,
+                                criticalMax: criticalMax,
+                                rangeMin: rangeMin,
+                                rangeMax: rangeMax
+                            )
+                            .scaleEffect(0.707)
+                        }
+
+                        ChartsView(
+                            criticalMin: criticalMin,
+                            criticalMax: criticalMax,
+                            rangeMin: rangeMin,
+                            rangeMax: rangeMax,
+                            selection: $tabSelection
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    .padding([.leading, .trailing])
                 }
-                .padding([.leading, .trailing])
             }
+            .containerRelativeFrame(.vertical, count: 1, span: 1, spacing: 0)
         }
-        .onReceive(orientationChanged) { _ in
-            self.prevOrientation = self.orientation
-            self.orientation = UIDevice.current.orientation
+        .refreshable {
+            await modelData.refresh()
         }
     }
     
