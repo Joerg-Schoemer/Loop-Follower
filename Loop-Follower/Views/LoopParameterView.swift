@@ -31,6 +31,7 @@ struct LoopParameterView: View {
 
         VStack {
             Group {
+                Spacer()
                 if let siteChanged = self.siteChanged {
                     LoopParameterValue(
                         label: NSLocalizedString("CAGE", comment: "Canula age"),
@@ -68,6 +69,7 @@ struct LoopParameterView: View {
                             label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
                             data: predictedMinMax(loop.predicted?.values))
                     }
+                    Spacer()
                     Divider()
                     LoopParameterBatteryView(
                         label: NSLocalizedString("Battery", comment: "Battery"),
@@ -85,6 +87,7 @@ struct LoopParameterView: View {
                         label: NSLocalizedString("TIR last 24h", comment: "Time In Range"),
                         data: (Double(timeInRange) / 1000).formatted(.percent.precision(.fractionLength(1...1))))
                 }
+                Spacer()
             }
                 
         }

@@ -205,32 +205,6 @@ public class ModelData : ObservableObject {
         }
     }
 
-    func loadEventType(eventType : String, days: Int) async -> Date? {
-        let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: days, to: .now)!
-
-        let queryItems = [
-            URLQueryItem(name: "find[eventType]", value: eventType),
-            URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)),
-            URLQueryItem(name: "count", value: "1")
-        ]
-
-        do {
-            let treatments: [ChangeEvent] = try await NightScoutAPI.get(
-                path: "/api/v1/treatments.json",
-                queryItems: queryItems
-            )
-            if let first = treatments.first {
-                return first.date
-            }
-
-            print("loadEventType: no treatment of type \"\(eventType)\" found")
-            return nil
-        } catch {
-            print("loadEventType: Error fetching treatments: \(String(describing: error))")
-            return nil
-        }
-    }
-
     @MainActor
     func reloadData() async {
         guard !isReloading else { return }
@@ -260,8 +234,8 @@ public class ModelData : ObservableObject {
         async let insulin = self.loadInsulin()
         async let carbs = self.loadCarbs()
         async let tempBasal = self.loadTempBasal()
-        async let siteChanged = self.loadEventType(eventType: "Site Change", days: -5)
-        async let sensorChanged = self.loadEventType(eventType: "/Sensor Start|Sensor Change/", days: -14)
+        async let siteChanged = NightScoutAPI.ageOf(eventType: "Site Change", days: -5)
+        async let sensorChanged = NightScoutAPI.ageOf(eventType: "/Sensor Start|Sensor Change/", days: -14)
 
         self.insulin = await insulin
         self.carbs = await carbs
@@ -399,15 +373,6 @@ public class ModelData : ObservableObject {
         )
     }
 }
-
-fileprivate func iso8601() -> ISO8601DateFormatter {
-    let formatter = ISO8601DateFormatter()
-    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-    
-    return formatter
-}
-
-fileprivate let formatter : ISO8601DateFormatter = iso8601()
 
 func initLoad<T: Decodable>(_ filename: String) -> T {
     let data: Data
@@ -689,14 +654,27 @@ extension Formatter {
 }
 
 extension JSONDecoder.DateDecodingStrategy {
-   static var iso8601WithFractionalSeconds = custom { decoder in
-      let dateStr = try decoder.singleValueContainer().decode(String.self)
-      let customIsoFormatter = Formatter.customISO8601DateFormatter
-      if let date = customIsoFormatter.date(from: dateStr) {
-         return date
-      }
-      throw DecodingError.dataCorrupted(
-               DecodingError.Context(codingPath: decoder.codingPath,
-                                     debugDescription: "Invalid date"))
-   }
+    static var iso8601WithFractionalSeconds = custom { decoder in
+        let dateStr = try decoder.singleValueContainer().decode(String.self)
+        let customIsoFormatter = Formatter.customISO8601DateFormatter
+        if let date = customIsoFormatter.date(from: dateStr) {
+            return date
+        }
+        throw DecodingError.dataCorrupted(
+            DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: "Invalid date"
+            )
+        )
+    }
 }
+
+fileprivate func iso8601() -> ISO8601DateFormatter {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    
+    return formatter
+}
+
+fileprivate let formatter : ISO8601DateFormatter = iso8601()
+

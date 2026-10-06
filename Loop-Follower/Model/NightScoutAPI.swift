@@ -78,4 +78,39 @@ struct NightScoutAPI {
             ]
         )
     }
+
+    static func ageOf(eventType : String, days: Int) async -> Date? {
+        let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: days, to: .now)!
+
+        let queryItems = [
+            URLQueryItem(name: "find[eventType]", value: eventType),
+            URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)),
+            URLQueryItem(name: "count", value: "1")
+        ]
+
+        do {
+            let treatments: [ChangeEvent] = try await NightScoutAPI.get(
+                path: "/api/v1/treatments.json",
+                queryItems: queryItems
+            )
+            if let first = treatments.first {
+                return first.date
+            }
+
+            print("loadEventType: no treatment of type \"\(eventType)\" found")
+            return nil
+        } catch {
+            print("loadEventType: Error fetching treatments: \(String(describing: error))")
+            return nil
+        }
+    }
 }
+
+fileprivate func iso8601() -> ISO8601DateFormatter {
+    let formatter = ISO8601DateFormatter()
+    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+    
+    return formatter
+}
+
+fileprivate let formatter : ISO8601DateFormatter = iso8601()
