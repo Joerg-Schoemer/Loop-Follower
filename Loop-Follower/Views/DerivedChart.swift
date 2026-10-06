@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Charts
+import Combine
 
 struct DerivedChart: View {
     
@@ -30,13 +31,13 @@ struct DerivedChart: View {
 
     var body: some View {
 
-        let velocity = derive(entries.filter({ c in
+        let velocities = derive(entries.filter({ c in
             if let currentDate = currentDate {
                 return c.date >= Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: currentDate)!
             }
             return false
-        }), "veloc")
-        let acceleration = derive(velocity, "accel")
+        }))
+        let accelerations = derive(velocities)
 
         VStack {
             Text("Derived")
@@ -56,7 +57,7 @@ struct DerivedChart: View {
                     .foregroundStyle(Color(.systemFill))
                     */
                 }
-                ForEach(velocity) { velocity in
+                ForEach(velocities) { velocity in
                     BarMark(
                         x: .value("timestamp", velocity.date),
                         y: .value("BG", velocity.sgv),
@@ -64,7 +65,7 @@ struct DerivedChart: View {
                     )
                     .foregroundStyle(by: .value("category", "velocity"))
                 }
-                ForEach(acceleration) { acceleration in
+                ForEach(accelerations) { acceleration in
                     BarMark(
                         x: .value("timestamp", acceleration.date),
                         y: .value("BG", acceleration.sgv),
@@ -135,13 +136,18 @@ struct DerivedChart_Previews: PreviewProvider {
 
 }
 
-func derive(_ values: [Entry], _ name: String) -> [Entry] {
-    return zip(values.dropFirst(), values).map {
+func derive(_ values: [Entry]) -> [Entry] {
+    if values.isEmpty {
+        return [];
+    }
+
+    return zip(values.dropFirst(), values).map { older, newer in
+
         return Entry(
-            sgv: $1.sgv - $0.sgv,
+            sgv: (newer.sgv - older.sgv) * 5 / Int((newer.date - older.date) / 60),
+            delta: Int((newer.date - older.date) / 60),
             id: UUID().uuidString,
-            dateString: $1.dateString
+            dateString: newer.dateString
         )
     }
 }
-

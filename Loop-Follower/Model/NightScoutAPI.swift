@@ -65,4 +65,17 @@ struct NightScoutAPI {
         let usedDecoder = decoder ?? JSONDecoder()
         return try usedDecoder.decode(T.self, from: data)
     }
+    
+    static func treatments<T: Decodable>(
+        _ type : String,
+        _ startDate : String
+    ) async throws -> T {
+        return try await NightScoutAPI.get(
+            path: "/api/v1/treatments.json",
+            queryItems: [
+                URLQueryItem(name: "find[eventType]", value: type),
+                URLQueryItem(name: "find[created_at][$gte]", value: startDate)
+            ]
+        )
+    }
 }

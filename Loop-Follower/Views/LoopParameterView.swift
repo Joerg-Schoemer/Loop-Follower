@@ -68,7 +68,6 @@ struct LoopParameterView: View {
                             label: NSLocalizedString("Min/Max/in 6h", comment: "Predicted [Min/Max/in 6h] sgv"),
                             data: predictedMinMax(loop.predicted?.values))
                     }
-                    Spacer()
                     Divider()
                     LoopParameterBatteryView(
                         label: NSLocalizedString("Battery", comment: "Battery"),

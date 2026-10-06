@@ -150,15 +150,8 @@ public class ModelData : ObservableObject {
     }
     
     func loadInsulin() async -> [CorrectionBolus] {
-
         do {
-            return try await NightScoutAPI.get(
-                path: "/api/v1/treatments.json",
-                queryItems: [
-                    URLQueryItem(name: "find[eventType]", value: "/Bolus|SMB|Correction%20Bolus/"),
-                    URLQueryItem(name: "find[created_at][$gte]", value: getYesterday())
-                ]
-            )
+            return try await NightScoutAPI.treatments("/Bolus|SMB|Correction%20Bolus/", getYesterday())
         } catch {
             print("loadInsulin: Error fetching treatments: \(error)")
             return []
@@ -167,13 +160,7 @@ public class ModelData : ObservableObject {
     
     func loadCarbs() async -> [CarbCorrection] {
         do {
-            return try await NightScoutAPI.get(
-                path: "/api/v1/treatments.json",
-                queryItems: [
-                    URLQueryItem(name: "find[eventType]", value: "Carb Correction"),
-                    URLQueryItem(name: "find[created_at][$gte]", value: getYesterday())
-                ]
-            )
+            return try await NightScoutAPI.treatments("Carb Correction", getYesterday())
         } catch {
             print("loadCarbs: Error fetching treatments: \(error)")
             return []
@@ -182,13 +169,7 @@ public class ModelData : ObservableObject {
     
     func loadTempBasal() async -> [TempBasal] {
         do {
-            return try await NightScoutAPI.get(
-                path: "/api/v1/treatments.json",
-                queryItems: [
-                    URLQueryItem(name: "find[eventType]", value: "Temp Basal"),
-                    URLQueryItem(name: "find[created_at][$gte]", value: getStartTime())
-                ]
-            )
+            return try await NightScoutAPI.treatments("Temp Basal", getStartTime())
         } catch {
             print("loadTempBasal: Error fetching treatments: \(error)")
             return []
@@ -241,11 +222,13 @@ public class ModelData : ObservableObject {
             if let first = treatments.first {
                 return first.date
             }
+
+            print("loadEventType: no treatment of type \"\(eventType)\" found")
+            return nil
         } catch {
             print("loadEventType: Error fetching treatments: \(String(describing: error))")
+            return nil
         }
-        print("loadEventType: no treatment of type \"\(eventType)\" found")
-        return nil
     }
 
     @MainActor
