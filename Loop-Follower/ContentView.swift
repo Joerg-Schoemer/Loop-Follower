@@ -9,11 +9,15 @@ import SwiftUI
 
 struct ContentView: View {
 
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
     var body: some View {
         NavigationStack {
             MonitorView()
                 .toolbar {
-                    bottomToolbar
+                    if verticalSizeClass != .compact {
+                        bottomToolbar
+                    }
                 }
         }
         .navigationBarHidden(true)

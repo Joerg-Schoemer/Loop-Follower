@@ -14,6 +14,10 @@ struct CurrentValueView: View {
 
     @State private var progress = 0.0
 
+    // Anchor date of the currently displayed CGM value, kept in @State so the
+    // timer does not depend on a captured (stale) copy of `self.currentEntry`.
+    @State private var currentEntryDate = Date.now
+
     let delta : Int?
 
     let criticalMin : Int
@@ -83,9 +87,13 @@ struct CurrentValueView: View {
                     }
                     .font(.system(size: 72, weight: .bold, design: .default))
                     .onAppear {
-                        progress = progressValue()
-                        let timer = Timer(timeInterval: 5, repeats: true) { _ in
-                            progress = progressValue()
+                        progressTimer?.invalidate()
+
+                        currentEntryDate = currentEntry.date
+
+                        progress = progressValue(currentEntry.date)
+                        let timer = Timer(timeInterval: 3, repeats: true) { _ in
+                            progress = progressValue(currentEntryDate)
                         }
                         RunLoop.main.add(timer, forMode: .common)
                         progressTimer = timer
@@ -94,8 +102,11 @@ struct CurrentValueView: View {
                         progressTimer?.invalidate()
                         progressTimer = nil
                     }
-                    .onChange(of: self.currentEntry!) { oldValue, value in
-                        progress = progressValue()
+                    .onChange(of: self.currentEntry) { oldValue, newValue in
+                        if let newValue = newValue {
+                            currentEntryDate = newValue.date
+                            progress = progressValue(newValue.date)
+                        }
                     }
                     .frame(width: 150)
                     Text(formatDelta())
@@ -131,8 +142,8 @@ struct CurrentValueView: View {
         return .black
     }
     
-    private func progressValue() -> Double {
-        return min(Date.now - currentEntry!.date, 300)
+    private func progressValue(_ entryDate : Date) -> Double {
+        return min(Date.now - entryDate, 300)
     }
 }
 

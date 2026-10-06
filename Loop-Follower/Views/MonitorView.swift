@@ -11,6 +11,7 @@ struct MonitorView: View {
     
     @EnvironmentObject var modelData : ModelData
     @Environment(\.verticalSizeClass) var verticalSizeClass
+    @ObservedObject private var alarmController = AlarmController.shared
     @State var tabSelection : String = "BG"
 
     let criticalMax : Int = 260
@@ -68,6 +69,13 @@ struct MonitorView: View {
         }
         .refreshable {
             await modelData.refresh()
+        }
+        .overlay(alignment: .top) {
+            if alarmController.isActive {
+                AlarmBanner(sgv: alarmController.activeSgv) {
+                    alarmController.acknowledge()
+                }
+            }
         }
     }
     

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 @main
 struct Loop_FollowerApp: App {
@@ -17,6 +18,20 @@ struct Loop_FollowerApp: App {
             ContentView()
                 .environmentObject(modelData)
                 .environmentObject(settings)
+                .task {
+                    await requestNotificationPermission()
+                    AlarmController.shared.updateSettings(from: settings)
+                }
+        }
+    }
+
+    /// Asks the user for permission to show local notifications for the alarm.
+    private func requestNotificationPermission() async {
+        let center = UNUserNotificationCenter.current()
+        do {
+            try await center.requestAuthorization(options: [.alert, .sound, .badge])
+        } catch {
+            // Ignore permission errors; the alarm continues to work via sound.
         }
     }
 }

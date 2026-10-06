@@ -14,6 +14,12 @@ class SettingsStore  : ObservableObject  {
         static let url = "url"
         static let token = "token"
         static let pumpRes = "pumpResolution"
+        static let veryLowThreshold = "veryLowThreshold"
+        static let lowThreshold = "lowThreshold"
+        static let lowTime = "lowTime"
+        static let highThreshold = "highThreshold"
+        static let highTime = "highTime"
+        static let veryHighThreshold = "veryHighThreshold"
     }
     
     private let cancellable: Cancellable
@@ -27,7 +33,13 @@ class SettingsStore  : ObservableObject  {
         defaults.register(defaults: [
             Keys.url: "",
             Keys.token: "",
-            Keys.pumpRes: 0.05
+            Keys.pumpRes: 0.05,
+            Keys.veryLowThreshold: 55,
+            Keys.lowThreshold: 70,
+            Keys.lowTime: 10 * 60,
+            Keys.highThreshold: 180,
+            Keys.highTime: 15 * 60,
+            Keys.veryHighThreshold: 260
         ])
         
         cancellable = NotificationCenter.default
@@ -50,6 +62,38 @@ class SettingsStore  : ObservableObject  {
     var pumpRes: Double {
         set { defaults.set(newValue, forKey: Keys.pumpRes) }
         get { defaults.double(forKey: Keys.pumpRes) }
+    }
+
+    var veryLowThreshold: Int {
+        set { defaults.set(newValue, forKey: Keys.veryLowThreshold) }
+        get { defaults.integer(forKey: Keys.veryLowThreshold) }
+    }
+
+    var lowThreshold: Int {
+        set { defaults.set(newValue, forKey: Keys.lowThreshold) }
+        get { defaults.integer(forKey: Keys.lowThreshold) }
+    }
+
+    /// Time in seconds below ``lowThreshold`` before the low alarm fires.
+    var lowTime: TimeInterval {
+        set { defaults.set(newValue, forKey: Keys.lowTime) }
+        get { defaults.double(forKey: Keys.lowTime) }
+    }
+
+    var highThreshold: Int {
+        set { defaults.set(newValue, forKey: Keys.highThreshold) }
+        get { defaults.integer(forKey: Keys.highThreshold) }
+    }
+
+    /// Time in seconds above ``highThreshold`` before the high alarm fires.
+    var highTime: TimeInterval {
+        set { defaults.set(newValue, forKey: Keys.highTime) }
+        get { defaults.double(forKey: Keys.highTime) }
+    }
+
+    var veryHighThreshold: Int {
+        set { defaults.set(newValue, forKey: Keys.veryHighThreshold) }
+        get { defaults.integer(forKey: Keys.veryHighThreshold) }
     }
 }
 

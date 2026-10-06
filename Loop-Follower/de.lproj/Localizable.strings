@@ -1,3 +1,9 @@
+/* Critical glucose alarm title */
+"ALARM" = "ALARM";
+
+/* Confirm the alarm */
+"Acknowledge" = "Bestätigen";
+
 /* No comment provided by engineer. */
 "basal" = "Basal";
 

@@ -260,6 +260,9 @@ public class ModelData : ObservableObject {
         self.entries = filterEntries(entries)
         self.lastEntry = self.entries.first
 
+        // check the latest value against the critical alarm thresholds
+        AlarmController.shared.evaluate(entries: self.entries)
+
         // only reload the widget when a new CGM value arrived, to save the widget's reload budget
         if let lastEntry = self.lastEntry, lastEntry.id != previousLastEntry?.id {
             print("reload Widget")
@@ -653,6 +656,10 @@ func calculateResultingBasal(
 }
 
 func filterEntries(_ entries : [Entry]) -> [Entry] {
+    if entries.isEmpty {
+        return entries
+    }
+    
     let interval : TimeInterval = 100
     var clearedEntries = zip(entries, entries.dropFirst()).filter { (e1, e2) in
         return abs(e1.date - e2.date) > interval
@@ -667,91 +674,6 @@ func filterEntries(_ entries : [Entry]) -> [Entry] {
     }
     
     return clearedEntries
-}
-
-enum AlertType {
-    case veryHigh, high, low, veryLow, data, none
-}
-
-struct Alert {
-    let type: AlertType
-}
-
-struct AlertSettings {
-    let veryLowThreshold : Int
-    
-    let lowThreshold : Int
-    let lowTime : TimeInterval?
-    
-    let highThreshold : Int
-    let highTime : TimeInterval?
-
-    let veryHighThreshold : Int
-}
-
-struct AlertState {
-    var veryLow : Entry?
-    var low : Entry?
-    var high : Entry?
-    var veryHigh : Entry?
-}
-
-func processSgvForAlerts(_ entries: [Entry], alertSettings : AlertSettings) -> AlertType {
-    
-    if let first = entries.first {
-        // on the first entry we decide which threshold to check
-        if first.sgv < alertSettings.veryLowThreshold {
-            return .veryLow
-        } else if first.sgv < alertSettings.lowThreshold {
-            if let firstAboveThresholdIndex = entries.firstIndex(where: { $0.sgv >= alertSettings.lowThreshold }) {
-                let lastBelowThreshold = entries[firstAboveThresholdIndex - 1]
-                let diff = lastBelowThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
-                if let lowTime = alertSettings.lowTime {
-                    if diff > lowTime {
-                        return .low
-                    }
-                } else {
-                    return .none
-                }
-            } else if let lastBelowThreshold = entries.last {
-                let diff = lastBelowThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
-                if let lowTime = alertSettings.lowTime {
-                    if diff > lowTime {
-                        return .low
-                    }
-                } else {
-                    return .none
-                }
-            }
-        } else if first.sgv > alertSettings.veryHighThreshold {
-            return .veryHigh
-        } else if first.sgv > alertSettings.highThreshold {
-            if let firstBelowThresholdIndex = entries.firstIndex(where: { $0.sgv <= alertSettings.highThreshold }) {
-                let lastAboveThreshold = entries[firstBelowThresholdIndex - 1]
-                let diff = lastAboveThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
-                if let highTime = alertSettings.highTime {
-                    if diff > highTime {
-                        return .high
-                    }
-                } else {
-                    return .none
-                }
-            } else if let lastAboveThreshold = entries.last {
-                let diff = lastAboveThreshold.date.distance(to: first.date).rounded(.toNearestOrAwayFromZero)
-                if let highTime = alertSettings.highTime {
-                    if diff > highTime {
-                        return .high
-                    }
-                } else {
-                    return .none
-                }
-            }
-        }
-    } else {
-        return .data
-    }
-
-    return .none
 }
 
 ///
