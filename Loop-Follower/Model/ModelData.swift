@@ -680,6 +680,9 @@ func filterEntries(_ entries : [Entry]) -> [Entry] {
 /// calculates the timeInRange in promill
 ///
 func calcTimeInRange(_ entries: [Entry], min: Int, max: Int) -> Int {
+    if entries.isEmpty {
+        return 0;
+    }
 
     let aboveOrBelowCount = entries.filter { e in
         e.sgv > max || e.sgv < min
