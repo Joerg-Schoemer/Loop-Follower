@@ -159,7 +159,7 @@ final class AlarmController: ObservableObject {
     /// and activates the alarm for a low/high episode until acknowledged.
     /// After an acknowledgment the alarm stays silent for two hours, then
     /// re-activates if the glucose is still outside the range.
-    func evaluate(entries: [Entry]) {
+    func evaluate(_ entries: [Entry]) {
         let type = processSgvForAlerts(entries, alertSettings: alertSettings)
         alertType = type
 

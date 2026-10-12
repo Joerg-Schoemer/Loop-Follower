@@ -42,8 +42,6 @@ public class ModelData : ObservableObject {
     
     @Published var timeInRange : Int?
     
-    let hourOfHistory : Int = -6
-    
     private var tempBasal : [TempBasal] = []
     
     private var isReloading = false
@@ -51,12 +49,10 @@ public class ModelData : ObservableObject {
     init() {
         Timer.scheduledTimer(withTimeInterval: 2, repeats: true) { timer in
             Task { @MainActor in
-                print("running timer event \(Date.now)")
                 if let nextRun = self.load() {
                     print("rescheduling timer at: \(nextRun)")
                     timer.fireDate = nextRun
                 } else {
-                    print("invalidating timer")
                     timer.invalidate()
                 }
             }
@@ -105,106 +101,6 @@ public class ModelData : ObservableObject {
         self.sensorChanged = Calendar.current.date(byAdding: .hour, value: -96, to: Date.now)!
     }
 
-    func loadSgv() async -> [Entry] {
-        let date = Calendar.current.date(byAdding: .hour, value: -48, to: .now)!.timeIntervalSince1970 * 1000
-        let queryItems = [
-            URLQueryItem(name: "find[date][$gte]", value: date.description),
-            URLQueryItem(name: "count", value: "2000")
-        ]
-
-        do {
-            return try await NightScoutAPI.get(
-                path: "/api/v1/entries/sgv.json",
-                queryItems: queryItems
-            )
-        } catch {
-            print("loadSgv: Error with fetching sgv: \(error)")
-            return []
-        }
-    }
-
-    func loadMbg() async -> [MbgEntry] {
-        let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!.timeIntervalSince1970 * 1000
-        let queryItems = [
-            URLQueryItem(name: "find[date][$gte]", value: date.description),
-            URLQueryItem(name: "count", value: "1000")
-        ]
-
-        do {
-            return try await NightScoutAPI.get(
-                path: "/api/v1/entries/mbg.json",
-                queryItems: queryItems
-            )
-        } catch {
-            print("loadMbg: Error with fetching mbg: \(error)")
-            return []
-        }
-    }
-
-    fileprivate func getStartTime() -> String {
-        return formatter.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!)
-    }
-
-    fileprivate func getYesterday() -> String {
-        return formatter.string(from: Calendar.current.date(byAdding: .hour, value: -48, to: .now)!)
-    }
-    
-    func loadInsulin() async -> [CorrectionBolus] {
-        do {
-            return try await NightScoutAPI.treatments("/Bolus|SMB|Correction%20Bolus/", getYesterday())
-        } catch {
-            print("loadInsulin: Error fetching treatments: \(error)")
-            return []
-        }
-    }
-    
-    func loadCarbs() async -> [CarbCorrection] {
-        do {
-            return try await NightScoutAPI.treatments("Carb Correction", getYesterday())
-        } catch {
-            print("loadCarbs: Error fetching treatments: \(error)")
-            return []
-        }
-    }
-    
-    func loadTempBasal() async -> [TempBasal] {
-        do {
-            return try await NightScoutAPI.treatments("Temp Basal", getStartTime())
-        } catch {
-            print("loadTempBasal: Error fetching treatments: \(error)")
-            return []
-        }
-    }
-    
-    func loadDeviceStatus() async -> LoopData? {
-        do {
-            let loopData: [LoopData] = try await NightScoutAPI.get(
-                path: "/api/v1/devicestatus.json",
-                queryItems: [
-                    URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()),
-                    URLQueryItem(name: "count", value: "1")
-                ]
-            )
-            return loopData.first
-        } catch {
-            print("loadDeviceStatus: Error with fetching devicestatus: \(error)")
-            return nil
-        }
-    }
-    
-    func loadProfile() async -> Profiles? {
-        do {
-            let profiles: [Profiles] = try await NightScoutAPI.get(
-                path: "/api/v1/profile.json",
-                queryItems: []
-            )
-            return profiles.first
-        } catch {
-            print("loadProfile: Error with fetching profile: \(error)")
-            return nil
-        }
-    }
-
     @MainActor
     func reloadData() async {
         guard !isReloading else { return }
@@ -212,40 +108,37 @@ public class ModelData : ObservableObject {
         defer { isReloading = false }
 
         let previousLastEntry = self.lastEntry
-        let entries = await self.loadSgv()
         self.currentDate = Date.now
-        self.entries = filterEntries(entries)
+        self.entries = filterEntries(await NightScoutAPI.loadSgv())
         self.lastEntry = self.entries.first
 
-        // check the latest value against the critical alarm thresholds
-        AlarmController.shared.evaluate(entries: self.entries)
+        Task {
+            // check the latest value against the critical alarm thresholds
+            AlarmController.shared.evaluate(self.entries)
+        }
+        
+        Task {
+            let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
+            let tir = await calcTimeInRange(self.entries.filter { enrtry in enrtry.date > startOfTir }, min: 70, max: 180)
+            self.timeInRange = tir
+        }
 
         // only reload the widget when a new CGM value arrived, to save the widget's reload budget
         if let lastEntry = self.lastEntry, lastEntry.id != previousLastEntry?.id {
-            print("reload Widget")
             WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
         }
-        let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
-        self.timeInRange = calcTimeInRange(self.entries.filter { $0.date > startOfTir }, min: 70, max: 180)
 
-        self.mgbs = await self.loadMbg()
-        self.currentLoopData = await self.loadDeviceStatus()
+        self.siteChanged = await NightScoutAPI.ageOf(eventType: "Site Change", days: -5)
+        self.sensorChanged = await NightScoutAPI.ageOf(eventType: "/Sensor Start|Sensor Change/", days: -14)
+        self.insulin = await NightScoutAPI.loadInsulin()
+        self.carbs = await NightScoutAPI.loadCarbs()
+        self.currentLoopData = await NightScoutAPI.loadDeviceStatus()
+        self.tempBasal = await NightScoutAPI.loadTempBasal()
+        self.mgbs = await NightScoutAPI.loadMbg()
 
-        async let insulin = self.loadInsulin()
-        async let carbs = self.loadCarbs()
-        async let tempBasal = self.loadTempBasal()
-        async let siteChanged = NightScoutAPI.ageOf(eventType: "Site Change", days: -5)
-        async let sensorChanged = NightScoutAPI.ageOf(eventType: "/Sensor Start|Sensor Change/", days: -14)
-
-        self.insulin = await insulin
-        self.carbs = await carbs
-        self.tempBasal = await tempBasal
-        self.siteChanged = await siteChanged
-        self.sensorChanged = await sensorChanged
-
-        let profile = await self.loadProfile()
-        if let profile = profile {
-            let startDate = Calendar.current.date(byAdding: .hour, value: self.hourOfHistory, to: self.currentDate)!
+        async let profile = NightScoutAPI.loadProfile()
+        if let profile = await profile {
+            let startDate = Calendar.current.date(byAdding: .hour, value: NightScoutAPI.hourOfHistory, to: self.currentDate)!
 
             let endDate: Date
             if self.currentLoopData != nil {
@@ -255,21 +148,21 @@ public class ModelData : ObservableObject {
             }
 
             self.profile = profile.store[profile.defaultProfile]!
-
             self.loopSettings = profile.loopSettings
 
-            self.scheduledBasal = calculateTempBasal(
-                basals: self.profile!.basal,
-                startDate: startDate,
-                endDate: endDate
-            )
-
-            self.resultingBasal = calculateResultingBasal(
-                tempBasal: self.tempBasal,
-                scheduledBasal: self.scheduledBasal,
-                startDate: startDate,
-                endDate: endDate
-            ).sorted(by: {$0.startDate < $1.startDate})
+            Task {
+                self.scheduledBasal = calculateTempBasal(
+                    basals: self.profile!.basal,
+                    startDate: startDate,
+                    endDate: endDate
+                )
+                self.resultingBasal = calculateResultingBasal(
+                    tempBasal: self.tempBasal,
+                    scheduledBasal: self.scheduledBasal,
+                    startDate: startDate,
+                    endDate: endDate
+                ).sorted(by: {$0.startDate < $1.startDate})
+            }
         }
     }
 
@@ -304,7 +197,9 @@ public class ModelData : ObservableObject {
             let nowComponents = calendar.dateComponents([.hour, .minute, .second], from: now)
             let difference = calendar.dateComponents([.second], from: timeComponents, to: nowComponents).second!
 
+            // letzter Wert länger als 5 Minuten her
             if difference > 300 {
+                // dann in 10 Sekunden nochmal laden.
                 return Calendar.current.date(
                     byAdding: .second,
                     value: 10,
@@ -312,12 +207,14 @@ public class ModelData : ObservableObject {
                 )!
             }
             
+            // vom letzten Wert an eine Minute weiter
             var nextRun = Calendar.current.date(
                 byAdding: .minute,
                 value: 1,
                 to: lastEntry.date
             )!
 
+            // wenn der nächste Lauf noch kleiner als jetzt ist, dann eine Minute dazu bis wir in der Zukunft sind.
             while nextRun < now {
                 nextRun = Calendar.current.date(
                     byAdding: .minute,
@@ -326,12 +223,14 @@ public class ModelData : ObservableObject {
                 )!
             }
 
+            // am Ende noch einen 10 Sekunden Puffer dazu.
             return Calendar.current.date(
                 byAdding: .second,
                 value: 10,
                 to: nextRun)!
         }
 
+        // noch keinen Wert geladen, wir versuchen es in 10 Sekunden nocheinmal.
         return Calendar.current.date(
             byAdding: .second,
             value: 10,
@@ -448,7 +347,7 @@ func calculateTempBasal(
     let startOfDayTwo = Calendar.current.date(byAdding: .day, value: 1, to: startOfDayOne)!
     tempBasal.append(contentsOf: convertBasalToTempBasal(basals, startOfDayTwo))
 
-    tempBasal = tempBasal.filter({ $0.endDate > startDate && $0.startDate < endDate })
+    tempBasal = tempBasal.filter { basal in basal.endDate > startDate && basal.startDate < endDate }
 
     if let first = tempBasal.first {
         if first.startDate < startDate {
@@ -627,7 +526,7 @@ func filterEntries(_ entries : [Entry]) -> [Entry] {
 ///
 /// calculates the timeInRange in promill
 ///
-func calcTimeInRange(_ entries: [Entry], min: Int, max: Int) -> Int {
+func calcTimeInRange(_ entries: [Entry], min: Int, max: Int) async -> Int {
     if entries.isEmpty {
         return 0;
     }

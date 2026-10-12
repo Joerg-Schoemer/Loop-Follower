@@ -18,6 +18,8 @@ import Foundation
 /// configuration around.
 struct NightScoutAPI {
 
+    static let hourOfHistory : Int = -6
+
     /// The shared UserDefaults suite used to store the Nightscout configuration.
     static let suiteName = "group.loop.follower"
 
@@ -82,16 +84,14 @@ struct NightScoutAPI {
     static func ageOf(eventType : String, days: Int) async -> Date? {
         let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: days, to: .now)!
 
-        let queryItems = [
-            URLQueryItem(name: "find[eventType]", value: eventType),
-            URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)),
-            URLQueryItem(name: "count", value: "1")
-        ]
-
         do {
             let treatments: [ChangeEvent] = try await NightScoutAPI.get(
                 path: "/api/v1/treatments.json",
-                queryItems: queryItems
+                queryItems: [
+                    URLQueryItem(name: "find[eventType]", value: eventType),
+                    URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)),
+                    URLQueryItem(name: "count", value: "1")
+                ]
             )
             if let first = treatments.first {
                 return first.date
@@ -104,6 +104,104 @@ struct NightScoutAPI {
             return nil
         }
     }
+    static func loadSgv() async -> [Entry] {
+        let date = Calendar.current.date(byAdding: .hour, value: -48, to: .now)!.timeIntervalSince1970 * 1000
+
+        do {
+            return try await NightScoutAPI.get(
+                path: "/api/v1/entries/sgv.json",
+                queryItems: [
+                    URLQueryItem(name: "find[date][$gte]", value: date.description),
+                    URLQueryItem(name: "count", value: "2000")
+                ]
+            )
+        } catch {
+            print("loadSgv: Error with fetching sgv: \(error)")
+            return []
+        }
+    }
+
+    static func loadMbg() async -> [MbgEntry] {
+        let date = Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!.timeIntervalSince1970 * 1000
+
+        do {
+            return try await NightScoutAPI.get(
+                path: "/api/v1/entries/mbg.json",
+                queryItems: [
+                    URLQueryItem(name: "find[date][$gte]", value: date.description),
+                    URLQueryItem(name: "count", value: "1000")
+                ]
+            )
+        } catch {
+            print("loadMbg: Error with fetching mbg: \(error)")
+            return []
+        }
+    }
+
+    static func loadInsulin() async -> [CorrectionBolus] {
+        do {
+            return try await NightScoutAPI.treatments("/Bolus|SMB|Correction%20Bolus/", getYesterday())
+        } catch {
+            print("loadInsulin: Error fetching treatments: \(error)")
+            return []
+        }
+    }
+    
+    static func loadCarbs() async -> [CarbCorrection] {
+        do {
+            return try await NightScoutAPI.treatments("Carb Correction", getYesterday())
+        } catch {
+            print("loadCarbs: Error fetching treatments: \(error)")
+            return []
+        }
+    }
+    
+    static func loadTempBasal() async -> [TempBasal] {
+        do {
+            return try await NightScoutAPI.treatments("Temp Basal", getStartTime())
+        } catch {
+            print("loadTempBasal: Error fetching treatments: \(error)")
+            return []
+        }
+    }
+    
+    static func loadDeviceStatus() async -> LoopData? {
+        do {
+            let loopData: [LoopData] = try await NightScoutAPI.get(
+                path: "/api/v1/devicestatus.json",
+                queryItems: [
+                    URLQueryItem(name: "find[created_at][$gte]", value: getStartTime()),
+                    URLQueryItem(name: "count", value: "1")
+                ]
+            )
+            return loopData.first
+        } catch {
+            print("loadDeviceStatus: Error with fetching devicestatus: \(error)")
+            return nil
+        }
+    }
+    
+    static func loadProfile() async -> Profiles? {
+        do {
+            let profiles: [Profiles] = try await NightScoutAPI.get(
+                path: "/api/v1/profile.json",
+                queryItems: []
+            )
+            return profiles.first
+        } catch {
+            print("loadProfile: Error with fetching profile: \(error)")
+            return nil
+        }
+    }
+
+    fileprivate static func getStartTime() -> String {
+        return formatter.string(from: Calendar.current.date(byAdding: .hour, value: hourOfHistory, to: .now)!)
+    }
+
+    fileprivate static func getYesterday() -> String {
+        return formatter.string(from: Calendar.current.date(byAdding: .hour, value: -48, to: .now)!)
+    }
+
 }
 
 fileprivate func iso8601() -> ISO8601DateFormatter {

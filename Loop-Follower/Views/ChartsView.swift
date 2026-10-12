@@ -25,7 +25,7 @@ struct ChartsView: View {
             Group {
                 DerivedChart(
                     currentDate: modelData.currentDate,
-                    hourOfHistory: modelData.hourOfHistory,
+                    hourOfHistory: NightScoutAPI.hourOfHistory,
                     entries: modelData.entries
                 )
                 .tag("derived")
@@ -37,7 +37,7 @@ struct ChartsView: View {
                     carbs: modelData.carbs,
                     entries: modelData.entries,
                     mbgs: modelData.mgbs,
-                    hourOfHistory: modelData.hourOfHistory,
+                    hourOfHistory: NightScoutAPI.hourOfHistory,
                     criticalMin: criticalMin,
                     criticalMax: criticalMax,
                     rangeMin: rangeMin,
