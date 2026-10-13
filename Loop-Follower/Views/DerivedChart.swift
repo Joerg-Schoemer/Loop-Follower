@@ -138,13 +138,13 @@ struct DerivedChart_Previews: PreviewProvider {
 
 func derive(_ values: [Entry]) -> [Entry] {
     if values.isEmpty {
-        return [];
+        return values;
     }
 
     return zip(values.dropFirst(), values).map { older, newer in
 
         return Entry(
-            sgv: (newer.sgv - older.sgv) * 5 / Int((newer.date - older.date) / 60),
+            sgv: newer.sgv - older.sgv,
             delta: Int((newer.date - older.date) / 60),
             id: UUID().uuidString,
             dateString: newer.dateString

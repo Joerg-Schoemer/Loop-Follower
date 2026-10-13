@@ -67,10 +67,10 @@ struct BasalChart_Previews: PreviewProvider {
             TempBasal(id: "", duration: 360, rate: 0.05, created_at: "2023-02-15T02:00:00Z")
         ]
         let rb = [
-            TempBasal(id: "", duration:  30, rate: 0.05, created_at: "2023-02-14T23:00:00Z", type: "scheduled"),
-            TempBasal(id: "", duration:  30, rate: 0.00, created_at: "2023-02-14T23:30:00Z", type: "temporary"),
-            TempBasal(id: "", duration: 100, rate: 0.10, created_at: "2023-02-15T00:00:00Z", type: "scheduled"),
-            TempBasal(id: "", duration:  30, rate: 0.15, created_at: "2023-02-15T01:40:00Z", type: "temporary"),
+            TempBasal(id: "", duration:  30, rate: 0.05, created_at: "2023-02-14T23:00:00Z", type: .scheduled),
+            TempBasal(id: "", duration:  30, rate: 0.00, created_at: "2023-02-14T23:30:00Z", type: .temporary),
+            TempBasal(id: "", duration: 100, rate: 0.10, created_at: "2023-02-15T00:00:00Z", type: .scheduled),
+            TempBasal(id: "", duration:  30, rate: 0.15, created_at: "2023-02-15T01:40:00Z", type: .temporary),
             TempBasal(id: "", duration:  50, rate: 0.00, created_at: "2023-02-15T02:10:00Z"),
             TempBasal(id: "", duration: 100, rate: 0.05, created_at: "2023-02-15T03:00:00Z"),
             TempBasal(id: "", duration: 200, rate: 0.05, created_at: "2023-02-15T04:40:00Z")

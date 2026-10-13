@@ -7,6 +7,7 @@
 
 import Foundation
 import AudioToolbox
+import UIKit
 import UserNotifications
 
 enum AlertType {
@@ -148,11 +149,45 @@ final class AlarmController: ObservableObject {
 
     private var shouldContinue = false
 
+    /// True while the app is in the foreground. The repeating beep only runs while
+    /// the app is visible; the scheduled local notification covers the background.
+    private var isInForeground = true
+
     /// Until when the alarm stays silent after the user acknowledged the current
     /// episode. After this date the alarm rings again if the glucose is still critical.
     private var acknowledgedUntil: Date?
 
-    private init() {}
+    private init() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationWillResignActive),
+            name: UIApplication.willResignActiveNotification,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applicationDidBecomeActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+
+    /// Stops re-arming the repeating beep when the app resigns active. The currently
+    /// playing beep is allowed to finish; no new sound-completion handler is registered
+    /// during the background transition, which would otherwise be dropped and logged as
+    /// "cannot add handler to 0 from 0 - dropping".
+    @objc private func applicationWillResignActive() {
+        isInForeground = false
+    }
+
+    /// Resumes the repeating beep when the app returns to the foreground, if the alarm
+    /// is still active.
+    @objc private func applicationDidBecomeActive() {
+        isInForeground = true
+        if isActive {
+            play()
+        }
+    }
 
     /// Called after every data reload with the newest glucose values.
     /// Estimates the alarm state via ``processSgvForAlerts(_:alertSettings:)``
@@ -207,7 +242,7 @@ final class AlarmController: ObservableObject {
     }
 
     private func play() {
-        guard shouldContinue, isActive else { return }
+        guard shouldContinue, isActive, isInForeground else { return }
         AudioServicesPlaySystemSoundWithCompletion(soundID) { [weak self] in
             Task { @MainActor in
                 // pause between repetitions so the alarm plays as distinct beeps

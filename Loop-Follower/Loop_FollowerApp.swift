@@ -10,6 +10,7 @@ import UserNotifications
 
 @main
 struct Loop_FollowerApp: App {
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var modelData = ModelData()
     @StateObject private var settings = SettingsStore()
     
@@ -21,6 +22,13 @@ struct Loop_FollowerApp: App {
                 .task {
                     await requestNotificationPermission()
                     AlarmController.shared.updateSettings(from: settings)
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        Task {
+                            await modelData.refresh()
+                        }
+                    }
                 }
         }
     }

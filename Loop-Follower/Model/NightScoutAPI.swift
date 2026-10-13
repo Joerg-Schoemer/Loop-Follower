@@ -35,10 +35,9 @@ struct NightScoutAPI {
 
     /// Generic GET helper: builds a URL from a relative API path and query
     /// items, performs the request async, and decodes the JSON body into `T`.
-    static func get<T: Decodable>(
+    private static func get<T: Decodable>(
         path: String,
-        queryItems: [URLQueryItem],
-        decoder: JSONDecoder? = nil
+        queryItems: [URLQueryItem]
     ) async throws -> T {
         guard var components = URLComponents(string: "\(baseUrl)\(path)") else {
             throw URLError(.badURL)
@@ -64,20 +63,28 @@ struct NightScoutAPI {
             throw URLError(.badServerResponse)
         }
 
-        let usedDecoder = decoder ?? JSONDecoder()
+        let usedDecoder = JSONDecoder()
         return try usedDecoder.decode(T.self, from: data)
     }
     
     static func treatments<T: Decodable>(
         _ type : String,
-        _ startDate : String
+        _ startDate : String,
+        _ count : Int? = nil
     ) async throws -> T {
+        
+        var queryItems = [
+            URLQueryItem(name: "find[eventType]", value: type),
+            URLQueryItem(name: "find[created_at][$gte]", value: startDate)
+        ]
+        
+        if let count = count {
+            queryItems.append(URLQueryItem(name: "count", value: count.description))
+        }
+        
         return try await NightScoutAPI.get(
             path: "/api/v1/treatments.json",
-            queryItems: [
-                URLQueryItem(name: "find[eventType]", value: type),
-                URLQueryItem(name: "find[created_at][$gte]", value: startDate)
-            ]
+            queryItems: queryItems
         )
     }
 
@@ -85,14 +92,7 @@ struct NightScoutAPI {
         let daysBackInTime : Date = Calendar.current.date(byAdding: .day, value: days, to: .now)!
 
         do {
-            let treatments: [ChangeEvent] = try await NightScoutAPI.get(
-                path: "/api/v1/treatments.json",
-                queryItems: [
-                    URLQueryItem(name: "find[eventType]", value: eventType),
-                    URLQueryItem(name: "find[created_at][$gte]", value: formatter.string(from: daysBackInTime)),
-                    URLQueryItem(name: "count", value: "1")
-                ]
-            )
+            let treatments: [ChangeEvent] = try await treatments(eventType, formatter.string(from: daysBackInTime), 1)
             if let first = treatments.first {
                 return first.date
             }
@@ -104,7 +104,7 @@ struct NightScoutAPI {
             return nil
         }
     }
-    static func loadSgv() async -> [Entry] {
+    static func loadSgv() async -> [Entry]? {
         let date = Calendar.current.date(byAdding: .hour, value: -48, to: .now)!.timeIntervalSince1970 * 1000
 
         do {
@@ -140,7 +140,7 @@ struct NightScoutAPI {
 
     static func loadInsulin() async -> [CorrectionBolus] {
         do {
-            return try await NightScoutAPI.treatments("/Bolus|SMB|Correction%20Bolus/", getYesterday())
+            return try await treatments("/Bolus|SMB|Correction%20Bolus/", getYesterday())
         } catch {
             print("loadInsulin: Error fetching treatments: \(error)")
             return []
@@ -149,7 +149,7 @@ struct NightScoutAPI {
     
     static func loadCarbs() async -> [CarbCorrection] {
         do {
-            return try await NightScoutAPI.treatments("Carb Correction", getYesterday())
+            return try await treatments("Carb Correction", getYesterday())
         } catch {
             print("loadCarbs: Error fetching treatments: \(error)")
             return []
@@ -158,7 +158,7 @@ struct NightScoutAPI {
     
     static func loadTempBasal() async -> [TempBasal] {
         do {
-            return try await NightScoutAPI.treatments("Temp Basal", getStartTime())
+            return try await treatments("Temp Basal", getStartTime())
         } catch {
             print("loadTempBasal: Error fetching treatments: \(error)")
             return []

@@ -21,12 +21,19 @@ struct TempBasal : Codable, Identifiable {
     let rate : Double
     let created_at : String
 
-    var type : String = "temporary"
+    var type : BasalType = .temporary
     var endDate : Date = Date()
         
     var startDate : Date {
         return formatter.date(from: created_at)!
     }
+}
+
+/// The origin of a basal-rate segment: either the pump's scheduled rate or an
+/// active temporary basal.
+enum BasalType: String, Codable {
+    case temporary
+    case scheduled
 }
 
 struct CorrectionBolus : Codable, Identifiable {

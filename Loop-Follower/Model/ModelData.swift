@@ -109,35 +109,49 @@ public class ModelData : ObservableObject {
 
         let previousLastEntry = self.lastEntry
         self.currentDate = Date.now
-        self.entries = filterEntries(await NightScoutAPI.loadSgv())
-        self.lastEntry = self.entries.first
-
-        Task {
-            // check the latest value against the critical alarm thresholds
-            AlarmController.shared.evaluate(self.entries)
-        }
         
-        Task {
-            let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
-            let tir = await calcTimeInRange(self.entries.filter { enrtry in enrtry.date > startOfTir }, min: 70, max: 180)
-            self.timeInRange = tir
+        async let unfilteredEntries = NightScoutAPI.loadSgv()
+
+        async let deviceStatus = NightScoutAPI.loadDeviceStatus()
+        async let tempBasal = NightScoutAPI.loadTempBasal()
+        async let siteChanged = NightScoutAPI.ageOf(eventType: "Site Change", days: -5)
+        async let sensorStart = NightScoutAPI.ageOf(eventType: "/Sensor Start|Sensor Change/", days: -14)
+        async let insulin = NightScoutAPI.loadInsulin()
+        async let carbs = NightScoutAPI.loadCarbs()
+        async let mbgs = NightScoutAPI.loadMbg()
+        async let profiles = NightScoutAPI.loadProfile()
+
+        self.siteChanged = await siteChanged
+        self.sensorChanged = await sensorStart
+        self.mgbs = await mbgs
+        self.insulin = await insulin
+        self.carbs = await carbs
+
+        if let entries = await unfilteredEntries {
+            self.entries = filterEntries(entries)
+            self.lastEntry = self.entries.first
+            
+            Task {
+                // check the latest value against the critical alarm thresholds
+                AlarmController.shared.evaluate(self.entries)
+            }
+            
+            Task {
+                let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
+                async let tir = calcTimeInRange(self.entries.filter { enrtry in enrtry.date > startOfTir }, min: 70, max: 180)
+                self.timeInRange = await tir
+            }
+            
+            // only reload the widget when a new CGM value arrived, to save the widget's reload budget
+            if let le = self.lastEntry, let ple = previousLastEntry, le.id != ple.id {
+                WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
+            }
         }
 
-        // only reload the widget when a new CGM value arrived, to save the widget's reload budget
-        if let lastEntry = self.lastEntry, lastEntry.id != previousLastEntry?.id {
-            WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
-        }
+        self.currentLoopData = await deviceStatus
+        self.tempBasal = await tempBasal
 
-        self.siteChanged = await NightScoutAPI.ageOf(eventType: "Site Change", days: -5)
-        self.sensorChanged = await NightScoutAPI.ageOf(eventType: "/Sensor Start|Sensor Change/", days: -14)
-        self.insulin = await NightScoutAPI.loadInsulin()
-        self.carbs = await NightScoutAPI.loadCarbs()
-        self.currentLoopData = await NightScoutAPI.loadDeviceStatus()
-        self.tempBasal = await NightScoutAPI.loadTempBasal()
-        self.mgbs = await NightScoutAPI.loadMbg()
-
-        async let profile = NightScoutAPI.loadProfile()
-        if let profile = await profile {
+        if let profile = await profiles {
             let startDate = Calendar.current.date(byAdding: .hour, value: NightScoutAPI.hourOfHistory, to: self.currentDate)!
 
             let endDate: Date
@@ -310,7 +324,7 @@ func convertBasalToTempBasal(
                 duration: (nextBasal.timeAsSeconds - currentBasal.timeAsSeconds) / 60,
                 rate: currentBasal.value,
                 created_at: formatter.string(from: startDate),
-                type: "scheduled",
+                type: .scheduled,
                 endDate: startDate + (nextBasal.timeAsSeconds - currentBasal.timeAsSeconds)
             )
         )
@@ -323,7 +337,7 @@ func convertBasalToTempBasal(
             duration: (86400 - lastBasal.timeAsSeconds) / 60,
             rate: lastBasal.value,
             created_at: formatter.string(from: startDate),
-            type: "scheduled",
+            type: .scheduled,
             endDate: startDate + (86400 - lastBasal.timeAsSeconds)
         )
     )
@@ -357,7 +371,7 @@ func calculateTempBasal(
                 duration: 0,
                 rate: first.rate,
                 created_at: formatter.string(from: startDate),
-                type: "scheduled",
+                type: .scheduled,
                 endDate: first.endDate
             )
             tempBasal.remove(at: 0)
@@ -373,7 +387,7 @@ func calculateTempBasal(
                 duration: 0,
                 rate: last.rate,
                 created_at: formatter.string(from: last.startDate),
-                type: "scheduled",
+                type: .scheduled,
                 endDate: endDate
             )
             tempBasal.remove(at: tempBasal.count - 1)
@@ -459,7 +473,7 @@ func calculateResultingBasal(
                         duration: 0,
                         rate: sb.rate,
                         created_at: formatter.string(from: lastTempEndDate),
-                        type: "scheduled",
+                        type: .scheduled,
                         endDate: tb.startDate
                     )
                 )
@@ -492,7 +506,7 @@ func calculateResultingBasal(
                     duration: 0,
                     rate: sb.rate,
                     created_at: formatter.string(from: lastTempEndDate),
-                    type: "scheduled",
+                    type: .scheduled,
                     endDate: sb.endDate
                 )
             )
