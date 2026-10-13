@@ -58,7 +58,8 @@ struct InsulinItem_Previews: PreviewProvider {
                 duration: 1,
                 timestamp: "2023-08-28T12:00:00Z",
                 created_at: "2023-08-28T12:00:00.000Z",
-                eventType: "Bolus"
+                eventType: "Bolus",
+                automatic: false
             )
         ).previewLayout(.fixed(width: 300, height: 70))
     }

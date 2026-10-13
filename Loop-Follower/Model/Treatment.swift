@@ -43,7 +43,8 @@ struct CorrectionBolus : Codable, Identifiable {
              duration,
              eventType,
              timestamp,
-             created_at
+             created_at,
+             automatic
     }
 
     let id: String
@@ -52,7 +53,8 @@ struct CorrectionBolus : Codable, Identifiable {
     let timestamp: String?
     let created_at: String
     let eventType: String
-    
+    let automatic: Bool
+
     var date : Date {
         return formatter.date(from: created_at)!
     }
@@ -62,15 +64,11 @@ struct CorrectionBolus : Codable, Identifiable {
     }
     
     var type : String {
-        if let duration = self.duration {
-            return switch Int(duration) {
-            case 0: "Automatic Bolus"
-            case 1: "Bolus"
-            default: eventType
-            }
+        if self.automatic {
+            return "Automatic Bolus"
         }
         
-        return eventType
+        return "Bolus"
     }
 }
 
