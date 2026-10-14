@@ -124,7 +124,7 @@ private struct LiveBGExpandedTrailing: View {
                 return "?"
             }())
             if let basal = state.basal {
-                MetricRow(symbol: "drop", value: String(format: "%.2f U/h", basal))
+                MetricRow(symbol: "syringe", value: String(format: "%.2f U/h", basal))
             }
         }
         .font(.footnote)

@@ -27,7 +27,7 @@ struct LoopParameterBatteryView: View {
                         let length : CGFloat = 5
                         
                         Rectangle()
-                            .fill(estimateColor(uploader.battery))
+                            .fill(estimateColor(uploader))
                             .frame(
                                 width: (width * CGFloat(min(max(uploader.battery, 20), 100))) / 100,
                                 height: geo.size.height
@@ -51,13 +51,6 @@ struct LoopParameterBatteryView: View {
                             )
                         }
                         .stroke(.gray, lineWidth: 1)
-
-                        if uploader.isCharging == true {
-                            Image(systemName: "bolt.fill")
-                                .font(.system(size: geo.size.height - 2, weight: .bold))
-                                .foregroundColor(.gray)
-                                .frame(width: width, height: geo.size.height)
-                        }
                     }
                 }
                 .frame(width: 32, height: 12)
@@ -66,29 +59,45 @@ struct LoopParameterBatteryView: View {
     }
 }
 
-private func estimateColor(_ percentage : Int) -> Color {
-    if percentage <= 20 {
+private func estimateColor(_ uploader : Uploader) -> Color {
+    if let charging = uploader.isCharging, charging {
+        return Color(.systemGreen)
+    }
+    if uploader.battery <= 20 {
         return Color(.systemRed)
     }
-    if percentage <= 30 {
+    if uploader.battery <= 30 {
         return Color(.systemYellow)
     }
     
-    return Color(.systemGreen)
+    return Color.primary.opacity(0.75)
 }
 
 struct LoopParameterBatteryView_Previews: PreviewProvider {
     static var previews: some View {
         ForEach(ColorScheme.allCases, id: \.self) {
             VStack {
-                LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: -10, isCharging: false))
-                LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 0, isCharging: false))
-                LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 10, isCharging: false))
-                LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 20, isCharging: true))
-                LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 30, isCharging: false))
-                LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 75, isCharging: false))
-                LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 100, isCharging: true))
-                LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 200, isCharging: false))
+                Section(header: Text("not charging")) {
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: -10, isCharging: false))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 0, isCharging: false))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 10, isCharging: false))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 20, isCharging: false))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 30, isCharging: false))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 75, isCharging: false))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 100, isCharging: false))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 200, isCharging: false))
+                }
+
+                Section(header:Text("charging")) {
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: -10, isCharging: true))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 0, isCharging: true))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 10, isCharging: true))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 20, isCharging: true))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 30, isCharging: true))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 75, isCharging: true))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 100, isCharging: true))
+                    LoopParameterBatteryView(label: "Battery", uploader: Uploader(battery: 200, isCharging: true))
+                }
             }
             .preferredColorScheme($0)
         }

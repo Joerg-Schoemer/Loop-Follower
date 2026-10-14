@@ -143,6 +143,9 @@ public class ModelData : ObservableObject {
             }
             
             // only reload the widget when a new CGM value arrived, to save the widget's reload budget
+            if self.lastEntry != nil && previousLastEntry == nil {
+                WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
+            }
             if let le = self.lastEntry, let ple = previousLastEntry, le.id != ple.id {
                 WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
             }
