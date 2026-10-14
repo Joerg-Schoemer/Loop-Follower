@@ -80,6 +80,8 @@ struct NightScoutAPI {
         
         if let count = count {
             queryItems.append(URLQueryItem(name: "count", value: count.description))
+        } else {
+            queryItems.append(URLQueryItem(name: "count", value: "1000"))
         }
         
         return try await NightScoutAPI.get(

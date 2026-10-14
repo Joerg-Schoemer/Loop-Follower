@@ -45,17 +45,19 @@ struct CarbonListView: View {
     var carbs : [Node<CarbCorrection>] {
         var nodes : [Node<CarbCorrection>] = []
         let carbs = Array(modelData.carbs)
+        
+        if carbs.isEmpty {
+            return nodes
+        }
 
-        if carbs.count > 0 {
-            var prevNode = Node<CarbCorrection>(item: carbs.first!, next: nil)
-            nodes.append(prevNode)
+        var prevNode = Node<CarbCorrection>(item: carbs.first!, next: nil)
+        nodes.append(prevNode)
 
-            var idx : Int = 0
-            while idx < carbs.count - 1 {
-                idx += 1
-                prevNode = Node<CarbCorrection>(item: carbs[idx], next: prevNode)
-                nodes.append(prevNode)
-            }
+        carbs.dropFirst().map { carb in
+            prevNode = Node<CarbCorrection>(item: carb, next: prevNode)
+            return prevNode
+        }.forEach { node in
+            nodes.append(node)
         }
         
         return nodes

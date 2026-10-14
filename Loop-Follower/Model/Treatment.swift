@@ -115,11 +115,11 @@ struct CarbCorrection : Codable, Identifiable {
                     switch (timeInHours) {
                     case
                         numberFormatter.string(from: 0.5),
-                        numberFormatter.string(from: 1.0):
+                        numberFormatter.string(from: 1.0),
+                        numberFormatter.string(from: 1.5),
+                        numberFormatter.string(from: 2.0):
                         return "🍭";
                     case
-                        numberFormatter.string(from: 1.5),
-                        numberFormatter.string(from: 2.0),
                         numberFormatter.string(from: 2.5),
                         numberFormatter.string(from: 3.0),
                         numberFormatter.string(from: 3.5),

@@ -93,7 +93,7 @@ struct CarbonDetails: View {
         var items : [Node<CarbCorrection>] = []
         items.append(carb)
 
-        let endOfAbsorption = carb.item.endOfHalfAbsorption
+        let endOfAbsorption = carb.item.endOfAbsorption
         
         var next = carb.next
         while (next != nil) {
@@ -109,10 +109,15 @@ struct CarbonDetails: View {
     }
     
     var insulin : [CorrectionBolus] {
-        let minutesBefore = -30
+        let minutesBefore = -45
+        let minutesAfter = 5
+        let carbItem = carb.item;
+        let mealStart: Date = carbItem.date
 
-        let startDate = Calendar.current.date(byAdding: .minute, value: minutesBefore, to: carb.item.date)!
-        
+        // Fenster: maximal eine Stunde vor dem Carb-Eintrag
+        let windowStart = Calendar.current.date(byAdding: .minute, value: minutesBefore, to: mealStart)!
+        let windowEnd = Calendar.current.date(byAdding: .minute, value: minutesAfter, to: mealStart)!
+
         let endOfAbsorption = carbs.map { $0.item.endOfAbsorption }.max()!
 
         let startOfNextMeal = if let nextMeal = carbs.last?.next {
@@ -127,8 +132,15 @@ struct CarbonDetails: View {
             endOfAbsorption
         }
 
-        return  modelData.insulin.filter { item in
-            item.date >= startDate && item.date <= endDate
+        // Starte beim letzten nicht-automatischen Bolus, der maximal eine Stunde
+        // vor dem Carb-Eintrag liegt. Fallback ist der Beginn des Stundenfensters.
+        let startDate = modelData.insulin
+            .filter { bolus in !bolus.automatic && bolus.date >= windowStart && bolus.date <= windowEnd }
+            .map { $0.date }
+            .max() ?? windowStart
+
+        return modelData.insulin.filter { bolus in
+            bolus.date >= startDate && bolus.date <= endDate
         }.reversed()
     }
     
