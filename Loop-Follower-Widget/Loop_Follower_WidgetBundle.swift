@@ -12,5 +12,6 @@ import SwiftUI
 struct Loop_Follower_WidgetBundle: WidgetBundle {
     var body: some Widget {
         Loop_Follower_Widget()
+        Loop_Follower_LiveActivity()
     }
 }

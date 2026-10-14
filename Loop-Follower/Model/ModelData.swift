@@ -151,6 +151,24 @@ public class ModelData : ObservableObject {
         self.currentLoopData = await deviceStatus
         self.tempBasal = await tempBasal
 
+        // Keep a Live Activity in sync with the freshest CGM reading.
+        if let lastEntry = self.lastEntry {
+            let delta = self.entries.count > 1
+                ? self.entries[0].sgv - self.entries[1].sgv
+                : nil
+            LiveBGActivityManager.shared.update(
+                sgv: lastEntry.sgv,
+                delta: delta,
+                direction: lastEntry.direction,
+                date: lastEntry.date,
+                iob: self.currentLoopData?.iob.value,
+                cob: self.currentLoopData?.cob.value,
+                basal: nil
+            )
+        } else {
+            LiveBGActivityManager.shared.stopIfStale(maxAge: 10 * 60)
+        }
+
         if let profile = await profiles {
             let startDate = Calendar.current.date(byAdding: .hour, value: NightScoutAPI.hourOfHistory, to: self.currentDate)!
 

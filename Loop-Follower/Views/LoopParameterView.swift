@@ -73,7 +73,8 @@ struct LoopParameterView: View {
                     Divider()
                     LoopParameterBatteryView(
                         label: NSLocalizedString("Battery", comment: "Battery"),
-                        percentage: loopData.uploader.battery)
+                        uploader: loopData.uploader
+                    )
                     if let override = loopData.override, override.active {
                         Divider()
                         LoopParameterValue(
