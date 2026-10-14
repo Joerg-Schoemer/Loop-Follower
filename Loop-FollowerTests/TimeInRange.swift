@@ -30,7 +30,7 @@ struct TimeInRange {
         
         let entries = generateData(startDate, minValue, maxValue)
         
-        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        let tir = await calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 1000)
     }
     
@@ -52,7 +52,7 @@ struct TimeInRange {
             by: { (i: Int) -> Int in Int(sin(Double(i) * .pi / 60) * 100) + 100 }
         )
         
-        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        let tir = await calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 416)
     }
     
@@ -74,7 +74,7 @@ struct TimeInRange {
             by: { (i: Int) -> Int in if i == 0 { 181 } else { 100 } }
         )
         
-        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        let tir = await calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 996)
     }
     
@@ -96,7 +96,7 @@ struct TimeInRange {
             by: { (i: Int) -> Int in if i == 1435 { 181 } else { 100 } }
         )
         
-        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        let tir = await calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 996)
     }
     
@@ -118,7 +118,7 @@ struct TimeInRange {
             by: { (i: Int) -> Int in 181 }
         )
         
-        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        let tir = await calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 0)
     }
     
@@ -140,7 +140,7 @@ struct TimeInRange {
             by: { (i: Int) -> Int in if i == 0 { 181 } else if i == 5 { 69 } else { 100 } }
         )
         
-        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        let tir = await calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 993)
     }
     
@@ -161,7 +161,7 @@ struct TimeInRange {
             fatalError("Couldn't parse \(filename) as \([Entry].self):\n\(error)")
         }
         
-        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        let tir = await calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 822)
     }
     
@@ -182,7 +182,7 @@ struct TimeInRange {
             fatalError("Couldn't parse \(filename) as \([Entry].self):\n\(error)")
         }
 
-        let tir = calcTimeInRange(entries, min: 70, max: 180)
+        let tir = await calcTimeInRange(entries, min: 70, max: 180)
         #expect(tir == 802)
     }
 }

@@ -37,14 +37,62 @@ struct Loop_Follower_LiveActivity: Widget {
             }
             .keylineTint(estimateColor(context.state.sgv))
         }
+        .supplementalActivityFamilies([.small])
     }
 }
 
-/// Lock screen / StandBy layout of the Live Activity.
+/// Lock screen / StandBy layout of the Live Activity. Also renders the
+/// watchOS Smart Stack (`small` family) with a compact layout.
 private struct LiveBGLockScreenView: View {
     let context: ActivityViewContext<LiveBGAttributes>
 
+    @Environment(\.activityFamily) private var activityFamily
+
     var body: some View {
+        switch activityFamily {
+        case .small:
+            smallFamilyView
+        default:
+            largeFamilyView
+        }
+    }
+
+    /// Compact horizontal layout used by the watchOS Smart Stack.
+    private var smallFamilyView: some View {
+        HStack(spacing: 15) {
+            VStack(alignment: .leading) {
+                Text("\(context.state.sgv)")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(estimateColor(context.state.sgv))
+                    .minimumScaleFactor(0.6)
+                    .contentTransition(.numericText())
+
+                HStack {
+                    if let direction = context.state.direction {
+                        Image(systemName: direction.systemImage)
+                            .font(.body.bold())
+                    }
+                    Text(formatDelta(context.state.delta))
+                        .font(.caption)
+                        .lineLimit(1)
+                }
+            }
+            VStack(alignment: .leading) {
+                MetricRow(
+                    symbol: "circle.dashed",
+                    value: context.state.iob.map { String(format: "%.2f IE", $0) } ?? "?"
+                )
+                MetricRow(
+                    symbol: "carrot",
+                    value: context.state.cob.map { String(format: "%.0f g", $0) } ?? "?"
+                )
+            }
+        }
+        .padding(8)
+    }
+
+    /// Full horizontal layout used on the iOS lock screen and StandBy.
+    private var largeFamilyView: some View {
         HStack(spacing: 12) {
             SgvSummaryView(state: context.state)
             Spacer()
@@ -116,13 +164,14 @@ private struct LiveBGExpandedTrailing: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            MetricRow(symbol: "circle.dashed", value: state.iob.map { String(format: "%.1f U", $0) } ?? "?")
-            MetricRow(symbol: "carrot", value: {
-                if let cob = state.cob {
-                    return String(format: "%.0f g", cob)
-                }
-                return "?"
-            }())
+            MetricRow(
+                symbol: "circle.dashed",
+                value: state.iob.map { String(format: "%.2f IE", $0) } ?? "?"
+            )
+            MetricRow(
+                symbol: "carrot",
+                value: state.cob.map { String(format: "%.0f g", $0) } ?? "?"
+            )
             if let basal = state.basal {
                 MetricRow(symbol: "syringe", value: String(format: "%.2f U/h", basal))
             }
