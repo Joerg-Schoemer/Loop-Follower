@@ -107,6 +107,8 @@ public class ModelData : ObservableObject {
         isReloading = true
         defer { isReloading = false }
 
+        print("start of reloadData at \(Date.now.description)")
+        
         let previousLastEntry = self.lastEntry
         self.currentDate = Date.now
         
@@ -154,12 +156,16 @@ public class ModelData : ObservableObject {
         self.currentLoopData = await deviceStatus
         self.tempBasal = await tempBasal
 
-        // Keep a Live Activity in sync with the freshest CGM reading.
+        // Keep a Live Activity in sync with the freshest CGM reading. Awaited
+        // directly so the update is guaranteed to finish before a background
+        // refresh task is marked complete and the app gets suspended again. Runs
+        // on every reload (independent of the entries fetch) and after the loop
+        // data is resolved so IOB/COB are always up to date.
         if let lastEntry = self.lastEntry {
             let delta = self.entries.count > 1
                 ? self.entries[0].sgv - self.entries[1].sgv
                 : nil
-            LiveBGActivityManager.shared.update(
+            await LiveBGActivityManager.shared.update(
                 sgv: lastEntry.sgv,
                 delta: delta,
                 direction: lastEntry.direction,
@@ -169,7 +175,7 @@ public class ModelData : ObservableObject {
                 basal: nil
             )
         } else {
-            LiveBGActivityManager.shared.stopIfStale(maxAge: 10 * 60)
+            await LiveBGActivityManager.shared.stopIfStale(maxAge: 10 * 60)
         }
 
         if let profile = await profiles {

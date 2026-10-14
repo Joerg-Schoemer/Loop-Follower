@@ -11,23 +11,38 @@ import UserNotifications
 @main
 struct Loop_FollowerApp: App {
     @Environment(\.scenePhase) private var scenePhase
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var modelData = ModelData()
     @StateObject private var settings = SettingsStore()
-    
+
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(modelData)
                 .environmentObject(settings)
                 .task {
+                    // Give the background refresh handler access to the shared
+                    // data model so it can trigger a reload when the app is
+                    // woken up while suspended.
+                    BackgroundRefreshManager.sharedModelData = modelData
                     await requestNotificationPermission()
                     AlarmController.shared.updateSettings(from: settings)
                 }
                 .onChange(of: scenePhase) { _, newPhase in
-                    if newPhase == .active {
+                    switch newPhase {
+                    case .active:
+                        // Refresh immediately on foregrounding and keep a
+                        // background refresh task queued for the next time the
+                        // app is suspended.
+                        BackgroundRefreshManager.schedule()
                         Task {
                             await modelData.refresh()
                         }
+                    case .background:
+                        // Queue one more background refresh before suspending.
+                        BackgroundRefreshManager.schedule()
+                    default:
+                        break
                     }
                 }
         }

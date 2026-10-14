@@ -42,6 +42,7 @@
 		4BD17434307F50490002AEC0 /* LiveBGActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD17433307F50490002AEC0 /* LiveBGActivityManager.swift */; };
 		4BD17436307F506D0002AEC0 /* LiveBGAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD17435307F506D0002AEC0 /* LiveBGAttributes.swift */; };
 		4BD17438307F507F0002AEC0 /* Loop_Follower_LiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD17437307F507F0002AEC0 /* Loop_Follower_LiveActivity.swift */; };
+		4BD1743B307F65F30002AEC0 /* BackgroundRefreshManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD1743A307F65F30002AEC0 /* BackgroundRefreshManager.swift */; };
 		4BD7B8EB2D0F7C060008AFA2 /* TimeInRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BD7B8EA2D0F7C060008AFA2 /* TimeInRange.swift */; };
 		4BDF77B72881B5880018E4AB /* LoopParameterBatteryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */; };
 		4BE2604F2A9D373700D51927 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE2604E2A9D373700D51927 /* ProfileView.swift */; };
@@ -140,6 +141,8 @@
 		4BD17433307F50490002AEC0 /* LiveBGActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBGActivityManager.swift; sourceTree = "<group>"; };
 		4BD17435307F506D0002AEC0 /* LiveBGAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveBGAttributes.swift; sourceTree = "<group>"; };
 		4BD17437307F507F0002AEC0 /* Loop_Follower_LiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Loop_Follower_LiveActivity.swift; sourceTree = "<group>"; };
+		4BD17439307F65DF0002AEC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		4BD1743A307F65F30002AEC0 /* BackgroundRefreshManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshManager.swift; sourceTree = "<group>"; };
 		4BD7B8EA2D0F7C060008AFA2 /* TimeInRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInRange.swift; sourceTree = "<group>"; };
 		4BDF77B62881B5880018E4AB /* LoopParameterBatteryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopParameterBatteryView.swift; sourceTree = "<group>"; };
 		4BE2604E2A9D373700D51927 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -256,6 +259,7 @@
 		4BF86DD2287EF911003B9060 /* Loop-Follower */ = {
 			isa = PBXGroup;
 			children = (
+				4BD17439307F65DF0002AEC0 /* Info.plist */,
 				4B21B3A62B0CF7D300887F71 /* Loop-Follower.entitlements */,
 				4B91FB28288057E700792B24 /* Localizable.strings */,
 				4BF86E09287F15EC003B9060 /* Model */,
@@ -264,6 +268,7 @@
 				4BF86DD5287EF911003B9060 /* ContentView.swift */,
 				4BF86DD7287EF913003B9060 /* Assets.xcassets */,
 				4BF86E17287F53EE003B9060 /* Views */,
+				4BD1743A307F65F30002AEC0 /* BackgroundRefreshManager.swift */,
 			);
 			path = "Loop-Follower";
 			sourceTree = "<group>";
@@ -535,6 +540,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				98D15237299B781500B53913 /* BasalChart.swift in Sources */,
+				4BD1743B307F65F30002AEC0 /* BackgroundRefreshManager.swift in Sources */,
 				4BF86E02287EFABB003B9060 /* CurrentValueView.swift in Sources */,
 				4B623267307572AA003687AB /* AlarmController.swift in Sources */,
 				4BF86E00287EFA6F003B9060 /* LoopParameterView.swift in Sources */,
@@ -835,6 +841,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Loop-Follower/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Loop-Follower/Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -871,6 +878,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Loop-Follower/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Loop-Follower/Info.plist";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

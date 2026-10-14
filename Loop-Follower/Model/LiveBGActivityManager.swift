@@ -45,7 +45,7 @@ final class LiveBGActivityManager {
         iob: Double?,
         cob: Double?,
         basal: Double?
-    ) {
+    ) async {
         let contentState = LiveBGAttributes.ContentState(
             sgv: sgv,
             delta: delta,
@@ -61,50 +61,47 @@ final class LiveBGActivityManager {
                 state: contentState,
                 staleDate: Calendar.current.date(byAdding: .minute, value: 8, to: date)
             )
-            Task {
-                await activity.update(content)
-            }
+            // Awaited directly (not fire-and-forget): in a BGAppRefreshTask the
+            // process can be suspended as soon as the task is marked complete,
+            // so a detached Task here could be killed before it ever runs.
+            await activity.update(content)
         } else {
             let attributes = LiveBGAttributes(startDate: date)
             let content = ActivityContent(
                 state: contentState,
                 staleDate: Calendar.current.date(byAdding: .minute, value: 8, to: date)
             )
-            Task {
-                _ = try? Activity<LiveBGAttributes>.request(
-                    attributes: attributes,
-                    content: content,
-                    pushType: nil
-                )
-            }
-        }
-    }
-
-    /// Ends the currently running Live Activity, if any.
-    func stop() {
-        guard let activity = Activity<LiveBGAttributes>.activities.first else {
-            return
-        }
-        let finalState = activity.content.state
-        Task {
-            await activity.end(
-                ActivityContent(
-                    state: finalState,
-                    staleDate: nil
-                ),
-                dismissalPolicy: .default
+            _ = try? Activity<LiveBGAttributes>.request(
+                attributes: attributes,
+                content: content,
+                pushType: nil
             )
         }
     }
 
+    /// Ends the currently running Live Activity, if any.
+    func stop() async {
+        guard let activity = Activity<LiveBGAttributes>.activities.first else {
+            return
+        }
+        let finalState = activity.content.state
+        await activity.end(
+            ActivityContent(
+                state: finalState,
+                staleDate: nil
+            ),
+            dismissalPolicy: .default
+        )
+    }
+
     /// Ends the Live Activity once the data becomes stale (reading older than the
     /// given threshold).
-    func stopIfStale(maxAge: TimeInterval) {
+    func stopIfStale(maxAge: TimeInterval) async {
         guard let activity = Activity<LiveBGAttributes>.activities.first else {
             return
         }
         if Date.now.timeIntervalSince(activity.content.state.date) > maxAge {
-            stop()
+            await stop()
         }
     }
 }

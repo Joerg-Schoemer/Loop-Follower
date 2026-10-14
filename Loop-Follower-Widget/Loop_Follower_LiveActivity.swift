@@ -37,20 +37,37 @@ struct Loop_Follower_LiveActivity: Widget {
             }
             .keylineTint(estimateColor(context.state.sgv))
         }
+        .supplementalActivityFamilies([.small])
     }
 }
 
-/// Lock screen / StandBy layout of the Live Activity.
+/// Lock screen / StandBy layout of the Live Activity, also used for the
+/// watchOS Smart Stack when rendered with the `.small` activity family.
 private struct LiveBGLockScreenView: View {
+    @Environment(\.activityFamily) private var activityFamily
     let context: ActivityViewContext<LiveBGAttributes>
 
     var body: some View {
-        HStack(spacing: 12) {
-            SgvSummaryView(state: context.state)
-            Spacer()
-            LiveBGExpandedTrailing(state: context.state)
+        switch activityFamily {
+        case .small:
+            HStack(spacing: 8) {
+                SgvCompactView(state: context.state)
+                if let direction = context.state.direction {
+                    Image(systemName: direction.systemImage)
+                        .font(.caption.bold())
+                }
+                Text(formatDelta(context.state.delta))
+                    .font(.caption2)
+            }
+            .padding(8)
+        case .medium, _:
+            HStack(spacing: 12) {
+                SgvSummaryView(state: context.state)
+                Spacer()
+                LiveBGExpandedTrailing(state: context.state)
+            }
+            .padding(16)
         }
-        .padding(16)
     }
 }
 
