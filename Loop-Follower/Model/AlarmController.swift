@@ -155,9 +155,21 @@ final class AlarmController: ObservableObject {
 
     /// Until when the alarm stays silent after the user acknowledged the current
     /// episode. After this date the alarm rings again if the glucose is still critical.
-    private var acknowledgedUntil: Date?
+    /// Persisted in ``UserDefaults`` so the acknowledgment survives an app restart.
+    private var acknowledgedUntil: Date? {
+        didSet { UserDefaults.standard.set(acknowledgedUntil, forKey: Self.acknowledgedUntilKey) }
+    }
+
+    /// UserDefaults key used to persist ``acknowledgedUntil`` across launches.
+    private static let acknowledgedUntilKey = "LoopFollower.AcknowledgedUntil"
 
     private init() {
+        // Restore a previous acknowledgment so the alarm does not restart after relaunch.
+        if let stored = UserDefaults.standard.object(forKey: Self.acknowledgedUntilKey) as? Date,
+           stored > Date.now {
+            acknowledgedUntil = stored
+        }
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(applicationWillResignActive),
