@@ -40,8 +40,6 @@ public class ModelData : ObservableObject {
     
     @Published var totalBasal : Double?
     
-    @Published var timeInRange : Int?
-    
     private var tempBasal : [TempBasal] = []
     
     private var isReloading = false
@@ -135,13 +133,7 @@ public class ModelData : ObservableObject {
                 // check the latest value against the critical alarm thresholds
                 AlarmController.shared.evaluate(self.entries)
             }
-            
-            Task {
-                let startOfTir = Calendar.current.date(byAdding: .hour, value: -24, to: self.currentDate)!
-                async let tir = calcTimeInRange(self.entries.filter { enrtry in enrtry.date > startOfTir }, min: 70, max: 180)
-                self.timeInRange = await tir
-            }
-            
+
             // only reload the widget when a new CGM value arrived, to save the widget's reload budget
             if self.lastEntry != nil && previousLastEntry == nil {
                 WidgetCenter.shared.reloadTimelines(ofKind: "Loop_Follower_Widget")
@@ -556,21 +548,6 @@ func filterEntries(_ entries : [Entry]) -> [Entry] {
     }
     
     return clearedEntries
-}
-
-///
-/// calculates the timeInRange in promill
-///
-func calcTimeInRange(_ entries: [Entry], min: Int, max: Int) async -> Int {
-    if entries.isEmpty {
-        return 0;
-    }
-
-    let aboveOrBelowCount = entries.filter { e in
-        e.sgv > max || e.sgv < min
-    }.count
-
-    return (entries.count - aboveOrBelowCount) * 1000 / entries.count
 }
 
 extension Date {

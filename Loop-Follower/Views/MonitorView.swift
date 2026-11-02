@@ -34,13 +34,7 @@ struct MonitorView: View {
                 } else {
                     VStack(spacing: 0) {
                         ZStack {
-                            LoopParameterView(
-                                loopData: modelData.currentLoopData,
-                                cn: modelData.cn,
-                                siteChanged: modelData.siteChanged,
-                                sensorChanged: modelData.sensorChanged,
-                                timeInRange: modelData.timeInRange
-                            )
+                            LoopParameterView()
                             CurrentValueView(
                                 currentDate: modelData.currentDate,
                                 currentEntry: modelData.lastEntry,

@@ -8,13 +8,9 @@
 import SwiftUI
 
 struct LoopParameterView: View {
-    
-    let loopData : LoopData?
-    let cn : Measurement<UnitMass>
-    let siteChanged : Date?
-    let sensorChanged : Date?
-    let timeInRange : Int?
-    
+
+    @EnvironmentObject var modelData : ModelData
+
     let insulinFormatStyle = Measurement<UnitInsulin>.FormatStyle(
         width: .abbreviated,
         usage: .asProvided,
@@ -32,24 +28,24 @@ struct LoopParameterView: View {
         VStack {
             Group {
                 Spacer()
-                if let siteChanged = self.siteChanged {
+                if let siteChanged = self.modelData.siteChanged {
                     LoopParameterValue(
                         label: NSLocalizedString("CAGE", comment: "Canula age"),
                         data: hoursBetween(start: siteChanged, end: Date.now))
                 }
-                if let sensorChanged = self.sensorChanged {
+                if let sensorChanged = self.modelData.sensorChanged {
                     LoopParameterValue(
                         label: NSLocalizedString("SAGE", comment: "Canula age"),
                         data: hoursBetween(start: sensorChanged, end: Date.now))
                 }
-                if let loopData = self.loopData {
+                if let loopData = self.modelData.currentLoopData {
                     Divider()
                     LoopParameterValue(
                         label: NSLocalizedString("IOB", comment: "Insulin on board"),
                         data: loopData.iob.formatted(insulinFormatStyle))
                     LoopParameterValue(
                         label: NSLocalizedString("Rec. Bolus", comment: "abbreviated recommended bolus"),
-                        data: recommendedBolus(self.loopData!.recommendedBolus))
+                        data: recommendedBolus(loopData.recommendedBolus))
                     LoopParameterValue(
                         label: NSLocalizedString("Pump Volume", comment: "Pump reservoir volume"),
                         data: pumpVolume(loopData.pumpVolume))
@@ -59,7 +55,7 @@ struct LoopParameterView: View {
                         data: loopData.cob.formatted(gramFormatStyle))
                     LoopParameterValue(
                         label: NSLocalizedString("Rec. Carbs", comment: "abbreviated recommended carbs"),
-                        data: cn.formatted(gramFormatStyle))
+                        data: self.modelData.cn.formatted(gramFormatStyle))
                     if let loop = loopData.loop {
                         Divider()
                         LoopParameterValue(
@@ -82,12 +78,21 @@ struct LoopParameterView: View {
                             data: override.activeName)
                     }
                 }
-                if let timeInRange = timeInRange {
-                    Divider()
-                    LoopParameterValue(
-                        label: NSLocalizedString("TIR last 24h", comment: "Time In Range"),
-                        data: (Double(timeInRange) / 1000).formatted(.percent.precision(.fractionLength(1...1))))
-                }
+                Divider()
+                LoopParameterValue(
+                    label: NSLocalizedString("TIR last 24h", comment: "Time In Range"),
+                    data: (
+                        Double(
+                            calcTimeInRange(
+                                modelData.entries.filter{ entry in
+                                    entry.date > Calendar.current.date(byAdding: .hour, value: -24, to: self.modelData.currentDate)!
+                                },
+                                min: 70,
+                                max: 180
+                            )
+                        ) / 1000
+                    ).formatted(.percent.precision(.fractionLength(1...1)))
+                )
                 Spacer()
             }
                 
@@ -154,36 +159,24 @@ func hoursBetween(start: Date, end: Date) -> String {
 
 struct LoopParameterView_Previews: PreviewProvider {
     static var previews: some View {
-        LoopParameterView(
-            loopData: LoopData(
-                id: "",
-                loop: Loop(
-                    cob: Cob(cob: 1.1),
-                    iob: Iob(iob: 0.05),
-                    timestamp: "2022-12-06T05:06:06Z",
-                    recommendedBolus: 0.1,
-                    predicted: nil,
-                    enacted: nil,
-                    failureReason: nil
-                ),
-                openaps: nil,
-                uploader: Uploader(battery: 75, isCharging: false),
-                pump: Pump(reservoir: nil),
-                override: LoopOverride(
-                    currentCorrectionRange: nil,
-                    multiplier: nil,
-                    name: "Sport",
-                    symbol: "🏃🏻",
-                    duration: nil,
-                    active: true,
-                    timestamp: "2022-12-06T05:06:06Z"
-                )
-            ),
-            cn: Measurement<UnitMass>(value: 2.5, unit: UnitMass.grams),
-            siteChanged: (Date.now - 86400.0),
-            sensorChanged: (Date.now - 86400.0/2.0),
-            timeInRange: 1000
-        )
+        LoopParameterView()
+        .environmentObject(ModelData(test: true))
         .previewLayout(.sizeThatFits)
     }
 }
+
+///
+/// calculates the timeInRange in promill
+///
+fileprivate func calcTimeInRange(_ entries: [Entry], min: Int, max: Int) -> Int {
+    if entries.isEmpty {
+        return 0;
+    }
+
+    let aboveOrBelowCount = entries.filter { e in
+        e.sgv > max || e.sgv < min
+    }.count
+
+    return (entries.count - aboveOrBelowCount) * 1000 / entries.count
+}
+
